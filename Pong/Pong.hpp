@@ -9,10 +9,10 @@
 class Pong
 {
 public:
-	Pong();
+	Pong(unsigned int window_width, unsigned int window_height);
 	~Pong();
 
-	bool init(const char* title, int xpos, int ypos, int width, int height, bool fullscreen);
+	bool init(const char* title, int xpos, int ypos, bool fullscreen);
 
 	bool handleEvents();
 	bool update();
@@ -31,6 +31,9 @@ private:
 
 	//Loads individual image as texture 
 	SDL_Texture* loadTexture( std::string path );
+
+	int window_width = 0;
+	int window_height = 0;
 
 	bool isRunning;
 };

@@ -1,12 +1,15 @@
 #include "Pong.hpp"
 
-Pong::Pong()
+Pong::Pong(unsigned int w_width, unsigned int w_height)
 {
 	gWindow = nullptr;
 
 	gRenderer = nullptr;
 
 	gTexture = nullptr;
+
+	window_width = w_width;
+	window_height = w_height;
 
 	//The surface contained by the window
 	//gScreenSurface = nullptr;
@@ -18,7 +21,7 @@ Pong::~Pong()
 {
 }
 
-bool Pong::init(const char* title, int xpos, int ypos, const int width, const int height, bool fullscreen)
+bool Pong::init(const char* title, int xpos, int ypos, bool fullscreen)
 {
 	//Initialization flag
 	bool success = true;
@@ -32,7 +35,8 @@ bool Pong::init(const char* title, int xpos, int ypos, const int width, const in
 	else
 	{
 		//Create window
-		gWindow = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, width, height, SDL_WINDOW_SHOWN);
+		
+		gWindow = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, SDL_WINDOW_SHOWN);
 		if (gWindow == NULL)
 		{
 			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -46,17 +50,6 @@ bool Pong::init(const char* title, int xpos, int ypos, const int width, const in
 				printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError()); success = false;
 				success = false;
 			}
-			else {
-				SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-
-				int imgFlags = IMG_INIT_PNG;
-				if (!(IMG_Init(imgFlags) & imgFlags)) { 
-					printf("SDL_image could not initialize! SDL_image Error: %s\n", IMG_GetError()); 
-					success = false; 
-				}
-			}
-			//Get window surface
-			//gScreenSurface = SDL_GetWindowSurface(gWindow);
 		}
 	}
 
@@ -70,10 +63,8 @@ bool Pong::update()
 	//Loading success flag
 	bool success = true;
 
-	if (gTexture != nullptr)
-		SDL_DestroyTexture(gTexture);
-
-	gTexture = loadTexture("hello_world.png");
+	//if (gTexture != nullptr)
+	//	SDL_DestroyTexture(gTexture);
 
 	SDL_Delay(100);
 
@@ -84,10 +75,19 @@ bool Pong::render()
 {
 	bool success = true;
 
+	SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 	SDL_RenderClear(gRenderer);
-	SDL_RenderCopy(gRenderer, gTexture, NULL, NULL);
 
-	SDL_DestroyTexture(gTexture);
+	//Render red filled quad 
+	SDL_Rect leftRect = { 0,0, window_width / 8, window_height / 6 };
+	SDL_SetRenderDrawColor( gRenderer, 0xFF, 0x00, 0x00, 0xFF ); 
+	SDL_RenderFillRect( gRenderer, &leftRect);
+
+	SDL_Rect rightRect = { window_width - window_width / 8,0, window_width / 8, window_height / 6 };
+	SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
+	SDL_RenderFillRect(gRenderer, &rightRect);
+
+	//SDL_DestroyTexture(gTexture);
 
 	SDL_RenderPresent(gRenderer);
 

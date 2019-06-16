@@ -7,15 +7,13 @@ const int SCREEN_HEIGHT = 480;
 
 int main(int argc, char* args[])
 {
-	game = new Pong();
-	game->init("Pong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, true);
+	game = new Pong(SCREEN_WIDTH, SCREEN_HEIGHT);
+	game->init("Pong", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, true);
 
 	while (game->running()) {
 		game->handleEvents();
 		game->update();
 		game->render();
-
-
 	}
 
 	//Free resources and close SDL
