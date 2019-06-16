@@ -1,16 +1,17 @@
-#ifndef Pong_hpp
-#define Pong_hpp
+#ifndef Game_hpp
+#define Game_hpp
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include "Texture.hpp"
 #include <stdio.h>
 #include <string>
 
-class Pong
+class Game
 {
 public:
-	Pong(unsigned int window_width, unsigned int window_height);
-	~Pong();
+	Game(unsigned int window_width, unsigned int window_height);
+	~Game();
 
 	bool init(const char* title, int xpos, int ypos, bool fullscreen);
 
@@ -27,10 +28,9 @@ private:
 
 	SDL_Renderer* gRenderer;
 
-	SDL_Texture* gTexture;
+	Texture initialTexture = NULL;
 
-	//Loads individual image as texture 
-	SDL_Texture* loadTexture( std::string path );
+	void newRectangle(int x, int y, int width, int height);
 
 	int window_width = 0;
 	int window_height = 0;

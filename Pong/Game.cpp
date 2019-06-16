@@ -1,12 +1,12 @@
-#include "Pong.hpp"
+#include "Game.hpp"
 
-Pong::Pong(unsigned int w_width, unsigned int w_height)
+Game::Game(unsigned int w_width, unsigned int w_height)
 {
 	gWindow = nullptr;
 
 	gRenderer = nullptr;
 
-	gTexture = nullptr;
+	//texture = NULL;
 
 	window_width = w_width;
 	window_height = w_height;
@@ -17,11 +17,11 @@ Pong::Pong(unsigned int w_width, unsigned int w_height)
 	isRunning = false;
 }
 
-Pong::~Pong()
+Game::~Game()
 {
 }
 
-bool Pong::init(const char* title, int xpos, int ypos, bool fullscreen)
+bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 {
 	//Initialization flag
 	bool success = true;
@@ -45,6 +45,7 @@ bool Pong::init(const char* title, int xpos, int ypos, bool fullscreen)
 		else
 		{
 			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
+			initialTexture = Texture(gRenderer);
 
 			if (gRenderer == NULL) {
 				printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError()); success = false;
@@ -58,43 +59,47 @@ bool Pong::init(const char* title, int xpos, int ypos, bool fullscreen)
 	return success;
 }
 
-bool Pong::update()
+bool Game::update()
 {
 	//Loading success flag
 	bool success = true;
 
-	//if (gTexture != nullptr)
-	//	SDL_DestroyTexture(gTexture);
+	//if (texture != nullptr)
+	//	texture->free();
+
+	//initialTexture = Texture(gRenderer);
+	initialTexture.loadFromFile("hello_world.png");
 
 	SDL_Delay(100);
 
 	return success;
 }
 
-bool Pong::render()
+bool Game::render()
 {
 	bool success = true;
 
-	SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-	SDL_RenderClear(gRenderer);
+	//SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
+	//SDL_RenderClear(gRenderer);
 
-	//Render red filled quad 
-	SDL_Rect leftRect = { 0,0, window_width / 8, window_height / 6 };
-	SDL_SetRenderDrawColor( gRenderer, 0xFF, 0x00, 0x00, 0xFF ); 
-	SDL_RenderFillRect( gRenderer, &leftRect);
+	//newRectangle(0, 0, window_width/24, window_height/6);
+	//newRectangle(window_width - window_width / 24, 0, window_width / 24, window_height / 6);
 
-	SDL_Rect rightRect = { window_width - window_width / 8,0, window_width / 8, window_height / 6 };
-	SDL_SetRenderDrawColor(gRenderer, 0x00, 0xFF, 0x00, 0xFF);
-	SDL_RenderFillRect(gRenderer, &rightRect);
 
-	//SDL_DestroyTexture(gTexture);
+	initialTexture.render(0,0);
 
 	SDL_RenderPresent(gRenderer);
 
 	return success;
 }
 
-void Pong::clean()
+void Game::newRectangle(int x, int y, int width, int height) {
+	SDL_Rect rightRect = {x, y, width, height};
+	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF);
+	SDL_RenderFillRect(gRenderer, &rightRect);
+}
+
+void Game::clean()
 {
 	//Deallocate renderer
 	SDL_DestroyRenderer(gRenderer);
@@ -108,7 +113,7 @@ void Pong::clean()
 	SDL_Quit();
 }
 
-bool Pong::handleEvents()
+bool Game::handleEvents()
 {
 	SDL_Event event;
 
@@ -138,7 +143,7 @@ bool Pong::handleEvents()
 	return false;
 };
 
-bool Pong::running()
+bool Game::running()
 {
 	if (isRunning) {
 		return true;
@@ -146,24 +151,5 @@ bool Pong::running()
 	return false;
 }
 
-SDL_Texture* Pong::loadTexture(std::string path)
-{
-	SDL_Texture* newTexture = NULL;
 
-	//Load image
-	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-	if (loadedSurface == NULL)
-	{
-		printf("Unable to load image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
-	}
-	else {
-		newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
-		if (newTexture == NULL) { 
-			printf("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError()); 
-		} 
-		//Get rid of old loaded surface 
-		SDL_FreeSurface(loadedSurface);
-	}
-	return newTexture;
-}
 
