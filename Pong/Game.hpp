@@ -4,8 +4,12 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include "Texture.hpp"
+#include "SpriteSheet.h"
+#include "GameObject.h"
 #include <stdio.h>
 #include <string>
+
+//const int NUMBER_OF_SPRITES = 1;
 
 class Game
 {
@@ -28,9 +32,13 @@ private:
 
 	SDL_Renderer* gRenderer;
 
-	Texture initialTexture = NULL;
+	SpriteSheet gSpriteSheet;
 
-	void newRectangle(int x, int y, int width, int height);
+	std::unordered_map<std::string, GameObject> gameObjects;
+
+	Texture gSpriteSheetTexture = NULL;
+
+	void drawNewRectangle(int x, int y, int width, int height);
 
 	int window_width = 0;
 	int window_height = 0;

@@ -7,6 +7,7 @@ Game::Game(unsigned int w_width, unsigned int w_height)
 	gRenderer = nullptr;
 
 	//texture = NULL;
+	//gSpriteSheet = NULL;
 
 	window_width = w_width;
 	window_height = w_height;
@@ -45,8 +46,15 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 		else
 		{
 			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
-			initialTexture = Texture(gRenderer);
 
+			gSpriteSheet = SpriteSheet("0x72_DungeonTilesetII_v1.1.png", "tiles_list_v1.1");
+
+			gameObjects["elf"] = GameObject(gSpriteSheet["elf_f_idle_anim"].first, gSpriteSheet["elf_f_idle_anim"].second);
+
+			gSpriteSheetTexture = Texture(gRenderer);
+			gSpriteSheetTexture.loadFromFile(gSpriteSheet.spritesPath);
+
+			
 			if (gRenderer == NULL) {
 				printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError()); success = false;
 				success = false;
@@ -59,6 +67,7 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 	return success;
 }
 
+
 bool Game::update()
 {
 	//Loading success flag
@@ -68,7 +77,7 @@ bool Game::update()
 	//	texture->free();
 
 	//initialTexture = Texture(gRenderer);
-	initialTexture.loadFromFile("hello_world.png");
+	gameObjects["elf"].nextFrame();
 
 	SDL_Delay(100);
 
@@ -86,14 +95,18 @@ bool Game::render()
 	//newRectangle(window_width - window_width / 24, 0, window_width / 24, window_height / 6);
 
 
-	initialTexture.render(0,0);
+	gSpriteSheetTexture.render(window_width/2, window_height/2, gameObjects["elf"].currentSprite);
+
+	//gSpriteSheetTexture.render(0, window_height / 2, gSpriteSheet["weapon_golden_sword"]);
 
 	SDL_RenderPresent(gRenderer);
 
 	return success;
 }
 
-void Game::newRectangle(int x, int y, int width, int height) {
+
+
+void Game::drawNewRectangle(int x, int y, int width, int height) {
 	SDL_Rect rightRect = {x, y, width, height};
 	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF);
 	SDL_RenderFillRect(gRenderer, &rightRect);
@@ -101,6 +114,7 @@ void Game::newRectangle(int x, int y, int width, int height) {
 
 void Game::clean()
 {
+	gSpriteSheetTexture.free();
 	//Deallocate renderer
 	SDL_DestroyRenderer(gRenderer);
 	gRenderer = NULL;
@@ -109,7 +123,11 @@ void Game::clean()
 	SDL_DestroyWindow(gWindow);
 	gWindow = NULL;
 
+	//gSpriteSheet.destroy();
+	//gSpriteSheet = NULL;
+
 	//Quit SDL subsystems
+	IMG_Quit();
 	SDL_Quit();
 }
 
