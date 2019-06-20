@@ -8,7 +8,7 @@
 class Texture
 {
 public:
-	Texture(SDL_Renderer* renderer);
+	Texture(SDL_Renderer* renderer, bool db = false);
 	~Texture();
 
 	bool loadFromFile(std::string path);
@@ -24,5 +24,7 @@ private:
 
 	int mWidth;
 	int mHeight;
+
+	bool debug;
 };
 

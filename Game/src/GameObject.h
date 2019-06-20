@@ -11,6 +11,8 @@ public:
 	GameObject(SpriteSheet & spriteSheet, std::string const& spriteName, int x, int y);
 	~GameObject();
 
+	void destroy(); //TODO check 
+
 	std::vector<SDL_Rect*> sprites;
 	int currentSpriteIndex = 0;
 	int numberOfFrames = 0;
@@ -26,12 +28,15 @@ public:
 
 	bool playerControlled = false;
 
-	std::pair<int, int> getSize();
+	SDL_Rect* colliderBox;
+	bool collision = false;
 
+	std::pair<int, int> getSize();
 	void nextFrame();
 	void setAnimationSlowdown(int slowdown);
 	void setPlayerControlled(bool c);
 	void move();
+
 	
 private:
 

@@ -1,11 +1,13 @@
 #include "Texture.h"
 
-Texture::Texture(SDL_Renderer* renderer)
+Texture::Texture(SDL_Renderer* renderer, bool db)
 {
 	gRenderer = renderer;
 	mTexture = NULL;
 	mWidth = 0;
 	mHeight = 0;
+
+	debug = db;
 }
 
 Texture::~Texture()
@@ -56,10 +58,17 @@ void Texture::render(GameObject gameObject)
 	//Set rendering space and render to screen 
 	SDL_Rect renderQuad = { gameObject.position_x, gameObject.position_y, gameObject.getSize().first, gameObject.getSize().second };
 
-	if (gameObject.currentSprite != NULL) {
-		renderQuad.w = gameObject.currentSprite->w;
-		renderQuad.h = gameObject.currentSprite->h;
+	//if (gameObject.currentSprite != NULL) {
+	//	renderQuad.w = gameObject.currentSprite->w;
+	//	renderQuad.h = gameObject.currentSprite->h;
+	//}
+
+	if (debug) {
+		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
+		SDL_RenderDrawRect(gRenderer, gameObject.colliderBox);
+		SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
 	}
+
 
 	SDL_RenderCopyEx( gRenderer, mTexture, gameObject.currentSprite, &renderQuad, gameObject.rotationDegrees, NULL, gameObject.flipType);
 }

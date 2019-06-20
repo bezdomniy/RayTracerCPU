@@ -4,6 +4,7 @@
 GameObject::GameObject()
 {
 	currentSprite = nullptr;
+	colliderBox = nullptr;
 	flipType = SDL_FLIP_NONE;
 	//centre = nullptr;
 }
@@ -15,7 +16,7 @@ GameObject::GameObject(SpriteSheet & spriteSheet, std::string const& spriteName,
 	position_y = y;
 	flipType = SDL_FLIP_NONE;
 	currentSprite = spriteSheet[spriteName].first;
-	//centre = new SDL_Point({ position_x + currentSprite->w / 2, position_y + currentSprite->h / 2 });
+	colliderBox = new SDL_Rect({ position_x - 1, position_y - 1, currentSprite->w + 2, currentSprite->h + 2 });
 
 	int frames = spriteSheet[spriteName].second;
 	sprites.push_back(currentSprite);
@@ -30,6 +31,13 @@ GameObject::GameObject(SpriteSheet & spriteSheet, std::string const& spriteName,
 
 GameObject::~GameObject()
 {
+	//destroy();
+}
+
+void GameObject::destroy()
+{
+	delete colliderBox;
+	//colliderBox = nullptr;
 }
 
 std::pair<int, int> GameObject::getSize()
@@ -61,23 +69,67 @@ void GameObject::setPlayerControlled(bool c)
 
 void GameObject::move()
 {
+	const int BUMPBACK = 3;
 	if (playerControlled) {
 		const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-		if (currentKeyStates[SDL_SCANCODE_UP])
-			position_y -= 1;
-		if (currentKeyStates[SDL_SCANCODE_DOWN])
-			position_y += 1;
+		if (currentKeyStates[SDL_SCANCODE_UP]) {
+			if (collision) {
+				collision = false;
+				position_y += BUMPBACK;
+				colliderBox->y += BUMPBACK;
+			}
+			else {
+				position_y -= 1;
+				colliderBox->y -= 1;
+			}
+
+		}
+
+		if (currentKeyStates[SDL_SCANCODE_DOWN]) {
+			if (collision) {
+				collision = false;
+				position_y -= BUMPBACK;
+				colliderBox->y -= BUMPBACK;
+			}
+			else {
+				position_y += 1;
+				colliderBox->y += 1;
+			}
+		}
+
 		if (currentKeyStates[SDL_SCANCODE_LEFT]) {
-			flipType = SDL_FLIP_HORIZONTAL;
-			position_x -= 1;
+			if (collision) {
+				collision = false;
+				position_x += BUMPBACK;
+				colliderBox->x += BUMPBACK;
+			}
+			else {
+				flipType = SDL_FLIP_HORIZONTAL;
+				position_x -= 1;
+				colliderBox->x -= 1;
+			}
 		}
 		if (currentKeyStates[SDL_SCANCODE_RIGHT]) {
-			position_x += 1;
-			flipType = SDL_FLIP_NONE;
+			if (collision) {
+				collision = false;
+				position_x -= BUMPBACK;
+				colliderBox->x -= BUMPBACK;
+			}
+			else {
+				position_x += 1;
+				colliderBox->x += 1;
+				flipType = SDL_FLIP_NONE;
+			}
 		}
-		if (currentKeyStates[SDL_SCANCODE_Z])
+		if (currentKeyStates[SDL_SCANCODE_Z]) {
 			rotationDegrees -= 60;
-		if (currentKeyStates[SDL_SCANCODE_X])
+		}
+
+		if (currentKeyStates[SDL_SCANCODE_X]) {
 			rotationDegrees += 60;
+		}
+
 	}
 }
+
+

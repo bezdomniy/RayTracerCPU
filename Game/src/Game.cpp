@@ -1,5 +1,7 @@
 #include "Game.h"
 
+#define DEBUG true
+
 Game::Game(unsigned int w_width, unsigned int w_height)
 {
 	gWindow = nullptr;
@@ -54,7 +56,7 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 			gameObjects["ogre2"].setAnimationSlowdown(2);
 			gameObjects["hero"].setPlayerControlled(true);
 
-			gSpriteSheetTexture = Texture(gRenderer);
+			gSpriteSheetTexture = Texture(gRenderer, DEBUG);
 			gSpriteSheetTexture.loadFromFile(gSpriteSheet->spritesPath);
 
 			if (gRenderer == NULL) {
@@ -74,6 +76,8 @@ bool Game::update()
 {
 	//Loading success flag
 	bool success = true;
+
+	checkCollisions();
 
 	//if (texture != nullptr)
 	//	texture->free();
@@ -107,7 +111,7 @@ bool Game::render()
 
 	return success;
 }
-
+/// MISSING ; SOMEWHERE!!!! /////////////////
 
 
 void Game::drawNewRectangle(int x, int y, int width, int height) {
@@ -150,7 +154,8 @@ bool Game::handleEvents()
 	}
 
 	return false;
-};
+}
+
 
 bool Game::running()
 {
@@ -158,6 +163,19 @@ bool Game::running()
 		return true;
 	}
 	return false;
+}
+
+void Game::checkCollisions()
+{
+	for (auto &objectA : gameObjects) {
+		for (auto &objectB : gameObjects) {
+			if (objectA.first != objectB.first) {
+				if (SDL_HasIntersection(objectA.second.colliderBox, objectB.second.colliderBox)) {
+					objectA.second.collision = true;
+				}
+			}
+		}
+	}
 }
 
 

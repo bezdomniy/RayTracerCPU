@@ -28,6 +28,8 @@ public:
 
 	bool running();
 
+	void checkCollisions();
+
 private:
 	//The window we'll be rendering to
 	SDL_Window* gWindow;

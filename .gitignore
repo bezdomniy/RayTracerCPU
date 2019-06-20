@@ -30,9 +30,7 @@
 *.exe
 *.out
 *.app
-/Game/.vs/Game/v16
+
+/Game/.vs
 /Game/Debug
 /Game/x64/Debug
-/Game/Game.vcxproj.user
-/Game/Game.vcxproj.filters
-/Game/.vs/Game/v16
