@@ -5,13 +5,16 @@ GameObject::GameObject()
 {
 	currentSprite = nullptr;
 	colliderBox = nullptr;
+	gameObjectsPtr = nullptr;
 	flipType = SDL_FLIP_NONE;
 	//centre = nullptr;
 }
 
 //GameObject::GameObject(SDL_Rect* initialRect, int frames)
-GameObject::GameObject(SpriteSheet & spriteSheet, std::string const& spriteName, int x, int y)
+GameObject::GameObject(std::string const& name, SpriteSheet & spriteSheet, std::string const& spriteName, int x, int y, std::unordered_map<std::string, GameObject>* gameObjects)
 {
+	objectName = name;
+	gameObjectsPtr = gameObjects;
 	position_x = x;
 	position_y = y;
 	flipType = SDL_FLIP_NONE;
@@ -69,12 +72,12 @@ void GameObject::setPlayerControlled(bool c)
 
 void GameObject::move()
 {
-	const int BUMPBACK = 3;
+	const short int BUMPBACK = 1;
 	if (playerControlled) {
 		const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
 		if (currentKeyStates[SDL_SCANCODE_UP]) {
-			if (collision) {
-				collision = false;
+			if (checkCollisions(gameObjectsPtr)) {
+				playerControlled = false;
 				position_y += BUMPBACK;
 				colliderBox->y += BUMPBACK;
 			}
@@ -86,8 +89,8 @@ void GameObject::move()
 		}
 
 		if (currentKeyStates[SDL_SCANCODE_DOWN]) {
-			if (collision) {
-				collision = false;
+			if (checkCollisions(gameObjectsPtr)) {
+				playerControlled = false;
 				position_y -= BUMPBACK;
 				colliderBox->y -= BUMPBACK;
 			}
@@ -98,8 +101,8 @@ void GameObject::move()
 		}
 
 		if (currentKeyStates[SDL_SCANCODE_LEFT]) {
-			if (collision) {
-				collision = false;
+			if (checkCollisions(gameObjectsPtr)) {
+				playerControlled = false;
 				position_x += BUMPBACK;
 				colliderBox->x += BUMPBACK;
 			}
@@ -110,8 +113,8 @@ void GameObject::move()
 			}
 		}
 		if (currentKeyStates[SDL_SCANCODE_RIGHT]) {
-			if (collision) {
-				collision = false;
+			if (checkCollisions(gameObjectsPtr)) {
+				playerControlled = false;
 				position_x -= BUMPBACK;
 				colliderBox->x -= BUMPBACK;
 			}
@@ -129,7 +132,20 @@ void GameObject::move()
 			rotationDegrees += 60;
 		}
 
+		playerControlled = true;
 	}
+
+}
+
+bool GameObject::checkCollisions(std::unordered_map<std::string, GameObject>* objectMap)
+{
+		for (auto& object : *objectMap) {
+			if (objectName != object.second.objectName) {
+				if (SDL_HasIntersection(colliderBox, object.second.colliderBox)) {
+					return true;
+				}
+			}
+		}
 }
 
 

@@ -2,14 +2,17 @@
 
 #include <SDL.h>
 #include <vector>
+#include <unordered_map>
 #include "SpriteSheet.h"
 
 class GameObject
 {
 public:
 	GameObject();
-	GameObject(SpriteSheet & spriteSheet, std::string const& spriteName, int x, int y);
+	GameObject(std::string const& name, SpriteSheet & spriteSheet, std::string const& spriteName, int x, int y, std::unordered_map<std::string, GameObject>* gameObjects);
 	~GameObject();
+
+	std::string objectName;
 
 	void destroy(); //TODO check 
 
@@ -29,13 +32,17 @@ public:
 	bool playerControlled = false;
 
 	SDL_Rect* colliderBox;
-	bool collision = false;
+	//bool collisionDirection[4] = { false, false, false, false };
+	//bool collision = false;
+	std::unordered_map<std::string, GameObject>* gameObjectsPtr;
 
 	std::pair<int, int> getSize();
 	void nextFrame();
 	void setAnimationSlowdown(int slowdown);
 	void setPlayerControlled(bool c);
 	void move();
+
+	bool checkCollisions(std::unordered_map<std::string, GameObject>* objectMap);
 
 	
 private:

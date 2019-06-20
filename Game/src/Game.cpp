@@ -51,8 +51,8 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 
 			gSpriteSheet = new SpriteSheet("resources/0x72_DungeonTilesetII_v1.1.png", "resources/tiles_list_v1.1");
 
-			gameObjects["hero"] = GameObject(*gSpriteSheet, "elf_f_idle_anim", window_width / 2, window_height / 2);
-			gameObjects["ogre2"] = GameObject(*gSpriteSheet, "ogre_run_anim", window_width / 2 + 100, window_height / 2);
+			gameObjects["hero"] = GameObject("hero", *gSpriteSheet, "elf_f_idle_anim", window_width / 2, window_height / 2, &gameObjects);
+			gameObjects["ogre2"] = GameObject("ogre2" , *gSpriteSheet, "ogre_run_anim", window_width / 2 + 100, window_height / 2, &gameObjects);
 			gameObjects["ogre2"].setAnimationSlowdown(2);
 			gameObjects["hero"].setPlayerControlled(true);
 
@@ -77,13 +77,14 @@ bool Game::update()
 	//Loading success flag
 	bool success = true;
 
-	checkCollisions();
+	//checkCollisions();
 
 	//if (texture != nullptr)
 	//	texture->free();
 
 	//initialTexture = Texture(gRenderer);
 	gameObjects["hero"].nextFrame();
+	//gameObjects["hero"].checkCollisions(gameObjects);
 	gameObjects["ogre2"].nextFrame();
 
 	//SDL_Delay(100);
@@ -111,8 +112,6 @@ bool Game::render()
 
 	return success;
 }
-/// MISSING ; SOMEWHERE!!!! /////////////////
-
 
 void Game::drawNewRectangle(int x, int y, int width, int height) {
 	SDL_Rect rightRect = {x, y, width, height};
@@ -164,19 +163,4 @@ bool Game::running()
 	}
 	return false;
 }
-
-void Game::checkCollisions()
-{
-	for (auto &objectA : gameObjects) {
-		for (auto &objectB : gameObjects) {
-			if (objectA.first != objectB.first) {
-				if (SDL_HasIntersection(objectA.second.colliderBox, objectB.second.colliderBox)) {
-					objectA.second.collision = true;
-				}
-			}
-		}
-	}
-}
-
-
 
