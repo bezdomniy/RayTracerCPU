@@ -1,5 +1,5 @@
 #include "GameObject.h"
-
+#include "Game.h"
 
 GameObject::GameObject()
 {
@@ -57,6 +57,7 @@ void GameObject::nextFrame()
 
 	currentSprite = sprites.at(currentSpriteIndex/(numberOfFrames * animationSlowdown));
 
+	updateVelocity();
 	move();
 }
 
@@ -70,82 +71,94 @@ void GameObject::setPlayerControlled(bool c)
 	playerControlled = c;
 }
 
+void GameObject::updateVelocity()
+{
+	//const short int BUMPBACK = 1;
+	if (playerControlled) {
+		if (Game::event.type == SDL_KEYDOWN) {
+			switch (Game::event.key.keysym.sym) {
+			case SDLK_UP:
+				velocity_y = -1;
+				break;
+			case SDLK_DOWN:
+				velocity_y = 1;
+				break;
+			case SDLK_LEFT:
+				velocity_x = -1;
+				flipType = SDL_FLIP_HORIZONTAL;
+				break;
+			case SDLK_RIGHT:
+				velocity_x = 1;
+				flipType = SDL_FLIP_NONE;
+				break;
+			case SDLK_z:
+				rotationDegrees -= 60;
+				break;
+			case SDLK_x:
+				rotationDegrees += 60;
+				break;
+			default:
+				break;
+			}
+			//playerControlled = true;
+		}
+
+		if (Game::event.type == SDL_KEYUP) {
+			switch (Game::event.key.keysym.sym) {
+			case SDLK_UP:
+				velocity_y = 0;
+				break;
+			case SDLK_DOWN:
+				velocity_y = 0;
+				break;
+			case SDLK_LEFT:
+				velocity_x = 0;
+				break;
+			case SDLK_RIGHT:
+				velocity_x = 0; 
+				break;
+			default:
+				break;
+			//case SDLK_z:
+			//	rotationDegrees -= 60;
+			//case SDLK_x:
+			//	rotationDegrees += 60;
+			}
+			//playerControlled = true;
+		}
+	}
+}
+
 void GameObject::move()
 {
+	//printf("%d, %d\n", velocity_x, velocity_y);
+	position_x += velocity_x;
+	position_y += velocity_y;
+
+	colliderBox->x = position_x;
+	colliderBox->y = position_y;
+
 	const short int BUMPBACK = 1;
-	if (playerControlled) {
-		const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-		if (currentKeyStates[SDL_SCANCODE_UP]) {
-			if (checkCollisions(gameObjectsPtr)) {
-				playerControlled = false;
-				position_y += BUMPBACK;
-				colliderBox->y += BUMPBACK;
-			}
-			else {
-				position_y -= 1;
-				colliderBox->y -= 1;
-			}
 
-		}
+	if (playerControlled && checkCollisions(gameObjectsPtr)) {
+		//playerControlled = false;
+		position_x -= velocity_x;
+		position_y -= velocity_y;
 
-		if (currentKeyStates[SDL_SCANCODE_DOWN]) {
-			if (checkCollisions(gameObjectsPtr)) {
-				playerControlled = false;
-				position_y -= BUMPBACK;
-				colliderBox->y -= BUMPBACK;
-			}
-			else {
-				position_y += 1;
-				colliderBox->y += 1;
-			}
-		}
-
-		if (currentKeyStates[SDL_SCANCODE_LEFT]) {
-			if (checkCollisions(gameObjectsPtr)) {
-				playerControlled = false;
-				position_x += BUMPBACK;
-				colliderBox->x += BUMPBACK;
-			}
-			else {
-				flipType = SDL_FLIP_HORIZONTAL;
-				position_x -= 1;
-				colliderBox->x -= 1;
-			}
-		}
-		if (currentKeyStates[SDL_SCANCODE_RIGHT]) {
-			if (checkCollisions(gameObjectsPtr)) {
-				playerControlled = false;
-				position_x -= BUMPBACK;
-				colliderBox->x -= BUMPBACK;
-			}
-			else {
-				position_x += 1;
-				colliderBox->x += 1;
-				flipType = SDL_FLIP_NONE;
-			}
-		}
-		if (currentKeyStates[SDL_SCANCODE_Z]) {
-			rotationDegrees -= 60;
-		}
-
-		if (currentKeyStates[SDL_SCANCODE_X]) {
-			rotationDegrees += 60;
-		}
-
-		playerControlled = true;
+		colliderBox->x = position_x;
+		colliderBox->y = position_y;
 	}
-
 }
 
 bool GameObject::checkCollisions(std::unordered_map<std::string, GameObject>* objectMap)
 {
-		for (auto& object : *objectMap) {
-			if (objectName != object.second.objectName) {
-				if (SDL_HasIntersection(colliderBox, object.second.colliderBox)) {
-					return true;
-				}
+	for (auto& object : *objectMap) {
+		if (objectName != object.second.objectName) {
+			if (SDL_HasIntersection(colliderBox, object.second.colliderBox)) {
+				return true;
 			}
 		}
+	}
 }
 
 

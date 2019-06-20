@@ -19,6 +19,8 @@ public:
 	Game(unsigned int window_width, unsigned int window_height);
 	~Game();
 
+	static SDL_Event event;
+
 	bool init(const char* title, int xpos, int ypos, bool fullscreen);
 
 	bool handleEvents();

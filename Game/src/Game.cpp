@@ -2,6 +2,8 @@
 
 #define DEBUG true
 
+SDL_Event Game::event;
+
 Game::Game(unsigned int w_width, unsigned int w_height)
 {
 	gWindow = nullptr;
@@ -140,9 +142,10 @@ void Game::clean()
 
 bool Game::handleEvents()
 {
-	SDL_Event event;
+	
 
-	while (SDL_PollEvent(&event)) {
+	//while (SDL_PollEvent(&event)) {
+	SDL_PollEvent(&event);
 		switch (event.type) {
 		case SDL_QUIT:
 			isRunning = false;
@@ -150,7 +153,7 @@ bool Game::handleEvents()
 		default:
 			return true;
 		}
-	}
+	//}
 
 	return false;
 }
