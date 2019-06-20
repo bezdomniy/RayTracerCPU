@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+/Pong/.vs/Pong/v16
+/Pong/Debug
+/Pong/x64/Debug
+/Pong/Pong.vcxproj.user
+/Pong/Pong.vcxproj.filters
+/Pong/.vs/Game/v16
