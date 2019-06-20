@@ -20,13 +20,18 @@ public:
 	SDL_Rect* currentSprite;
 	int position_x = 0;
 	int position_y = 0;
+	//SDL_Point* centre;
 	double rotationDegrees = 0;
 	SDL_RendererFlip flipType;
+
+	bool playerControlled = false;
 
 	std::pair<int, int> getSize();
 
 	void nextFrame();
 	void setAnimationSlowdown(int slowdown);
+	void setPlayerControlled(bool c);
+	void move();
 	
 private:
 

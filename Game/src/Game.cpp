@@ -52,11 +52,11 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 			gameObjects["hero"] = GameObject(*gSpriteSheet, "elf_f_idle_anim", window_width / 2, window_height / 2);
 			gameObjects["ogre2"] = GameObject(*gSpriteSheet, "ogre_run_anim", window_width / 2 + 100, window_height / 2);
 			gameObjects["ogre2"].setAnimationSlowdown(2);
+			gameObjects["hero"].setPlayerControlled(true);
 
 			gSpriteSheetTexture = Texture(gRenderer);
 			gSpriteSheetTexture.loadFromFile(gSpriteSheet->spritesPath);
 
-			
 			if (gRenderer == NULL) {
 				printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError()); success = false;
 				success = false;
@@ -148,25 +148,6 @@ bool Game::handleEvents()
 			return true;
 		}
 	}
-
-		const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
-		if (currentKeyStates[SDL_SCANCODE_UP])
-			gameObjects["hero"].position_y -= 1;
-		if (currentKeyStates[SDL_SCANCODE_DOWN])
-			gameObjects["hero"].position_y += 1;
-		if (currentKeyStates[SDL_SCANCODE_LEFT])
-			gameObjects["hero"].position_x -= 1;
-		if (currentKeyStates[SDL_SCANCODE_RIGHT])
-			gameObjects["hero"].position_x += 1;
-		if (currentKeyStates[SDL_SCANCODE_D])
-			gameObjects["hero"].flipType = SDL_FLIP_VERTICAL;
-		if (currentKeyStates[SDL_SCANCODE_C])
-			gameObjects["hero"].flipType = SDL_FLIP_NONE;
-		if (currentKeyStates[SDL_SCANCODE_Z])
-			gameObjects["hero"].rotationDegrees -= 60;
-		if (currentKeyStates[SDL_SCANCODE_X])
-			gameObjects["hero"].rotationDegrees += 60;
-	
 
 	return false;
 };

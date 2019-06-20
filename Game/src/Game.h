@@ -35,10 +35,11 @@ private:
 	SDL_Renderer* gRenderer;
 
 	SpriteSheet* gSpriteSheet;
+	Texture gSpriteSheetTexture = NULL;
 
 	std::unordered_map<std::string, GameObject> gameObjects;
 
-	Texture gSpriteSheetTexture = NULL;
+
 
 	void drawNewRectangle(int x, int y, int width, int height);
 
