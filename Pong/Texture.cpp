@@ -51,17 +51,17 @@ void Texture::free()
 	}
 }
 
-void Texture::render(int x, int y, SDL_Rect* clip)
+void Texture::render(GameObject gameObject)
 {
 	//Set rendering space and render to screen 
-	SDL_Rect renderQuad = { x, y, mWidth, mHeight }; 
+	SDL_Rect renderQuad = { gameObject.position_x, gameObject.position_y, gameObject.getSize().first, gameObject.getSize().second };
 
-	if (clip != NULL) {
-		renderQuad.w = clip->w;
-		renderQuad.h = clip->h;
+	if (gameObject.currentSprite != NULL) {
+		renderQuad.w = gameObject.currentSprite->w;
+		renderQuad.h = gameObject.currentSprite->h;
 	}
 
-	SDL_RenderCopy( gRenderer, mTexture, clip, &renderQuad );
+	SDL_RenderCopyEx( gRenderer, mTexture, gameObject.currentSprite, &renderQuad, gameObject.rotationDegrees, NULL, gameObject.flipType);
 }
 
 int Texture::getWidth()

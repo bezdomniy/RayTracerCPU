@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef Game_hpp
 #define Game_hpp
 
@@ -32,7 +34,7 @@ private:
 
 	SDL_Renderer* gRenderer;
 
-	SpriteSheet gSpriteSheet;
+	SpriteSheet* gSpriteSheet;
 
 	std::unordered_map<std::string, GameObject> gameObjects;
 

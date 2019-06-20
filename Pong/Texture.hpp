@@ -1,6 +1,9 @@
+#pragma once
+
 #include <string>
 #include <SDL.h>
 #include <SDL_image.h>
+#include "GameObject.h"
 
 class Texture
 {
@@ -10,7 +13,7 @@ public:
 
 	bool loadFromFile(std::string path);
 	void free();
-	void render(int x, int y, SDL_Rect* clip = NULL);
+	void render(GameObject gameObject);
 
 	int getWidth();
 	int getHeight();

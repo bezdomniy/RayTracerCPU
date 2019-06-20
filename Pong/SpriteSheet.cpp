@@ -5,7 +5,7 @@ SpriteSheet::SpriteSheet()
 
 }
 
-SpriteSheet::SpriteSheet(std::string sp, std::string cp)
+SpriteSheet::SpriteSheet(std::string const& sp, std::string const& cp)
 {
 	spritesPath = sp;
 	load(cp);
@@ -33,7 +33,7 @@ void SpriteSheet::print()
 	}
 }
 
-std::pair<SDL_Rect*, int> SpriteSheet::operator[](std::string spriteName)
+std::pair<SDL_Rect*, int> SpriteSheet::operator[](std::string const& spriteName)
 {
 	return gSpriteClips[spriteName];
 }

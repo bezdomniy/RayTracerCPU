@@ -1,3 +1,5 @@
+#pragma once
+
 #include <fstream> 
 #include <unordered_map>
 #include <string>
@@ -9,12 +11,12 @@ class SpriteSheet
 {
 public:
 	SpriteSheet();
-	SpriteSheet(std::string sp, std::string cp);
+	SpriteSheet(std::string const& sp, std::string const& cp);
 	~SpriteSheet();
 	void destroy();
 	void print();
 
-	std::pair<SDL_Rect*, int> operator[] (std::string spriteName);
+	std::pair<SDL_Rect*, int> operator[] (std::string const& spriteName);
 
 	std::string spritesPath;
 	std::unordered_map<std::string, std::pair<SDL_Rect*, int>> gSpriteClips;

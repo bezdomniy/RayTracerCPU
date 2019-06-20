@@ -7,7 +7,7 @@ Game::Game(unsigned int w_width, unsigned int w_height)
 	gRenderer = nullptr;
 
 	//texture = NULL;
-	//gSpriteSheet = NULL;
+	gSpriteSheet = nullptr;
 
 	window_width = w_width;
 	window_height = w_height;
@@ -45,14 +45,16 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 		}
 		else
 		{
-			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED);
+			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-			gSpriteSheet = SpriteSheet("0x72_DungeonTilesetII_v1.1.png", "tiles_list_v1.1");
+			gSpriteSheet = new SpriteSheet("0x72_DungeonTilesetII_v1.1.png", "tiles_list_v1.1");
 
-			gameObjects["elf"] = GameObject(gSpriteSheet["elf_f_idle_anim"].first, gSpriteSheet["elf_f_idle_anim"].second);
+			gameObjects["hero"] = GameObject(*gSpriteSheet, "elf_f_idle_anim", window_width / 2, window_height / 2);
+			gameObjects["ogre2"] = GameObject(*gSpriteSheet, "ogre_run_anim", window_width / 2 + 100, window_height / 2);
+			gameObjects["ogre2"].setAnimationSlowdown(2);
 
 			gSpriteSheetTexture = Texture(gRenderer);
-			gSpriteSheetTexture.loadFromFile(gSpriteSheet.spritesPath);
+			gSpriteSheetTexture.loadFromFile(gSpriteSheet->spritesPath);
 
 			
 			if (gRenderer == NULL) {
@@ -77,9 +79,10 @@ bool Game::update()
 	//	texture->free();
 
 	//initialTexture = Texture(gRenderer);
-	gameObjects["elf"].nextFrame();
+	gameObjects["hero"].nextFrame();
+	gameObjects["ogre2"].nextFrame();
 
-	SDL_Delay(100);
+	//SDL_Delay(100);
 
 	return success;
 }
@@ -89,13 +92,14 @@ bool Game::render()
 	bool success = true;
 
 	//SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
-	//SDL_RenderClear(gRenderer);
+	SDL_RenderClear(gRenderer);
 
 	//newRectangle(0, 0, window_width/24, window_height/6);
 	//newRectangle(window_width - window_width / 24, 0, window_width / 24, window_height / 6);
 
 
-	gSpriteSheetTexture.render(window_width/2, window_height/2, gameObjects["elf"].currentSprite);
+	gSpriteSheetTexture.render(gameObjects["hero"]);
+	gSpriteSheetTexture.render(gameObjects["ogre2"]);
 
 	//gSpriteSheetTexture.render(0, window_height / 2, gSpriteSheet["weapon_golden_sword"]);
 
@@ -123,8 +127,8 @@ void Game::clean()
 	SDL_DestroyWindow(gWindow);
 	gWindow = NULL;
 
-	//gSpriteSheet.destroy();
-	//gSpriteSheet = NULL;
+	gSpriteSheet->destroy();
+	gSpriteSheet = NULL;
 
 	//Quit SDL subsystems
 	IMG_Quit();
@@ -140,23 +144,29 @@ bool Game::handleEvents()
 		case SDL_QUIT:
 			isRunning = false;
 			return true;
-		case SDL_KEYDOWN:
-			switch (event.key.keysym.sym) {
-				case SDLK_UP:
-					break;
-				case SDLK_DOWN:
-					break;
-				case SDLK_LEFT:
-					break;
-				case SDLK_RIGHT:
-					break;
-				default:
-					break;
-			}
 		default:
 			return true;
 		}
 	}
+
+		const Uint8* currentKeyStates = SDL_GetKeyboardState(NULL);
+		if (currentKeyStates[SDL_SCANCODE_UP])
+			gameObjects["hero"].position_y -= 1;
+		if (currentKeyStates[SDL_SCANCODE_DOWN])
+			gameObjects["hero"].position_y += 1;
+		if (currentKeyStates[SDL_SCANCODE_LEFT])
+			gameObjects["hero"].position_x -= 1;
+		if (currentKeyStates[SDL_SCANCODE_RIGHT])
+			gameObjects["hero"].position_x += 1;
+		if (currentKeyStates[SDL_SCANCODE_D])
+			gameObjects["hero"].flipType = SDL_FLIP_VERTICAL;
+		if (currentKeyStates[SDL_SCANCODE_C])
+			gameObjects["hero"].flipType = SDL_FLIP_NONE;
+		if (currentKeyStates[SDL_SCANCODE_Z])
+			gameObjects["hero"].rotationDegrees -= 60;
+		if (currentKeyStates[SDL_SCANCODE_X])
+			gameObjects["hero"].rotationDegrees += 60;
+	
 
 	return false;
 };
