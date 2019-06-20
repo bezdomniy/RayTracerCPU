@@ -1,4 +1,4 @@
-#include "Game.hpp"
+#include "Game.h"
 
 Game::Game(unsigned int w_width, unsigned int w_height)
 {
@@ -47,7 +47,7 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 		{
 			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-			gSpriteSheet = new SpriteSheet("0x72_DungeonTilesetII_v1.1.png", "tiles_list_v1.1");
+			gSpriteSheet = new SpriteSheet("resources/0x72_DungeonTilesetII_v1.1.png", "resources/tiles_list_v1.1");
 
 			gameObjects["hero"] = GameObject(*gSpriteSheet, "elf_f_idle_anim", window_width / 2, window_height / 2);
 			gameObjects["ogre2"] = GameObject(*gSpriteSheet, "ogre_run_anim", window_width / 2 + 100, window_height / 2);

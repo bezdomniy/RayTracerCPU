@@ -1,4 +1,4 @@
-#include "Texture.hpp"
+#include "Texture.h"
 
 Texture::Texture(SDL_Renderer* renderer)
 {

@@ -1,11 +1,11 @@
 #pragma once
 
-#ifndef Game_hpp
-#define Game_hpp
+#ifndef Game_h
+#define Game_h
 
 #include <SDL.h>
 #include <SDL_image.h>
-#include "Texture.hpp"
+#include "Texture.h"
 #include "SpriteSheet.h"
 #include "GameObject.h"
 #include <stdio.h>
