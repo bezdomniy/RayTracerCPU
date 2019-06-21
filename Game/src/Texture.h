@@ -4,6 +4,7 @@
 #include <SDL.h>
 #include <SDL_image.h>
 #include "GameObject.h"
+#include "Entity.h"
 
 class Texture
 {
@@ -13,6 +14,8 @@ public:
 
 	bool loadFromFile(std::string path);
 	void free();
+
+	void render(Entity entity);
 	void render(GameObject gameObject);
 
 	int getWidth();

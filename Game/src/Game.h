@@ -8,8 +8,11 @@
 #include "Texture.h"
 #include "SpriteSheet.h"
 #include "GameObject.h"
+#include "Entity.h"
 #include <stdio.h>
 #include <string>
+
+
 
 //const int NUMBER_OF_SPRITES = 1;
 
@@ -38,10 +41,11 @@ private:
 
 	SpriteSheet* gSpriteSheet;
 	Texture gSpriteSheetTexture = NULL;
+	Texture gBackgroundTexture = NULL;
 
-	std::unordered_map<std::string, GameObject> gameObjects;
+	GameObject camera;
 
-
+	std::unordered_map<std::string, Entity> entities;
 
 	void drawNewRectangle(int x, int y, int width, int height);
 

@@ -26,6 +26,7 @@ bool Texture::loadFromFile(std::string path)
 	if (loadedSurface == NULL)
 	{
 		printf("Unable to load image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
+
 	}
 	else {
 		newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
@@ -37,8 +38,10 @@ bool Texture::loadFromFile(std::string path)
 			mHeight = loadedSurface->h;
 		}
 		//Get rid of old loaded surface 
+		
 		SDL_FreeSurface(loadedSurface);
 	}
+
 	mTexture = newTexture;
 	return mTexture != NULL;
 }
@@ -53,24 +56,32 @@ void Texture::free()
 	}
 }
 
-void Texture::render(GameObject gameObject)
+void Texture::render(Entity entity)
 {
 	//Set rendering space and render to screen 
-	SDL_Rect renderQuad = { gameObject.position_x, gameObject.position_y, gameObject.getSize().first, gameObject.getSize().second };
+	SDL_Rect renderQuad = { entity.position_x, entity.position_y, entity.getSize().first, entity.getSize().second };
 
 	//if (gameObject.currentSprite != NULL) {
 	//	renderQuad.w = gameObject.currentSprite->w;
 	//	renderQuad.h = gameObject.currentSprite->h;
 	//}
 
-	if (debug) {
+	if (debug && entity.collidable) {
 		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
-		SDL_RenderDrawRect(gRenderer, gameObject.colliderBox);
+		SDL_RenderDrawRect(gRenderer, entity.colliderBox);
 		SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
 	}
 
 
-	SDL_RenderCopyEx( gRenderer, mTexture, gameObject.currentSprite, &renderQuad, gameObject.rotationDegrees, NULL, gameObject.flipType);
+	SDL_RenderCopyEx(gRenderer, mTexture, entity.currentSprite, &renderQuad, entity.rotationDegrees, NULL, entity.flipType);
+}
+
+void Texture::render(GameObject gameObject)
+{
+	//Set rendering space and render to screen 
+	SDL_Rect renderQuad = { gameObject.position_x, gameObject.position_y, 640, 480 };
+
+	SDL_RenderCopy( gRenderer, mTexture, NULL, &renderQuad);
 }
 
 int Texture::getWidth()

@@ -1,6 +1,6 @@
 #include "Game.h"
 
-#define DEBUG true
+#define DEBUG false
 
 SDL_Event Game::event;
 
@@ -51,15 +51,25 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 		{
 			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-			gSpriteSheet = new SpriteSheet("resources/0x72_DungeonTilesetII_v1.1.png", "resources/tiles_list_v1.1");
+			gSpriteSheet = new SpriteSheet("resources/platformer/adventurer.png", "resources/platformer/adventurer.json");
+			entities["hero"] = Entity("hero", gSpriteSheet, "adventurer-idle", window_width / 2, window_height / 2, &entities);
+			entities["ogre2"] = Entity("ogre2" , gSpriteSheet, "adventurer-idle", window_width / 2 + 100, window_height / 2, &entities);
 
-			gameObjects["hero"] = GameObject("hero", *gSpriteSheet, "elf_f_idle_anim", window_width / 2, window_height / 2, &gameObjects);
-			gameObjects["ogre2"] = GameObject("ogre2" , *gSpriteSheet, "ogre_run_anim", window_width / 2 + 100, window_height / 2, &gameObjects);
-			gameObjects["ogre2"].setAnimationSlowdown(2);
-			gameObjects["hero"].setPlayerControlled(true);
+			camera = GameObject("camera", 0, 0);
+
+			//gSpriteSheet = new SpriteSheet("resources/0x72_DungeonTilesetII_v1.1.png", "resources/tiles_list_v1.1", false);
+			//gameObjects["hero"] = GameObject("hero", gSpriteSheet, "elf_m_run_anim", window_width / 2, window_height / 2, &gameObjects);
+			//gameObjects["ogre2"] = GameObject("ogre2", gSpriteSheet, "ogre_idle_anim", window_width / 2 + 100, window_height / 2, &gameObjects);
+
+			entities["hero"].setAnimationSlowdown(2);
+			entities["ogre2"].setAnimationSlowdown(2);
+			entities["hero"].setPlayerControlled(true);
 
 			gSpriteSheetTexture = Texture(gRenderer, DEBUG);
 			gSpriteSheetTexture.loadFromFile(gSpriteSheet->spritesPath);
+
+			gBackgroundTexture = Texture(gRenderer, false);
+			gBackgroundTexture.loadFromFile("resources/background.png");
 
 			if (gRenderer == NULL) {
 				printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError()); success = false;
@@ -79,15 +89,8 @@ bool Game::update()
 	//Loading success flag
 	bool success = true;
 
-	//checkCollisions();
-
-	//if (texture != nullptr)
-	//	texture->free();
-
-	//initialTexture = Texture(gRenderer);
-	gameObjects["hero"].nextFrame();
-	//gameObjects["hero"].checkCollisions(gameObjects);
-	gameObjects["ogre2"].nextFrame();
+	entities["hero"].nextFrame();
+	entities["ogre2"].nextFrame();
 
 	//SDL_Delay(100);
 
@@ -101,14 +104,12 @@ bool Game::render()
 	//SDL_SetRenderDrawColor(gRenderer, 0xFF, 0xFF, 0xFF, 0xFF);
 	SDL_RenderClear(gRenderer);
 
-	//newRectangle(0, 0, window_width/24, window_height/6);
-	//newRectangle(window_width - window_width / 24, 0, window_width / 24, window_height / 6);
+	gBackgroundTexture.render(camera);
+
+	gSpriteSheetTexture.render(entities["hero"]);
+	gSpriteSheetTexture.render(entities["ogre2"]);
 
 
-	gSpriteSheetTexture.render(gameObjects["hero"]);
-	gSpriteSheetTexture.render(gameObjects["ogre2"]);
-
-	//gSpriteSheetTexture.render(0, window_height / 2, gSpriteSheet["weapon_golden_sword"]);
 
 	SDL_RenderPresent(gRenderer);
 
@@ -124,6 +125,8 @@ void Game::drawNewRectangle(int x, int y, int width, int height) {
 void Game::clean()
 {
 	gSpriteSheetTexture.free();
+	gBackgroundTexture.free();
+
 	//Deallocate renderer
 	SDL_DestroyRenderer(gRenderer);
 	gRenderer = NULL;
@@ -142,18 +145,14 @@ void Game::clean()
 
 bool Game::handleEvents()
 {
-	
-
-	//while (SDL_PollEvent(&event)) {
 	SDL_PollEvent(&event);
-		switch (event.type) {
-		case SDL_QUIT:
-			isRunning = false;
-			return true;
-		default:
-			return true;
-		}
-	//}
+	switch (event.type) {
+	case SDL_QUIT:
+		isRunning = false;
+		return true;
+	default:
+		return true;
+	}
 
 	return false;
 }
