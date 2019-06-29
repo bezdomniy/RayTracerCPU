@@ -56,32 +56,24 @@ void Texture::free()
 	}
 }
 
-void Texture::render(Entity entity)
+void Texture::render(Entity &entity, Camera& camera)
 {
-	//Set rendering space and render to screen 
-	SDL_Rect renderQuad = { entity.position_x, entity.position_y, entity.getSize().first, entity.getSize().second };
-
-	//if (gameObject.currentSprite != NULL) {
-	//	renderQuad.w = gameObject.currentSprite->w;
-	//	renderQuad.h = gameObject.currentSprite->h;
-	//}
+	SDL_Rect cameraSpacePosition = {entity.worldSpacePosition->x - camera.worldSpacePosition->x, entity.worldSpacePosition->y - camera.worldSpacePosition->y, entity.worldSpacePosition->w, entity.worldSpacePosition->h };
 
 	if (debug && entity.collidable) {
+		SDL_Rect cameraSpacePosition = { entity.colliderBox->x - camera.worldSpacePosition->x, entity.colliderBox->y - camera.worldSpacePosition->y, entity.colliderBox->w, entity.colliderBox->h };
 		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
-		SDL_RenderDrawRect(gRenderer, entity.colliderBox);
+		SDL_RenderDrawRect(gRenderer, &cameraSpacePosition);
 		SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
 	}
 
 
-	SDL_RenderCopyEx(gRenderer, mTexture, entity.currentSprite, &renderQuad, entity.rotationDegrees, NULL, entity.flipType);
+	SDL_RenderCopyEx(gRenderer, mTexture, entity.currentSprite, &cameraSpacePosition, entity.rotationDegrees, NULL, entity.flipType);
 }
 
-void Texture::render(GameObject gameObject)
+void Texture::render(Camera &camera)
 {
-	//Set rendering space and render to screen 
-	SDL_Rect renderQuad = { gameObject.position_x, gameObject.position_y, 640, 480 };
-
-	SDL_RenderCopy( gRenderer, mTexture, NULL, &renderQuad);
+	SDL_RenderCopy( gRenderer, mTexture, camera.worldSpacePosition, NULL);
 }
 
 int Texture::getWidth()

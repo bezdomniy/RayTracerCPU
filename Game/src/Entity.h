@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+//#include "Collider.h"
 
 class Entity :
 	public GameObject
@@ -11,44 +12,42 @@ public:
 	~Entity();
 	Entity(std::string const& name, SpriteSheet* spriteSheet, std::string const& spriteName, int x, int y, std::unordered_map<std::string, Entity>* entities);
 
-	using GameObject::destroy;
-
-	using GameObject::objectName;
-
-	using GameObject::position_x;
-	using GameObject::position_y;
-
-	using GameObject::velocity_x;
-	using GameObject::velocity_y;
-
-	using GameObject::rotationDegrees;
-	using GameObject::flipType;
-
 	bool playerControlled = false;
 
-	SDL_Rect* colliderBox;
+	SDL_Rect* colliderBox = nullptr;
 
 	std::unordered_map<std::string, Entity>* entityPtr;
 
 	std::pair<int, int> getSize();
+
 	void nextFrame();
 	void setAnimationSlowdown(int slowdown);
 	void setPlayerControlled(bool c);
 
 	void updateVelocity();
-	void move();
+	void move(float timeStep);
+
+	void setIdleSprite(std::string name);
+	void setRunSprite(std::string name);
+	void setAttackSprite(std::string name);
+	//void setIdleSprite(std::string);
+
 
 	bool checkCollisions(std::unordered_map<std::string, Entity>* objectMap);
-
 
 	int currentSpriteIndex = 0;
 	size_t numberOfFrames = 0;
 	int animationSlowdown = 1;
 
-
-
 	std::vector<SDL_Rect*>* spriteVector;
 	SpriteSheet* spriteSheetPtr;
 	SDL_Rect* currentSprite;
+
+private:
+	std::string idleSprite;
+	std::string runSprite;
+	std::string attackSprite;
+	//std::string runSprite;
+	
 };
 

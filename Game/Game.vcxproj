@@ -133,27 +133,36 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="src\Entity.h" />
-    <ClInclude Include="src\Game.h" />
-    <ClInclude Include="src\GameObject.h" />
-    <ClInclude Include="src\SpriteSheet.h" />
-    <ClInclude Include="src\Texture.h" />
+    <Image Include="resources\0x72_DungeonTilesetII_v1.1.png" />
+    <Image Include="resources\background.png" />
+    <Image Include="resources\platformer\adventurer.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="libpng16-16.dll" />
+    <None Include="resources\platformer\adventurer.json" />
+    <None Include="resources\tiles_list_v1.1" />
+    <None Include="SDL2.dll" />
+    <None Include="SDL2_image.dll" />
+    <None Include="zlib1.dll" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Camera.cpp" />
     <ClCompile Include="src\Entity.cpp" />
     <ClCompile Include="src\Game.cpp" />
     <ClCompile Include="src\GameObject.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\SpriteSheet.cpp" />
     <ClCompile Include="src\Texture.cpp" />
+    <ClCompile Include="src\Timer.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\0x72_DungeonTilesetII_v1.1.png" />
-    <Image Include="resources\platformer\adventurer.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="resources\platformer\adventurer.json" />
-    <None Include="resources\tiles_list_v1.1" />
+    <ClInclude Include="src\Camera.h" />
+    <ClInclude Include="src\Entity.h" />
+    <ClInclude Include="src\Game.h" />
+    <ClInclude Include="src\GameObject.h" />
+    <ClInclude Include="src\SpriteSheet.h" />
+    <ClInclude Include="src\Texture.h" />
+    <ClInclude Include="src\Timer.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -11,8 +11,7 @@ GameObject::GameObject()
 GameObject::GameObject(std::string const& name, int x, int y)
 {
 	objectName = name;
-	position_x = x;
-	position_y = y;
+	worldSpacePosition = new SDL_Rect({ x,y, 0, 0 });
 	flipType = SDL_FLIP_NONE;
 
 	collidable = false;

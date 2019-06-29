@@ -9,6 +9,8 @@
 #include "SpriteSheet.h"
 #include "GameObject.h"
 #include "Entity.h"
+#include "Camera.h"
+#include "Timer.h"
 #include <stdio.h>
 #include <string>
 
@@ -19,7 +21,7 @@
 class Game
 {
 public:
-	Game(unsigned int window_width, unsigned int window_height);
+	Game(unsigned int w_width, unsigned int w_height);
 	~Game();
 
 	static SDL_Event event;
@@ -39,15 +41,25 @@ private:
 
 	SDL_Renderer* gRenderer;
 
-	SpriteSheet* gSpriteSheet;
-	Texture gSpriteSheetTexture = NULL;
+	Timer* timer;
+
+	float timeStep = 0;
+
+	SpriteSheet* gSpriteSheet1;
+	SpriteSheet* gSpriteSheet2;
+
+	Texture gSpriteSheetTexture1 = NULL;
+	Texture gSpriteSheetTexture2 = NULL;
+
 	Texture gBackgroundTexture = NULL;
 
-	GameObject camera;
+	Camera camera;
+
+
 
 	std::unordered_map<std::string, Entity> entities;
 
-	void drawNewRectangle(int x, int y, int width, int height);
+	//void drawNewRectangle(int x, int y, int width, int height);
 
 	int window_width = 0;
 	int window_height = 0;
@@ -55,4 +67,4 @@ private:
 	bool isRunning;
 };
 
-#endif // !Pong_h
+#endif // !Game_h

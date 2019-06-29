@@ -18,12 +18,10 @@ public:
 
 	void destroy(); //TODO check 
 
+	SDL_Rect* worldSpacePosition = nullptr;
 
-	int position_x = 0;
-	int position_y = 0;
-
-	int velocity_x = 0;
-	int velocity_y = 0;
+	float velocity_x = 0;
+	float velocity_y = 0;
 	//SDL_Point* centre;
 	double rotationDegrees = 0;
 	SDL_RendererFlip flipType;

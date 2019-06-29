@@ -51,7 +51,7 @@ void SpriteSheet::loadText(std::string coordsPath)
 	std::string line;
 	std::string name;
 
-	int frames = 0;
+	int frames = 1;
 
 	SDL_Rect* nextRect = nullptr;
 	while (std::getline(infile, line)) {

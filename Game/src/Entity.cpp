@@ -14,44 +14,47 @@ Entity::Entity()
 
 Entity::~Entity()
 {
+	//delete collider;
 }
 
-Entity::Entity(std::string const& name, SpriteSheet* spriteSheet, std::string const& spriteName, int x, int y, std::unordered_map<std::string, Entity>* entities)
+Entity::Entity(std::string const& name, SpriteSheet* spriteSheet, std::string const& spriteName, int x, int y, std::unordered_map<std::string, Entity>* entities) : GameObject(name, x, y)
 {
-	objectName = name;
 	entityPtr = entities;
-	position_x = x;
-	position_y = y;
-	flipType = SDL_FLIP_NONE;
 
-	if (objectName != "camera") {
-		spriteSheetPtr = spriteSheet;
-		spriteVector = spriteSheetPtr->operator[](spriteName);
+	idleSprite = spriteName;
 
-		numberOfFrames = spriteVector->size();
-		//std::cout << numberOfFrames << "\n";
+	spriteSheetPtr = spriteSheet;
+	spriteVector = spriteSheetPtr->operator[](idleSprite);
 
-		currentSprite = spriteVector->at(currentSpriteIndex);
-		colliderBox = new SDL_Rect({ position_x - 1, position_y - 1, currentSprite->w + 2, currentSprite->h + 2 }); //TODO update to remove border buffer
+	numberOfFrames = spriteVector->size();
+
+	//std::cout << numberOfFrames << "\n";
+
+	currentSprite = spriteVector->at(currentSpriteIndex);
+
+	worldSpacePosition = new SDL_Rect({ x,y, currentSprite->w, currentSprite->h });
+
+	collidable = true;
+
+	if (collidable) {
+		colliderBox = new SDL_Rect({ x,y, worldSpacePosition->w, worldSpacePosition->h });
 	}
-	else {
-		collidable = false;
-		currentSprite = new SDL_Rect({ position_x, position_y, 640, 480 });
-	}
+
 }
 
 std::pair<int, int> Entity::getSize()
 {
-	return std::pair<int, int>{currentSprite->w, currentSprite->h};
+	return std::pair<int, int>{worldSpacePosition->w, worldSpacePosition->h};
 }
+
 
 void Entity::nextFrame()
 {
 	if (velocity_x != 0 || velocity_y != 0) {
-		spriteVector = spriteSheetPtr->operator[]("adventurer-run");
+		spriteVector = spriteSheetPtr->operator[](runSprite);
 	}
 	else {
-		spriteVector = spriteSheetPtr->operator[]("adventurer-idle");
+		spriteVector = spriteSheetPtr->operator[](idleSprite);
 	}
 	if (currentSpriteIndex < numberOfFrames * (numberOfFrames * animationSlowdown) - 1)
 		//if (currentSpriteIndex < numberOfFrames - 1)
@@ -60,10 +63,13 @@ void Entity::nextFrame()
 		currentSpriteIndex = 0;
 
 	currentSprite = spriteVector->at(currentSpriteIndex / (numberOfFrames * animationSlowdown));
+	worldSpacePosition->w = currentSprite->w;
+	worldSpacePosition->h = currentSprite->h;
+
+	colliderBox->w = worldSpacePosition->w;
+	colliderBox->h = worldSpacePosition->h;
 	//currentSprite = spriteVector->at(currentSpriteIndex);
 
-	updateVelocity();
-	move();
 }
 
 void Entity::setAnimationSlowdown(int slowdown)
@@ -134,25 +140,40 @@ void Entity::updateVelocity()
 	}
 }
 
-void Entity::move()
+void Entity::move(float timeStep)
 {
 	//printf("%d, %d\n", velocity_x, velocity_y);
-	position_x += velocity_x;
-	position_y += velocity_y;
+	worldSpacePosition->x += int (velocity_x * timeStep);
+	worldSpacePosition->y += int (velocity_y * timeStep);
 
-	colliderBox->x = position_x;
-	colliderBox->y = position_y;
+	colliderBox->x = worldSpacePosition->x;
+	colliderBox->y = worldSpacePosition->y;
 
 	const short int BUMPBACK = 1;
 
 	if (playerControlled && checkCollisions(entityPtr)) {
 		//playerControlled = false;
-		position_x -= velocity_x;
-		position_y -= velocity_y;
+		worldSpacePosition->x -= int (velocity_x * timeStep);
+		worldSpacePosition->y -= int (velocity_y * timeStep);
 
-		colliderBox->x = position_x;
-		colliderBox->y = position_y;
+		colliderBox->x = worldSpacePosition->x;
+		colliderBox->y = worldSpacePosition->y;
 	}
+}
+
+void Entity::setIdleSprite(std::string name)
+{
+	idleSprite = name;
+}
+
+void Entity::setRunSprite(std::string name)
+{
+	runSprite = name;
+}
+
+void Entity::setAttackSprite(std::string name)
+{
+	attackSprite = name;
 }
 
 bool Entity::checkCollisions(std::unordered_map<std::string, Entity>* objectMap)

@@ -1,17 +1,18 @@
 #include "Game.h"
 
-#define DEBUG false
+#define DEBUG true
 
 SDL_Event Game::event;
 
 Game::Game(unsigned int w_width, unsigned int w_height)
 {
 	gWindow = nullptr;
-
 	gRenderer = nullptr;
 
 	//texture = NULL;
-	gSpriteSheet = nullptr;
+	gSpriteSheet1 = nullptr;
+
+	timer = nullptr;
 
 	window_width = w_width;
 	window_height = w_height;
@@ -39,7 +40,7 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 	}
 	else
 	{
-		//Create window
+		timer = new Timer();
 		
 		gWindow = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, SDL_WINDOW_SHOWN);
 		if (gWindow == NULL)
@@ -51,22 +52,32 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 		{
 			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-			gSpriteSheet = new SpriteSheet("resources/platformer/adventurer.png", "resources/platformer/adventurer.json");
-			entities["hero"] = Entity("hero", gSpriteSheet, "adventurer-idle", window_width / 2, window_height / 2, &entities);
-			entities["ogre2"] = Entity("ogre2" , gSpriteSheet, "adventurer-idle", window_width / 2 + 100, window_height / 2, &entities);
+			gSpriteSheet1 = new SpriteSheet("resources/platformer/adventurer.png", "resources/platformer/adventurer.json");
+			entities["hero"] = Entity("hero", gSpriteSheet1, "adventurer-idle", window_width / 2, window_height / 2, &entities);
+			entities["hero"].setRunSprite("adventurer-run");
+			entities["ogre2"] = Entity("ogre2" , gSpriteSheet1, "adventurer-idle", window_width / 2 + 100, window_height / 2, &entities);
+			entities["ogre2"].setRunSprite("adventurer-run");
 
-			camera = GameObject("camera", 0, 0);
+			camera = Camera("camera", 0, 0, &entities["hero"]);
 
-			//gSpriteSheet = new SpriteSheet("resources/0x72_DungeonTilesetII_v1.1.png", "resources/tiles_list_v1.1", false);
-			//gameObjects["hero"] = GameObject("hero", gSpriteSheet, "elf_m_run_anim", window_width / 2, window_height / 2, &gameObjects);
-			//gameObjects["ogre2"] = GameObject("ogre2", gSpriteSheet, "ogre_idle_anim", window_width / 2 + 100, window_height / 2, &gameObjects);
+			gSpriteSheet2 = new SpriteSheet("resources/0x72_DungeonTilesetII_v1.1.png", "resources/tiles_list_v1.1", false);
+			entities["wall1"] = Entity("wall1", gSpriteSheet2, "wall_mid", window_width / 2, (window_height / 2) + 50, &entities);
+			entities["wall2"] = Entity("wall2", gSpriteSheet2, "wall_mid", (window_width / 2) - 16, (window_height / 2) + 50, &entities);
+			entities["wall3"] = Entity("wall3", gSpriteSheet2, "wall_mid", (window_width / 2) + 16, (window_height / 2) + 50, &entities);
+			entities["ogre3"] = Entity("ogre3", gSpriteSheet2, "ogre_idle_anim", window_width / 2 + 180, window_height / 2, &entities);
+			entities["ogre3"].setRunSprite("ogre_run_anim");
 
-			entities["hero"].setAnimationSlowdown(2);
-			entities["ogre2"].setAnimationSlowdown(2);
+			entities["hero"].setAnimationSlowdown(1);
+			entities["ogre2"].setAnimationSlowdown(1);
 			entities["hero"].setPlayerControlled(true);
+			//player_x = entities["hero"].position_x;
+			//player_y = entities["hero"].position_y;
 
-			gSpriteSheetTexture = Texture(gRenderer, DEBUG);
-			gSpriteSheetTexture.loadFromFile(gSpriteSheet->spritesPath);
+			gSpriteSheetTexture1 = Texture(gRenderer, DEBUG);
+			gSpriteSheetTexture1.loadFromFile(gSpriteSheet1->spritesPath);
+
+			gSpriteSheetTexture2 = Texture(gRenderer, DEBUG);
+			gSpriteSheetTexture2.loadFromFile(gSpriteSheet2->spritesPath);
 
 			gBackgroundTexture = Texture(gRenderer, false);
 			gBackgroundTexture.loadFromFile("resources/background.png");
@@ -89,8 +100,17 @@ bool Game::update()
 	//Loading success flag
 	bool success = true;
 
-	entities["hero"].nextFrame();
-	entities["ogre2"].nextFrame();
+	timeStep = timer->getTicks() / 5.f;
+
+	for (auto& entity : entities) {
+		entity.second.nextFrame();
+		entity.second.updateVelocity();
+		entity.second.move(timeStep);
+	}
+
+	camera.move();
+
+	timer->restart();
 
 	//SDL_Delay(100);
 
@@ -106,25 +126,28 @@ bool Game::render()
 
 	gBackgroundTexture.render(camera);
 
-	gSpriteSheetTexture.render(entities["hero"]);
-	gSpriteSheetTexture.render(entities["ogre2"]);
+	gSpriteSheetTexture1.render(entities["hero"], camera);
+	gSpriteSheetTexture1.render(entities["ogre2"], camera);
+	gSpriteSheetTexture2.render(entities["ogre3"], camera);
 
-
+	gSpriteSheetTexture2.render(entities["wall1"], camera);
+	gSpriteSheetTexture2.render(entities["wall2"], camera);
+	gSpriteSheetTexture2.render(entities["wall3"], camera);
 
 	SDL_RenderPresent(gRenderer);
 
 	return success;
 }
 
-void Game::drawNewRectangle(int x, int y, int width, int height) {
-	SDL_Rect rightRect = {x, y, width, height};
-	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF);
-	SDL_RenderFillRect(gRenderer, &rightRect);
-}
+//void Game::drawNewRectangle(int x, int y, int width, int height) {
+//	SDL_Rect rightRect = {x, y, width, height};
+//	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF);
+//	SDL_RenderFillRect(gRenderer, &rightRect);
+//}
 
 void Game::clean()
 {
-	gSpriteSheetTexture.free();
+	gSpriteSheetTexture1.free();
 	gBackgroundTexture.free();
 
 	//Deallocate renderer
@@ -135,8 +158,8 @@ void Game::clean()
 	SDL_DestroyWindow(gWindow);
 	gWindow = NULL;
 
-	gSpriteSheet->destroy();
-	gSpriteSheet = NULL;
+	gSpriteSheet1->destroy();
+	gSpriteSheet1 = NULL;
 
 	//Quit SDL subsystems
 	IMG_Quit();
