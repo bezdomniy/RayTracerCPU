@@ -14,6 +14,9 @@ GameObject::GameObject(std::string const& name, int x, int y)
 	worldSpacePosition = new SDL_Rect({ x,y, 0, 0 });
 	flipType = SDL_FLIP_NONE;
 
+	velocity << 0.f, 0.f;
+	acceleration << 0.f, 0.f;
+
 	collidable = false;
 	//currentSprite = new SDL_Rect({ position_x, position_y, 640, 480 });
 }

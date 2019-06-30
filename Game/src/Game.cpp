@@ -1,4 +1,5 @@
 #include "Game.h"
+//#include "Box2D/Box2D.h"
 
 #define DEBUG true
 
@@ -27,6 +28,38 @@ Game::~Game()
 {
 }
 
+float Game::accelerationFromGravity(float acceleration, float velocity, bool onGround)
+{
+	const float terminalVelocity = 2.f;
+	const float gravityConstant = 1.f / 60.f / 2.f;
+
+	if (!onGround && acceleration <= terminalVelocity) {
+		acceleration += gravityConstant;
+	}
+	else if (acceleration > 0) {
+		acceleration -= gravityConstant;
+	}
+
+	return acceleration;
+}
+
+float Game::accelerationFromJump(float force)
+{
+	const float terminalVelocity = 5.f;
+
+	if (force < terminalVelocity) {
+		force += 0.1f;
+	}
+
+	return force;
+}
+
+//template <typename T>
+bool Game::almostEquals(float a, float b)
+{
+	return std::abs(a - b) < std::numeric_limits<float>::epsilon();
+}
+
 bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 {
 	//Initialization flag
@@ -53,23 +86,30 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 			gSpriteSheet1 = new SpriteSheet("resources/platformer/adventurer.png", "resources/platformer/adventurer.json");
-			entities["hero"] = Entity("hero", gSpriteSheet1, "adventurer-idle", window_width / 2, window_height / 2, &entities);
-			entities["hero"].setRunSprite("adventurer-run");
-			entities["ogre2"] = Entity("ogre2" , gSpriteSheet1, "adventurer-idle", window_width / 2 + 100, window_height / 2, &entities);
-			entities["ogre2"].setRunSprite("adventurer-run");
+			entities1["hero"] = Entity("hero", gSpriteSheet1, "adventurer-idle", window_width / 2 , window_height / 2 + 500, &entities2);
+			entities1["hero"].setRunSprite("adventurer-run");
+			entities1["hero"].setJumpSprite("adventurer-fall");
+			entities1["hero"].fixedInPlace = false;
 
-			camera = Camera("camera", 0, 0, &entities["hero"]);
+			//entities1["ogre2"] = Entity("ogre2" , gSpriteSheet1, "adventurer-idle", window_width / 2 + 100, window_height / 2, &entities1);
+			//entities1["ogre2"].setRunSprite("adventurer-run");
+
+			camera = Camera("camera", 0, 500, &entities1["hero"]);
 
 			gSpriteSheet2 = new SpriteSheet("resources/0x72_DungeonTilesetII_v1.1.png", "resources/tiles_list_v1.1", false);
-			entities["wall1"] = Entity("wall1", gSpriteSheet2, "wall_mid", window_width / 2, (window_height / 2) + 50, &entities);
-			entities["wall2"] = Entity("wall2", gSpriteSheet2, "wall_mid", (window_width / 2) - 16, (window_height / 2) + 50, &entities);
-			entities["wall3"] = Entity("wall3", gSpriteSheet2, "wall_mid", (window_width / 2) + 16, (window_height / 2) + 50, &entities);
-			entities["ogre3"] = Entity("ogre3", gSpriteSheet2, "ogre_idle_anim", window_width / 2 + 180, window_height / 2, &entities);
-			entities["ogre3"].setRunSprite("ogre_run_anim");
 
-			entities["hero"].setAnimationSlowdown(1);
-			entities["ogre2"].setAnimationSlowdown(1);
-			entities["hero"].setPlayerControlled(true);
+			for (int i = 0; i < 20; i++) {
+				entities2["wall"+ std::to_string(i)] = Entity("wall" + std::to_string(i), gSpriteSheet2, "wall_mid", (window_width / 2) + 16*i, (window_height / 2) + 550, &entities1);
+			}
+			for (int i = 0; i < 20; i++) {
+				entities2["wall" + std::to_string(i+20)] = Entity("wall" + std::to_string(i + 20), gSpriteSheet2, "wall_mid", (window_width / 2) + 360 + 16 * i, (window_height / 2) + 450, &entities1);
+			}
+			//entities2["ogre3"] = Entity("ogre3", gSpriteSheet2, "ogre_idle_anim", (window_width / 2) + 100, (window_height / 2) - 100, &entities1);
+			//entities2["ogre3"].setRunSprite("ogre_run_anim");
+
+			entities1["hero"].setAnimationSlowdown(1);
+			//entities1["ogre2"].setAnimationSlowdown(1);
+			entities1["hero"].setPlayerControlled(true);
 			//player_x = entities["hero"].position_x;
 			//player_y = entities["hero"].position_y;
 
@@ -102,7 +142,7 @@ bool Game::update()
 
 	timeStep = timer->getTicks() / 5.f;
 
-	for (auto& entity : entities) {
+	for (auto& entity : entities1) {
 		entity.second.nextFrame();
 		entity.second.updateVelocity();
 		entity.second.move(timeStep);
@@ -126,13 +166,14 @@ bool Game::render()
 
 	gBackgroundTexture.render(camera);
 
-	gSpriteSheetTexture1.render(entities["hero"], camera);
-	gSpriteSheetTexture1.render(entities["ogre2"], camera);
-	gSpriteSheetTexture2.render(entities["ogre3"], camera);
+	gSpriteSheetTexture1.render(entities1["hero"], camera);
+	//gSpriteSheetTexture1.render(entities1["ogre2"], camera);
 
-	gSpriteSheetTexture2.render(entities["wall1"], camera);
-	gSpriteSheetTexture2.render(entities["wall2"], camera);
-	gSpriteSheetTexture2.render(entities["wall3"], camera);
+	for (auto& entity : entities2) {
+		gSpriteSheetTexture2.render(entity.second, camera);
+	}
+
+
 
 	SDL_RenderPresent(gRenderer);
 

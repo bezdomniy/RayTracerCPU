@@ -80,7 +80,7 @@ void SpriteSheet::loadJSON(std::string coordsPath)
 	i.close();
 
 	std::string name;
-	int posBuffer = 0;
+	size_t posBuffer = 0;
 	int rectIndex = 0;
 
 	// range-based for
@@ -96,7 +96,8 @@ void SpriteSheet::loadJSON(std::string coordsPath)
 		name = it.key().substr(0, posBuffer);
 
 		posBuffer = it.key().find_last_of(".");
-		rectIndex = stoi(it.key().substr(short(posBuffer) - 2, posBuffer));
+		rectIndex = stoi(it.key().substr(posBuffer - 2, posBuffer));
+		//std::cout << it.key() << ": " << rectIndex << "\n";
 
 		gSpriteClips[name].insert(gSpriteClips[name].begin()+ rectIndex, nextRect);
 
@@ -106,6 +107,10 @@ void SpriteSheet::loadJSON(std::string coordsPath)
 		//}
 		//std::cout << "\n";
 	}
+
+	//for (auto& e : gSpriteClips) {
+	//	std::cout << e.first << ": " << e.second.size()  << "\n";
+	//}
 
 
 	//exit(0);

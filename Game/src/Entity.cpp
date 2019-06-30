@@ -21,6 +21,9 @@ Entity::Entity(std::string const& name, SpriteSheet* spriteSheet, std::string co
 {
 	entityPtr = entities;
 
+	velocity << 0.f, 0.f;
+	acceleration << 0.1f, 0.f;
+
 	idleSprite = spriteName;
 
 	spriteSheetPtr = spriteSheet;
@@ -50,11 +53,20 @@ std::pair<int, int> Entity::getSize()
 
 void Entity::nextFrame()
 {
-	if (velocity_x != 0 || velocity_y != 0) {
+	std::printf("%f\n", velocity.y());
+	if (velocity.x() != 0 /*|| velocity_y != 0*/) {
+		//std::printf("%f\n", velocity.x());
 		spriteVector = spriteSheetPtr->operator[](runSprite);
+		numberOfFrames = spriteVector->size();
+	}
+	else if (!onGround && velocity.y() >= 1.f /*|| velocity_y != 0*/) {
+		/*std::printf("%f\n", velocity.y());*/
+		spriteVector = spriteSheetPtr->operator[](jumpSprite);
+		numberOfFrames = spriteVector->size();
 	}
 	else {
 		spriteVector = spriteSheetPtr->operator[](idleSprite);
+		numberOfFrames = spriteVector->size();
 	}
 	if (currentSpriteIndex < numberOfFrames * (numberOfFrames * animationSlowdown) - 1)
 		//if (currentSpriteIndex < numberOfFrames - 1)
@@ -84,22 +96,37 @@ void Entity::setPlayerControlled(bool c)
 
 void Entity::updateVelocity()
 {
-	//const short int BUMPBACK = 1;
 	if (playerControlled) {
 		if (Game::event.type == SDL_KEYDOWN) {
 			switch (Game::event.key.keysym.sym) {
 			case SDLK_UP:
-				velocity_y = -1;
+				if (onGround) {
+					onGround = false;
+					velocity.y() -= 3.f;
+				}
+				//else {
+				//	velocity.y() = 0.f;
+				//}
+					
 				break;
 			case SDLK_DOWN:
-				velocity_y = 1;
+				//if (velocity_y < 1) {
+				//	velocity_y += accelerate;
+				//}
+				//velocity.y() = 1.0f;
 				break;
 			case SDLK_LEFT:
-				velocity_x = -1;
+				//colliderBox->y = worldSpacePosition->y - 1;
+				if (onGround && velocity.x() > -1.0f) {
+					velocity.x() -= acceleration.x();
+				}
 				flipType = SDL_FLIP_HORIZONTAL;
 				break;
 			case SDLK_RIGHT:
-				velocity_x = 1;
+				//colliderBox->y = worldSpacePosition->y - 1;
+				if (onGround && velocity.x() < 1.0f) {
+					velocity.x() += acceleration.x();
+				}
 				flipType = SDL_FLIP_NONE;
 				break;
 			case SDLK_z:
@@ -117,16 +144,34 @@ void Entity::updateVelocity()
 		if (Game::event.type == SDL_KEYUP) {
 			switch (Game::event.key.keysym.sym) {
 			case SDLK_UP:
-				velocity_y = 0;
+				//velocity.y() = 0.0f;
 				break;
 			case SDLK_DOWN:
-				velocity_y = 0;
+				//velocity.y() = 0.0f;
 				break;
 			case SDLK_LEFT:
-				velocity_x = 0;
+				//colliderBox->y = worldSpacePosition->y + 1;
+				if (Game::almostEquals(velocity.x(), 0.0f)) {
+					velocity.x() = 0.0f;
+				}
+				if (onGround && velocity.x() > 0.0f) {
+					velocity.x() -= acceleration.x();
+				}
+				if (onGround && velocity.x() < 0.0f) {
+					velocity.x() += acceleration.x();
+				}
 				break;
 			case SDLK_RIGHT:
-				velocity_x = 0;
+				//colliderBox->y = worldSpacePosition->y + 1;
+				if (Game::almostEquals(velocity.x(), 0.0f)) {
+					velocity.x() = 0.0f;
+				}
+				if (onGround && velocity.x() > 0.0f) {
+					velocity.x() -= acceleration.x();
+				}
+				if (onGround && velocity.x() < 0.0f) {
+					velocity.x() += acceleration.x();
+				}
 				break;
 			default:
 				break;
@@ -138,26 +183,47 @@ void Entity::updateVelocity()
 			//playerControlled = true;
 		}
 	}
+
+	if (!fixedInPlace) {
+		acceleration.y() = Game::accelerationFromGravity(acceleration.y(), velocity.y(), onGround);
+	}
+	if (onGround) {
+		velocity.y() = 0.f;
+	}
 }
 
 void Entity::move(float timeStep)
 {
 	//printf("%d, %d\n", velocity_x, velocity_y);
-	worldSpacePosition->x += int (velocity_x * timeStep);
-	worldSpacePosition->y += int (velocity_y * timeStep);
+	worldSpacePosition->x += int (velocity.x() * timeStep);
+
+	if (!onGround) {
+		velocity.y() += acceleration.y();
+	}
+
+	worldSpacePosition->y += int (velocity.y() * timeStep);
 
 	colliderBox->x = worldSpacePosition->x;
 	colliderBox->y = worldSpacePosition->y;
 
-	const short int BUMPBACK = 1;
+	//onGround = false;
 
 	if (playerControlled && checkCollisions(entityPtr)) {
 		//playerControlled = false;
-		worldSpacePosition->x -= int (velocity_x * timeStep);
-		worldSpacePosition->y -= int (velocity_y * timeStep);
+
+		onGround = true;
+
+		worldSpacePosition->x -= 1;
+		worldSpacePosition->y -= 1;
+		
+		velocity.y() = 0.f;
+		acceleration.y() = 0.f;
 
 		colliderBox->x = worldSpacePosition->x;
 		colliderBox->y = worldSpacePosition->y;
+	}
+	else {
+		//onGround = false;
 	}
 }
 
@@ -169,6 +235,11 @@ void Entity::setIdleSprite(std::string name)
 void Entity::setRunSprite(std::string name)
 {
 	runSprite = name;
+}
+
+void Entity::setJumpSprite(std::string name)
+{
+	jumpSprite = name;
 }
 
 void Entity::setAttackSprite(std::string name)

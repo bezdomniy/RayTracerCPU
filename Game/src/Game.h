@@ -13,6 +13,7 @@
 #include "Timer.h"
 #include <stdio.h>
 #include <string>
+//#include <limits>
 
 
 
@@ -25,6 +26,11 @@ public:
 	~Game();
 
 	static SDL_Event event;
+	static float accelerationFromGravity(float force, float velocity, bool onGround);
+	static float accelerationFromJump(float force);
+
+	//template <typename T>
+	static bool almostEquals(float a, float b);
 
 	bool init(const char* title, int xpos, int ypos, bool fullscreen);
 
@@ -57,7 +63,8 @@ private:
 
 
 
-	std::unordered_map<std::string, Entity> entities;
+	std::unordered_map<std::string, Entity> entities1;
+	std::unordered_map<std::string, Entity> entities2;
 
 	//void drawNewRectangle(int x, int y, int width, int height);
 

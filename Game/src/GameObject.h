@@ -3,6 +3,7 @@
 #include <SDL.h>
 #include <vector>
 #include <unordered_map>
+#include <Eigen/Dense>
 #include "SpriteSheet.h"
 //#include "Game.h"
 
@@ -15,15 +16,15 @@ public:
 
 	std::string objectName;
 
-
 	void destroy(); //TODO check 
 
 	SDL_Rect* worldSpacePosition = nullptr;
 
-	float velocity_x = 0;
-	float velocity_y = 0;
+	Eigen::Vector2f velocity;
+	Eigen::Vector2f acceleration;
+
 	//SDL_Point* centre;
-	double rotationDegrees = 0;
+	double rotationDegrees = 0.0;
 	SDL_RendererFlip flipType;
 
 	bool collidable = true;

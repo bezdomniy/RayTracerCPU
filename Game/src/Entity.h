@@ -29,8 +29,13 @@ public:
 
 	void setIdleSprite(std::string name);
 	void setRunSprite(std::string name);
+	void setJumpSprite(std::string name);
 	void setAttackSprite(std::string name);
 	//void setIdleSprite(std::string);
+
+	bool fixedInPlace = true;
+
+	bool onGround = false;
 
 
 	bool checkCollisions(std::unordered_map<std::string, Entity>* objectMap);
@@ -46,6 +51,7 @@ public:
 private:
 	std::string idleSprite;
 	std::string runSprite;
+	std::string jumpSprite;
 	std::string attackSprite;
 	//std::string runSprite;
 	
