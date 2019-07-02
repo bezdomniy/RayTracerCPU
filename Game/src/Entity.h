@@ -1,16 +1,17 @@
 #pragma once
 #include "GameObject.h"
+//#include "Camera.h"
 //#include "Collider.h"
 
 class Entity :
 	public GameObject
 {
 public:
-	//using GameObject::~GameObject;
+	//using GameObject::GameObject;
 
 	Entity();
 	~Entity();
-	Entity(std::string const& name, SpriteSheet* spriteSheet, std::string const& spriteName, int x, int y, std::unordered_map<std::string, Entity>* entities);
+	Entity(std::string const& name, SpriteSheet* spriteSheet, std::string const& spriteName, int x, int y, SDL_Renderer* renderer, std::unordered_map<std::string, Entity>* entities);
 
 	bool playerControlled = false;
 
@@ -36,6 +37,8 @@ public:
 	bool fixedInPlace = true;
 
 	bool onGround = false;
+
+	void render(GameObject& camera);
 
 
 	bool checkCollisions(std::unordered_map<std::string, Entity>* objectMap);

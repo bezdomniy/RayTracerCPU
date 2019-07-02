@@ -71,6 +71,7 @@ void SpriteSheet::loadText(std::string coordsPath)
 			gSpriteClips[name].push_back(nextRect);
 		}
 	}
+	infile.close();
 }
 
 void SpriteSheet::loadJSON(std::string coordsPath)
@@ -97,21 +98,13 @@ void SpriteSheet::loadJSON(std::string coordsPath)
 
 		posBuffer = it.key().find_last_of(".");
 		rectIndex = stoi(it.key().substr(posBuffer - 2, posBuffer));
-		//std::cout << it.key() << ": " << rectIndex << "\n";
 
 		gSpriteClips[name].insert(gSpriteClips[name].begin()+ rectIndex, nextRect);
-
-		//std::cout << name << " ";
-		//for (auto e : gSpriteClips[name]) {
-		//	std::cout << e->x << " ";
-		//}
-		//std::cout << "\n";
 	}
 
 	//for (auto& e : gSpriteClips) {
 	//	std::cout << e.first << ": " << e.second.size()  << "\n";
 	//}
-
 
 	//exit(0);
 }

@@ -1,13 +1,12 @@
 #include "Texture.h"
 
-Texture::Texture(SDL_Renderer* renderer, bool db)
+Texture::Texture(SDL_Renderer* renderer)
 {
 	gRenderer = renderer;
 	mTexture = NULL;
 	mWidth = 0;
 	mHeight = 0;
 
-	debug = db;
 }
 
 Texture::~Texture()
@@ -56,24 +55,9 @@ void Texture::free()
 	}
 }
 
-void Texture::render(Entity &entity, Camera& camera)
+SDL_Texture* Texture::get()
 {
-	SDL_Rect cameraSpacePosition = {entity.worldSpacePosition->x - camera.worldSpacePosition->x, entity.worldSpacePosition->y - camera.worldSpacePosition->y, entity.worldSpacePosition->w, entity.worldSpacePosition->h };
-
-	if (debug && entity.collidable) {
-		SDL_Rect cameraSpacePosition = { entity.colliderBox->x - camera.worldSpacePosition->x, entity.colliderBox->y - camera.worldSpacePosition->y, entity.colliderBox->w, entity.colliderBox->h };
-		SDL_SetRenderDrawColor(gRenderer, 0xFF, 0x00, 0x00, 0xFF);
-		SDL_RenderDrawRect(gRenderer, &cameraSpacePosition);
-		SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0x00, 0xFF);
-	}
-
-
-	SDL_RenderCopyEx(gRenderer, mTexture, entity.currentSprite, &cameraSpacePosition, entity.rotationDegrees, NULL, entity.flipType);
-}
-
-void Texture::render(Camera &camera)
-{
-	SDL_RenderCopy( gRenderer, mTexture, camera.worldSpacePosition, NULL);
+	return mTexture;
 }
 
 int Texture::getWidth()

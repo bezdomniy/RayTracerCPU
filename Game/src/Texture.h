@@ -3,21 +3,19 @@
 #include <string>
 #include <SDL.h>
 #include <SDL_image.h>
-#include "GameObject.h"
-#include "Entity.h"
-#include "Camera.h"
+//#include "GameObject.h"
+//#include "Entity.h"
+//#include "Camera.h"
 
 class Texture
 {
 public:
-	Texture(SDL_Renderer* renderer, bool db = false);
+	Texture(SDL_Renderer* renderer);
 	~Texture();
 
 	bool loadFromFile(std::string path);
 	void free();
-
-	void render(Entity &entity, Camera& camera);
-	void render(Camera & camera);
+	SDL_Texture* get();
 
 	int getWidth();
 	int getHeight();
@@ -29,6 +27,5 @@ private:
 	int mWidth;
 	int mHeight;
 
-	bool debug;
 };
 

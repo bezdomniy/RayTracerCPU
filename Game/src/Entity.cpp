@@ -1,6 +1,8 @@
 #include "entity.h"
 #include "Game.h"
 
+#define DEBUG true
+
 Entity::Entity()
 {
 	currentSprite = nullptr;
@@ -17,7 +19,7 @@ Entity::~Entity()
 	//delete collider;
 }
 
-Entity::Entity(std::string const& name, SpriteSheet* spriteSheet, std::string const& spriteName, int x, int y, std::unordered_map<std::string, Entity>* entities) : GameObject(name, x, y)
+Entity::Entity(std::string const& name, SpriteSheet* spriteSheet, std::string const& spriteName, int x, int y, SDL_Renderer* renderer, std::unordered_map<std::string, Entity>* entities) : GameObject(name, x, y, renderer)
 {
 	entityPtr = entities;
 
@@ -245,6 +247,21 @@ void Entity::setJumpSprite(std::string name)
 void Entity::setAttackSprite(std::string name)
 {
 	attackSprite = name;
+}
+
+void Entity::render(GameObject& camera)
+{
+	SDL_Rect cameraSpacePosition = { worldSpacePosition->x - camera.worldSpacePosition->x, worldSpacePosition->y - camera.worldSpacePosition->y, worldSpacePosition->w, worldSpacePosition->h };
+
+	if (DEBUG && collidable) {
+		SDL_Rect cameraSpacePosition = { colliderBox->x - camera.worldSpacePosition->x, colliderBox->y - camera.worldSpacePosition->y, colliderBox->w, colliderBox->h };
+		SDL_SetRenderDrawColor(rendererPtr, 0xFF, 0x00, 0x00, 0xFF);
+		SDL_RenderDrawRect(rendererPtr, &cameraSpacePosition);
+		SDL_SetRenderDrawColor(rendererPtr, 0x00, 0x00, 0x00, 0xFF);
+	}
+
+
+	SDL_RenderCopyEx(rendererPtr, gameObjectTexture->get(), currentSprite, &cameraSpacePosition, rotationDegrees, NULL, flipType);
 }
 
 bool Entity::checkCollisions(std::unordered_map<std::string, Entity>* objectMap)

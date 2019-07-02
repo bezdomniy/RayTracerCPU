@@ -7,10 +7,12 @@ class Camera :
 {
 
 public:
+	//using GameObject::GameObject;
+
 	Camera();
 	~Camera();
 
-	Camera(std::string const& name, int x, int y, Entity* player);
+	Camera(std::string const& name, int x, int y, SDL_Renderer* renderer, Entity* player);
 	void move();
 
 private:

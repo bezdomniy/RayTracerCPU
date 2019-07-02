@@ -11,6 +11,8 @@
 #include "Entity.h"
 #include "Camera.h"
 #include "Timer.h"
+#include "ObjectManager.h"
+
 #include <stdio.h>
 #include <string>
 //#include <limits>
@@ -51,20 +53,22 @@ private:
 
 	float timeStep = 0;
 
-	SpriteSheet* gSpriteSheet1;
-	SpriteSheet* gSpriteSheet2;
+	ObjectManager* objectManager = nullptr;
 
-	Texture gSpriteSheetTexture1 = NULL;
-	Texture gSpriteSheetTexture2 = NULL;
+	//SpriteSheet* gSpriteSheet1;
+	//SpriteSheet* gSpriteSheet2;
+
+	//Texture gSpriteSheetTexture1 = NULL;
+	//Texture gSpriteSheetTexture2 = NULL;
 
 	Texture gBackgroundTexture = NULL;
 
 	Camera camera;
 
 
-
-	std::unordered_map<std::string, Entity> entities1;
-	std::unordered_map<std::string, Entity> entities2;
+	Entity player;
+	//std::unordered_map<std::string, Entity> entities1;
+	//std::unordered_map<std::string, Entity> entities2;
 
 	//void drawNewRectangle(int x, int y, int width, int height);
 

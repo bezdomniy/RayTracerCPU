@@ -8,10 +8,13 @@ Camera::~Camera()
 {
 }
 
-Camera::Camera(std::string const& name, int x, int y, Entity* player) : GameObject(name, x, y) {
+Camera::Camera(std::string const& name, int x, int y, SDL_Renderer* renderer, Entity* player) : GameObject(name, x, y, renderer) {
 	playerPtr = player;
 
-	worldSpacePosition = new SDL_Rect({ x,y, 640, 480 });
+
+	worldSpacePosition->w = 640;
+	worldSpacePosition->h = 480;
+	//worldSpacePosition = new SDL_Rect({ x,y, 640, 480 });
 }
 
 void Camera::move()
