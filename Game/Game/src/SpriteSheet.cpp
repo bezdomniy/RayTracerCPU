@@ -11,7 +11,7 @@ SpriteSheet::SpriteSheet(std::string const& sp, std::string const& cp, bool json
 	spritesPath = sp;
 	//loadText(cp);
 	if (json)
-		loadJSON("resources/platformer/adventurer.json");
+		loadJSON(cp);
 	else
 		loadText(cp);
 }
@@ -77,6 +77,10 @@ void SpriteSheet::loadText(std::string coordsPath)
 void SpriteSheet::loadJSON(std::string coordsPath)
 {
 	std::ifstream i(coordsPath);
+	if (!i.is_open()) {
+		std::cerr << "Error opening file at: " << coordsPath << "\n";
+		//exit(1);
+	}
 	json j = json::parse(i);
 	i.close();
 

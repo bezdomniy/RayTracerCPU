@@ -1,7 +1,5 @@
 #pragma once
 
-#ifndef Game_h
-#define Game_h
 
 #include <SDL.h>
 #include <SDL_image.h>
@@ -78,4 +76,3 @@ private:
 	bool isRunning;
 };
 
-#endif // !Game_h

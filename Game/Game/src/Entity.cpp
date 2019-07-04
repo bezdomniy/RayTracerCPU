@@ -1,4 +1,4 @@
-#include "entity.h"
+#include "Entity.h"
 #include "Game.h"
 
 #define DEBUG true
@@ -260,17 +260,17 @@ void Entity::render(GameObject& camera)
 		SDL_SetRenderDrawColor(rendererPtr, 0x00, 0x00, 0x00, 0xFF);
 	}
 
-
 	SDL_RenderCopyEx(rendererPtr, gameObjectTexture->get(), currentSprite, &cameraSpacePosition, rotationDegrees, NULL, flipType);
 }
 
 bool Entity::checkCollisions(std::unordered_map<std::string, Entity>* objectMap)
 {
-	for (auto& object : *objectMap) {
-		if (objectName != object.second.objectName && object.second.collidable) {
-			if (SDL_HasIntersection(colliderBox, object.second.colliderBox)) {
+	for (auto& gameObject : *objectMap) {
+		if (objectName != gameObject.second.objectName && gameObject.second.collidable) {
+			if (SDL_HasIntersection(colliderBox, gameObject.second.colliderBox)) {
 				return true;
 			}
 		}
 	}
+	return false;
 }

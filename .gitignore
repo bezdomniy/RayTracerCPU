@@ -34,3 +34,5 @@
 /Game/.vs
 /Game/Debug
 /Game/x64/Debug
+/Game/Game/out/build
+/Game/Game/.vs

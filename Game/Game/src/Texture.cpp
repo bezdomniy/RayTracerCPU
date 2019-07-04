@@ -3,7 +3,7 @@
 Texture::Texture(SDL_Renderer* renderer)
 {
 	gRenderer = renderer;
-	mTexture = NULL;
+	mTexture = nullptr;
 	mWidth = 0;
 	mHeight = 0;
 
@@ -18,18 +18,18 @@ bool Texture::loadFromFile(std::string path)
 {
 	free();
 
-	SDL_Texture* newTexture = NULL;
+	SDL_Texture* newTexture = nullptr;
 
 	//Load image
 	SDL_Surface* loadedSurface = IMG_Load(path.c_str());
-	if (loadedSurface == NULL)
+	if (loadedSurface == nullptr)
 	{
 		printf("Unable to load image %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
 
 	}
 	else {
 		newTexture = SDL_CreateTextureFromSurface(gRenderer, loadedSurface);
-		if (newTexture == NULL) {
+		if (newTexture == nullptr) {
 			printf("Unable to create texture from %s! SDL Error: %s\n", path.c_str(), SDL_GetError());
 		}
 		else {
@@ -42,14 +42,14 @@ bool Texture::loadFromFile(std::string path)
 	}
 
 	mTexture = newTexture;
-	return mTexture != NULL;
+	return mTexture != nullptr;
 }
 
 void Texture::free()
 {
-	if (mTexture != NULL) {
+	if (mTexture != nullptr) {
 		SDL_DestroyTexture(mTexture);
-		mTexture = NULL;
+		mTexture = nullptr;
 		mWidth = 0;
 		mHeight = 0;
 	}

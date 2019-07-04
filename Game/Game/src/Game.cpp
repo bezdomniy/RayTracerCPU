@@ -87,8 +87,8 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 			gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
 			objectManager = new ObjectManager(gRenderer);
-			objectManager->addSpriteSheet("resources/platformer/adventurer.png", "resources/platformer/adventurer.json");
-			objectManager->addSpriteSheet("resources/0x72_DungeonTilesetII_v1.1.png", "resources/tiles_list_v1.1", false);
+			objectManager->addSpriteSheet("../../../resources/platformer/adventurer.png", "../../../resources/platformer/adventurer.json");
+			objectManager->addSpriteSheet("../../../resources/0x72_DungeonTilesetII_v1.1.png", "../../../resources/tiles_list_v1.1", false);
 			for (auto& spriteSheet : objectManager->spriteSheets) {
 				objectManager->addTexture(gRenderer, spriteSheet.second);
 			}
@@ -107,10 +107,9 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 			camera = Camera("camera", 0, 500, gRenderer, &player);
 
 
+			objectManager->loadMapFromFile("../../../resources/platformer/map.mp", "0x72_DungeonTilesetII_v1.1.png");
 
-			objectManager->loadMapFromFile("resources/platformer/map.mp", "0x72_DungeonTilesetII_v1.1.png");
-
-			camera.setTextureFromPath("resources/background.png");
+			camera.setTextureFromPath("../../../resources/background.png");
 
 			if (gRenderer == NULL) {
 				printf("Renderer could not be created! SDL Error: %s\n", SDL_GetError()); success = false;

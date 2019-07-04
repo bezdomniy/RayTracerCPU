@@ -1,3 +1,5 @@
+#ifndef GAME_H
+#define GAME_H
 #include "Game.h"
 
 Game* game = nullptr;
@@ -24,3 +26,5 @@ int main(int argc, char* args[])
 
 	return 0;
 }
+
+#endif    // GAME_H

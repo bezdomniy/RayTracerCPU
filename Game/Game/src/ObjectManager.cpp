@@ -43,6 +43,13 @@ void ObjectManager::loadMapFromFile(std::string const path, std::string textureN
 			spriteName = indexToSprite[stoi(gridBuffer)];
 
 			tileName = "tile" + std::to_string(i) + std::to_string(j);
+
+			//std::cout << "|";
+			//for (auto& c : tiles) {
+			//	std::cout << c.first << " ";
+			//}
+			//std::cout << "|\n\n";
+
 			tiles[tileName] = Entity(tileName, getSpriteSheet(spriteName), spriteName, j * gridWidth, i * gridHeight, rendererPtr, &tiles);
 			tiles[tileName].setTexture(texturesByName[textureName]);
 
