@@ -1,5 +1,6 @@
 #pragma once
 #include "GameObject.h"
+#include "Sprite.h"
 //#include "Camera.h"
 //#include "Collider.h"
 
@@ -12,6 +13,7 @@ public:
 	Entity();
 	~Entity();
 	Entity(std::string const& name, SpriteSheet* spriteSheet, std::string const& spriteName, int x, int y, SDL_Renderer* renderer, std::unordered_map<std::string, Entity>* entities);
+	Entity(std::string const& name, SpriteSheet* spriteSheet, int const spriteIndex, int x, int y, SDL_Renderer* renderer, std::unordered_map<std::string, Entity>* entities);
 
 	bool playerControlled = false;
 
@@ -47,9 +49,9 @@ public:
 	size_t numberOfFrames = 0;
 	int animationSlowdown = 1;
 
-	std::vector<SDL_Rect*>* spriteVector;
+	std::vector<Sprite*>* spriteVector;
 	SpriteSheet* spriteSheetPtr;
-	SDL_Rect* currentSprite;
+	Sprite* currentSprite;
 
 private:
 	std::string idleSprite;

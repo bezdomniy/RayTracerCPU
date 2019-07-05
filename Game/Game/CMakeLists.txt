@@ -11,7 +11,7 @@ file(GLOB SOURCES
     src/*.cpp
 )
 
-add_compile_options("-Wpragma-pack")
+#add_compile_options("-Wpragma-pack")
 
 add_executable(Game ${SOURCES})
 #add_executable (Game "./src/main.cpp")

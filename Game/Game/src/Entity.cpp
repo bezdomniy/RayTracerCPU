@@ -47,6 +47,34 @@ Entity::Entity(std::string const& name, SpriteSheet* spriteSheet, std::string co
 
 }
 
+Entity::Entity(std::string const& name, SpriteSheet* spriteSheet, int const spriteIndex, int x, int y, SDL_Renderer* renderer, std::unordered_map<std::string, Entity>* entities) : GameObject(name, x, y, renderer)
+{
+	entityPtr = entities;
+
+	velocity << 0.f, 0.f;
+	acceleration << 0.1f, 0.f;
+
+	spriteSheetPtr = spriteSheet;
+	spriteVector = new std::vector<Sprite*>();
+
+	//std::cout << spriteSheetPtr->sprites.size() << "\n";
+	spriteVector->push_back(spriteSheetPtr->operator[](spriteIndex));
+
+	numberOfFrames = spriteVector->size();
+
+	//std::cout << numberOfFrames << "\n";
+
+	currentSprite = spriteVector->at(currentSpriteIndex);
+
+	worldSpacePosition = new SDL_Rect({ x,y, currentSprite->w, currentSprite->h });
+
+	collidable = true;
+
+	if (collidable) {
+		colliderBox = new SDL_Rect({ x,y, worldSpacePosition->w, worldSpacePosition->h });
+	}
+}
+
 std::pair<int, int> Entity::getSize()
 {
 	return std::pair<int, int>{worldSpacePosition->w, worldSpacePosition->h};
