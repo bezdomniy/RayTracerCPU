@@ -32,6 +32,9 @@ target_link_libraries(Game PRIVATE ${OPENGL_gl_LIBRARY})
 find_package(glm CONFIG REQUIRED)
 target_link_libraries(Game PRIVATE glm)
 
+find_package(assimp CONFIG REQUIRED)
+target_link_libraries(Game PRIVATE ${ASSIMP_LIBRARIES})
+
 #set(INCLUDE_DIRS ${SDL2_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 #set(LIBS ${LIBS} ${SDL2_LIBRARIES} ${GLEW_LIBRARIES} )
 

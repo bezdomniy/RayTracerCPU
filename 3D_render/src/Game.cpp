@@ -2,7 +2,7 @@
 #include <iostream>
 
 SDL_Event Game::event;
-
+const Uint8* Game::kb = SDL_GetKeyboardState(NULL);
 
 Game::Game(unsigned int w_width, unsigned int w_height)
 {
@@ -21,6 +21,11 @@ Game::~Game()
 {
 }
 
+
+bool Game::almostEquals(float a, float b)
+{
+	return std::abs(a - b) < std::numeric_limits<float>::epsilon();
+}
 
 bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 {
@@ -89,59 +94,27 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 
 void Game::initialiseObjects()
 {
-	float vertices[] = {
-		 0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+	//donut = Model("../../../resources/blender/donut.obj");
+	//donutTop = Model("../../../resources/blender/donutTop.ply");
 
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	int grid[] = {  5,3,3,3,3,3,3,3,3,6,
+					1,0,0,0,0,0,0,0,0,2,
+					1,0,0,0,0,9,0,0,0,2,
+					1,0,0,0,0,0,0,0,0,2,
+					1,0,9,0,0,0,0,0,0,2,
+					1,0,0,0,0,0,0,0,0,2,
+					1,0,0,0,0,0,9,0,0,2,
+					1,0,0,9,0,0,0,0,0,2,
+					1,0,0,0,0,0,0,0,0,2,
+					8,4,4,4,4,4,4,4,4,7 };
 
-		 0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-		 0.5f,  0.5f, -0.5f,  1.0f, 0.0f,
-		-0.5f,  0.5f, -0.5f,  0.0f, 0.0f,
-		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+	map.loadMap(grid, sizeof(grid)/sizeof(int), 10, 10, "../../../resources/textures/wall.jpg", "../../../resources/textures/floor.jpg");
+	addPlayer(-1.5f, -1.5f);
+}
 
-		 0.5f,  -0.5f, 0.5f,  1.0f, 1.0f,
-		 0.5f,  -0.5f,-0.5f,  1.0f, 0.0f,
-		-0.5f,  -0.5f,-0.5f,  0.0f, 0.0f,
-		-0.5f,  -0.5f, 0.5f,  0.0f, 1.0f,
-
-		 0.5f,   0.5f, 0.5f,  1.0f, 1.0f,
-		 0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,
-		 0.5f,  -0.5f,-0.5f,  0.0f, 0.0f,
-		 0.5f,   0.5f,-0.5f,  0.0f, 1.0f,
-
-		-0.5f,   0.5f, 0.5f,  1.0f, 1.0f,
-		-0.5f,  -0.5f, 0.5f,  1.0f, 0.0f,
-		-0.5f,  -0.5f,-0.5f,  0.0f, 0.0f,
-		-0.5f,   0.5f,-0.5f,  0.0f, 1.0f
-
-	};
-
-
-	unsigned int indices[] = {  
-		0, 1, 3,  
-		1, 2, 3, 
-		4, 5, 7,
-		5, 6 ,7,
-		8, 9, 11,
-		9, 10,11,
-		12, 13, 15,
-		13, 14, 15,
-		16, 17, 19,
-		17, 18, 19,
-		20, 21, 23,
-		21, 22, 23,
-		24, 25, 27,
-		25, 26, 27
-	};
-
-	texture = Texture("../../../resources/textures/wall.jpg");
-	createVAO(vertices, sizeof(vertices), indices, sizeof(indices));
+void Game::addPlayer(float x, float z)
+{
+	player = Player("awesomeDude", x, z);
 }
 
 
@@ -150,7 +123,9 @@ bool Game::update()
 	//Loading success flag
 	bool success = true;
 
-	timeStep = timer->getTicks();
+	timeStep = timer->getTicks()/10;
+	player.updateVelocity();
+	player.move(timeStep);
 
 	//timer->restart();
 	return success;
@@ -162,15 +137,17 @@ void Game::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::rotate(model, glm::radians(1.0f)*timeStep/10.f  , glm::vec3(0.5f, 1.0f, 0.0f));
+	/*model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));*/
+	//model = glm::rotate(model, glm::radians(1.0f)*timeStep/10.f  , glm::vec3(1.0f, 0.0f, 0.1f));
 
 	glm::mat4 view = glm::mat4(1.f);
-	view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+	view = glm::translate(view, glm::vec3(player.worldSpacePosition.x, player.worldSpacePosition.y, player.worldSpacePosition.z));
+	
 
 	glm::mat4 projection;
-	projection = glm::perspective(glm::radians(60.0f), float(window_width / window_height), 0.1f, 100.0f);
-
-	glBindTexture(GL_TEXTURE_2D, texture.get());
+	projection = glm::perspective(glm::radians(60.0f), float(window_width) / float(window_height), 0.1f, 100.0f);
+	projection = glm::rotate(projection, glm::radians(player.rotationDegrees) , glm::vec3(0.0f, 1.0f, 0.0f));
+	//glBindTexture(GL_TEXTURE_2D, texture.get());
 
 	shader.use();
 
@@ -186,6 +163,10 @@ void Game::render()
 	glBindVertexArray(VAO);
 	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)0);
 	glBindVertexArray(0);
+
+	//donut.Draw(shader);
+	map.Draw(shader);
+	//donutTop.Draw(shader);
 
 	SDL_GL_SwapWindow(window);	
 }
@@ -224,32 +205,4 @@ bool Game::running()
 	}
 	return false;
 }
-
-void Game::createVAO(float vertices[], size_t sizeV, unsigned int indices[], size_t sizeI)
-{
-	glGenBuffers(1, &EBO);
-	glGenBuffers(1, &VBO);
-	glGenVertexArrays(1, &VAO);
-
-	// 1. bind Vertex Array Object
-	glBindVertexArray(VAO);
-		// 2. copy our vertices array in a vertex buffer for OpenGL to use
-		glBindBuffer(GL_ARRAY_BUFFER, VBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeV, vertices, GL_STATIC_DRAW);
-		// 3. copy our index array in a element buffer for OpenGL to use
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeI, indices, GL_STATIC_DRAW);
-		// 4. then set the vertex attributes pointers
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-		glEnableVertexAttribArray(0);
-
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
-		glEnableVertexAttribArray(1);
-
-	glBindVertexArray(0);
-}
-
-
-
-
 

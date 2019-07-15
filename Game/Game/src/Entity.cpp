@@ -83,7 +83,7 @@ std::pair<int, int> Entity::getSize()
 
 void Entity::nextFrame()
 {
-	std::printf("%f\n", velocity.y());
+	//std::printf("%f\n", velocity.y());
 	if (velocity.x() != 0 /*|| velocity_y != 0*/) {
 		//std::printf("%f\n", velocity.x());
 		spriteVector = spriteSheetPtr->operator[](runSprite);
@@ -231,6 +231,7 @@ void Entity::move(float timeStep)
 		velocity.y() += acceleration.y();
 	}
 
+	std::cout << velocity.y() * timeStep << "\n";
 	worldSpacePosition->y += int (velocity.y() * timeStep);
 
 	colliderBox->x = worldSpacePosition->x;
@@ -238,22 +239,51 @@ void Entity::move(float timeStep)
 
 	//onGround = false;
 
-	if (playerControlled && checkCollisions(entityPtr)) {
-		//playerControlled = false;
+	//if (onGround) {
+	//	colliderBox->y = worldSpacePosition->y + 1;
+	//}
 
-		onGround = true;
+	//onGround = false;
 
-		worldSpacePosition->x -= 1;
-		worldSpacePosition->y -= 1;
+	std::vector<int> collisions = checkCollisions(entityPtr);
+
+	if (playerControlled && !collisions.empty()) {
+	//if (playerControlled && (collisions[0] || collisions[1] || collisions[2] || collisions[3])) {
+		std::cout << collisions[0] << ", " << collisions[1] << ", " << collisions[2] << ", " << collisions[3] << "\n";
+
+		if (/*!onGround && */collisions[3]) {
+			//worldSpacePosition->y -= (velocity.y() * timeStep) + collisions[3];
+			worldSpacePosition->y = collisions[3] - colliderBox->h;
+			velocity.y() = 0.f;
+			acceleration.y() = 0.f;
+			onGround = true;
+		}
+		else if (collisions[2]) {
+			//worldSpacePosition->y += (velocity.y() * timeStep) - collisions[2];
+			worldSpacePosition->y = collisions[2];
+			velocity.y() = 0.f;
+			acceleration.y() = 0.f;
+		}
+
+		else if (collisions[0]) {
+			//worldSpacePosition->x += (velocity.x() * timeStep) - collisions[0];
+			worldSpacePosition->x = collisions[0];
+			velocity.x() = 0.f;
+			//acceleration.x() = 0.f;
+		}
+		else if (collisions[1]) {
+			//worldSpacePosition->x -= (velocity.x() * timeStep) - collisions[1];
+			worldSpacePosition->x = collisions[1] - colliderBox->w;
+			velocity.x() = 0.f;
+			//acceleration.x() = 0.f;
+		}
+
+		//if (onGround)
+		//	onGround = !(collisions[0] == 0 && collisions[1] == 0);
 		
-		velocity.y() = 0.f;
-		acceleration.y() = 0.f;
-
 		colliderBox->x = worldSpacePosition->x;
 		colliderBox->y = worldSpacePosition->y;
-	}
-	else {
-		//onGround = false;
+		
 	}
 }
 
@@ -291,14 +321,34 @@ void Entity::render(GameObject& camera)
 	SDL_RenderCopyEx(rendererPtr, gameObjectTexture->get(), currentSprite, &cameraSpacePosition, rotationDegrees, NULL, flipType);
 }
 
-bool Entity::checkCollisions(std::unordered_map<std::string, Entity>* objectMap)
+std::vector<int> Entity::checkCollisions(std::unordered_map<std::string, Entity>* objectMap)
 {
 	for (auto& gameObject : *objectMap) {
 		if (objectName != gameObject.second.objectName && gameObject.second.collidable) {
 			if (SDL_HasIntersection(colliderBox, gameObject.second.colliderBox)) {
-				return true;
+				std::vector<int> ret = { 0,0,0,0 };
+				if (colliderBox->x > gameObject.second.colliderBox->x && colliderBox->x < gameObject.second.colliderBox->x + gameObject.second.colliderBox->w) {
+					//ret[0] = (gameObject.second.colliderBox->x + gameObject.second.colliderBox->w) - colliderBox->x;
+					ret[0] = (gameObject.second.colliderBox->x + gameObject.second.colliderBox->w);
+				}
+				if (colliderBox->x + colliderBox->w > gameObject.second.colliderBox->x && colliderBox->x + colliderBox->w < gameObject.second.colliderBox->x + gameObject.second.colliderBox->w) {
+					//ret[1] = (colliderBox->x + colliderBox->w) - gameObject.second.colliderBox->x;
+					ret[1] = gameObject.second.colliderBox->x;
+				}
+				if (colliderBox->y > gameObject.second.colliderBox->y && colliderBox->y < gameObject.second.colliderBox->y + gameObject.second.colliderBox->h) {
+					//ret[2] = (gameObject.second.colliderBox->y + gameObject.second.colliderBox->h) - colliderBox->y;
+					ret[2] = (gameObject.second.colliderBox->y + gameObject.second.colliderBox->h);
+				}
+				if (colliderBox->y + colliderBox->h > gameObject.second.colliderBox->y && colliderBox->y + colliderBox->h < gameObject.second.colliderBox->y + gameObject.second.colliderBox->h) {
+					//ret[3] = (colliderBox->y + colliderBox->h) - gameObject.second.colliderBox->y;
+					ret[3] = gameObject.second.colliderBox->y;
+				}
+
+				//std::cout << ret[0] << ", " << ret[1] << ", " << ret[2] << ", " << ret[3] << "\n";
+				//if (ret[0] || ret[1] || ret[2] || ret[3])
+				return ret;
 			}
 		}
 	}
-	return false;
+	return {};
 }

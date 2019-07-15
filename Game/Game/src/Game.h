@@ -13,11 +13,6 @@
 
 #include <stdio.h>
 #include <string>
-//#include <limits>
-
-
-
-//const int NUMBER_OF_SPRITES = 1;
 
 class Game
 {
@@ -53,22 +48,12 @@ private:
 
 	ObjectManager* objectManager = nullptr;
 
-	//SpriteSheet* gSpriteSheet1;
-	//SpriteSheet* gSpriteSheet2;
-
-	//Texture gSpriteSheetTexture1 = NULL;
-	//Texture gSpriteSheetTexture2 = NULL;
-
 	Texture gBackgroundTexture = NULL;
 
 	Camera camera;
 
 
 	Entity player;
-	//std::unordered_map<std::string, Entity> entities1;
-	//std::unordered_map<std::string, Entity> entities2;
-
-	//void drawNewRectangle(int x, int y, int width, int height);
 
 	int window_width = 0;
 	int window_height = 0;

@@ -36,3 +36,5 @@
 /Game/x64/Debug
 /Game/Game/out/build
 /Game/Game/.vs
+/3D_render/.vs
+/3D_render/out/build/x64-Clang-Debug

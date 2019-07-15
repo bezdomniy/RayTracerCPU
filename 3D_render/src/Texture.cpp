@@ -1,22 +1,22 @@
 #include "Texture.h"
 
-Texture::Texture()
+TextureClass::TextureClass()
 {
 
 }
 
-Texture::Texture(std::string const& path)
+TextureClass::TextureClass(std::string const& path)
 {
 	mWidth = 0;
 	mHeight = 0;
 	loadFromFile(path);
 }
 
-Texture::~Texture()
+TextureClass::~TextureClass()
 {
 }
 
-void Texture::loadFromFile(std::string const& path)
+void TextureClass::loadFromFile(std::string const& path)
 {
 	//Load image
 	//IMG_Init(IMG_INIT_JPG);
@@ -57,17 +57,17 @@ void Texture::loadFromFile(std::string const& path)
 	//IMG_Quit();
 }
 
-GLuint Texture::get()
+GLuint TextureClass::get()
 {
 	return id;
 }
 
-int Texture::getWidth()
+int TextureClass::getWidth()
 {
 	return mWidth;
 }
 
-int Texture::getHeight()
+int TextureClass::getHeight()
 {
 	return mHeight;
 }

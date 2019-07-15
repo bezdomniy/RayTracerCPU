@@ -31,6 +31,9 @@ Game::~Game()
 float Game::accelerationFromGravity(float acceleration, float velocity, bool onGround)
 {
 	//return 0.f;
+	if (onGround) {
+		acceleration = 0.f;
+	}
 	const float terminalVelocity = 2.f;
 	const float gravityConstant = 1.f / 60.f / 2.f;
 
@@ -103,11 +106,7 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 			player.setAnimationSlowdown(1);
 			player.setPlayerControlled(true);
 
-			//entities1["ogre2"] = Entity("ogre2" , gSpriteSheet1, "adventurer-idle", window_width / 2 + 100, window_height / 2, &entities1);
-			//entities1["ogre2"].setRunSprite("adventurer-run");
-
 			camera = Camera("camera", 0, 500, gRenderer, &player);
-
 
 			objectManager->loadMapFromFile("../../../resources/platformer/map1.json", "nature-platformer-tileset-16x16.png");
 
@@ -180,12 +179,6 @@ bool Game::render()
 
 	return success;
 }
-
-//void Game::drawNewRectangle(int x, int y, int width, int height) {
-//	SDL_Rect rightRect = {x, y, width, height};
-//	SDL_SetRenderDrawColor(gRenderer, 0x00, 0x00, 0xFF, 0xFF);
-//	SDL_RenderFillRect(gRenderer, &rightRect);
-//}
 
 void Game::clean()
 {

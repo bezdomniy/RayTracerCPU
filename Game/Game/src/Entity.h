@@ -43,7 +43,7 @@ public:
 	void render(GameObject& camera);
 
 
-	bool checkCollisions(std::unordered_map<std::string, Entity>* objectMap);
+	std::vector<int> checkCollisions(std::unordered_map<std::string, Entity>* objectMap);
 
 	int currentSpriteIndex = 0;
 	size_t numberOfFrames = 0;

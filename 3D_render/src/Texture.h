@@ -5,14 +5,15 @@
 #include <SDL_image.h>
 #include <gl/glew.h>
 
-class Texture
+class TextureClass
 {
 public:
-	Texture();
-	Texture(std::string const& path);
-	~Texture();
+	TextureClass();
+	TextureClass(std::string const& path);
+	~TextureClass();
 
 	GLuint id = 0;
+	std::string type;
 
 	void loadFromFile(std::string const& path);
 

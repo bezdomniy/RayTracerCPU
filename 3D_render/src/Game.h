@@ -11,9 +11,12 @@
 
 #include "Timer.h"
 #include "Shader.h"
-#include "Texture.h"
+//#include "Texture.h"
+//#include "Model.h"
+#include "Map2d.h"
+#include "Player.h"
 
-#include <stdio.h>
+#include <iostream>
 #include <string>
 
 class Game
@@ -22,10 +25,14 @@ public:
 	Game(unsigned int w_width, unsigned int w_height);
 	~Game();
 
+	static const Uint8* kb; 
 	static SDL_Event event;
+
+	static bool almostEquals(float a, float b);
 
 	bool init(const char* title, int xpos, int ypos, bool fullscreen);
 	void initialiseObjects();
+	void addPlayer(float x, float y);
 
 	bool handleEvents();
 	bool update();
@@ -40,19 +47,22 @@ private:
 
 	SDL_GLContext context;
 	Timer* timer;
+	//Model donut;
+	//Model donutTop;
+	Map2d map;
 
 	GLuint VAO;
 	GLuint EBO;
 	GLuint VBO;
 
 	Shader shader;
-	Texture texture;
-
-	void createVAO(float vertices[], size_t sizeV, unsigned int indices[], size_t sizeI);
+	Player player;
+	
+	//TextureClass texture;
 
 	//void framebuffer_size_callback(SDL_Window* w, int width, int height);
 
-	float timeStep = 0;
+	float timeStep = 0.f;
 
 	int window_width = 0;
 	int window_height = 0;
