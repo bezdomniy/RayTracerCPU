@@ -17,6 +17,6 @@ public:
 	void move(float timeStep);
 
 private:
-	float maxVelocity = 0.00005f;
+	float maxVelocity = 0.1f;
 
 };

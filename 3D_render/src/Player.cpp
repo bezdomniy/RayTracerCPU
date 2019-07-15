@@ -105,7 +105,7 @@ void Player::updateVelocity()
 		velocity.z += (Game::kb[SDL_SCANCODE_W] - Game::kb[SDL_SCANCODE_S]) * acceleration.z;
 	}
 
-	rotationDegrees += (-Game::kb[SDL_SCANCODE_LEFT] + Game::kb[SDL_SCANCODE_RIGHT]) ;
+	rotationDegrees += (-Game::kb[SDL_SCANCODE_LEFT] + Game::kb[SDL_SCANCODE_RIGHT]) * 4 ;
 
 	if (!Game::kb[SDL_SCANCODE_A] && !Game::kb[SDL_SCANCODE_D]) {
 		if (Game::almostEquals(velocity.x, 0.0f)) {
@@ -139,6 +139,6 @@ void Player::move(float timeStep)
 
 	worldSpacePosition += (forward * timeStep);
 
-	std::cout << "x: " << velocity.x << " , z: " << velocity.z << "\n";
+	//std::cout << "x: " << velocity.x << " , z: " << velocity.z << "\n";
 
 }

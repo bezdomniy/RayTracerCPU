@@ -12,7 +12,7 @@ GameObject::GameObject(std::string const& name, float x, float z)
 
 	velocity = glm::vec3(0.f, 0.f, 0.f);
 	forward = glm::vec3(1.f, 1.f, 1.f);
-	acceleration = glm::vec3(0.000025f, 0.f, 0.000025f);
+	acceleration = glm::vec3(0.025f, 0.f, 0.025f);
 
 	collidable = false;
 }

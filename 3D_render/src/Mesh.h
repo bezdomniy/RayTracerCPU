@@ -34,6 +34,7 @@ public:
 	/*  Functions  */
 	Mesh();
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture*> textures);
+	~Mesh();
 	void Draw(Shader shader);
 	void Draw(Shader shader, Texture* texture);
 
