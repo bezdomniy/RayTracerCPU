@@ -24,13 +24,20 @@ Mesh::~Mesh()
 		glDeleteBuffers(1, &EBO);
 }
 
-void Mesh::Draw(Shader shader)
+void Mesh::Draw(Shader shader, glm::vec3 worldPosition)
 {
+	shader.use();
 	// bind appropriate textures
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
 	unsigned int normalNr = 1;
 	unsigned int heightNr = 1;
+
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, worldPosition);
+
+	unsigned int modelLoc = glGetUniformLocation(shader.id, "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 	for (unsigned int i = 0; i < textures.size(); i++)
 	{
@@ -65,11 +72,18 @@ void Mesh::Draw(Shader shader)
 
 void Mesh::Draw(Shader shader, Texture* texture)
 {
+	shader.use();
 	// bind appropriate textures
 	unsigned int diffuseNr = 1;
 	unsigned int specularNr = 1;
 	unsigned int normalNr = 1;
 	unsigned int heightNr = 1;
+
+	glm::mat4 model = glm::mat4(1.0f);
+	//model = glm::translate(model, worldPosition);
+
+	unsigned int modelLoc = glGetUniformLocation(shader.id, "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 
 
 		glActiveTexture(GL_TEXTURE0); // active proper texture unit before binding
@@ -122,6 +136,12 @@ Mesh Mesh::combine(Mesh& other)
 
 	newMesh = Mesh(newVertices, newIndices, newTextures);
 	newMesh.type = this->type;
+
+	//std::cout << newMesh.vertices[0].Normal.x << " " << newMesh.vertices[0].Normal.y << " " << newMesh.vertices[0].Normal.z << "\n";
+	//std::cout << newMesh.vertices[1].Normal.x << " " << newMesh.vertices[1].Normal.y << " " << newMesh.vertices[1].Normal.z << "\n";
+	//std::cout << newMesh.vertices[2].Normal.x << " " << newMesh.vertices[2].Normal.y << " " << newMesh.vertices[2].Normal.z << "\n";
+	//std::cout << newMesh.vertices[3].Normal.x << " " << newMesh.vertices[3].Normal.y << " " << newMesh.vertices[3].Normal.z << "\n";
+	//std::cout << "\n";
 
 	return newMesh;
 }

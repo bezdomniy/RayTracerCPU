@@ -7,18 +7,22 @@ Model::Model()
 Model::Model(char* path)
 {
 	loadModel(path);
-	std::cout << meshes.size() << "\n";
+	worldPosition = glm::vec3(0.f, 0.f, 0.f);
 }
 
 Model::~Model()
 {
 }
 
+void Model::setPosition(glm::vec3 newPos)
+{
+	worldPosition = newPos;
+}
+
 void Model::Draw(Shader shader)
 {
-
 	for (unsigned int i = 0; i < meshes.size(); i++)
-		meshes[i].Draw(shader);
+		meshes[i].Draw(shader, worldPosition);
 }
 
 void Model::loadModel(std::string path)

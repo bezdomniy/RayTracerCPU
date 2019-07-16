@@ -18,7 +18,7 @@ Map2d::~Map2d()
 {
 }
 
-Mesh Map2d::addWall(int posX, int posZ, int alignment, const std::string& texturePath, bool addToMeshes)
+Mesh Map2d::addWall(int posX, int posZ, int alignment, bool facingOut, const std::string& texturePath, bool addToMeshes)
 {
 	std::vector<Vertex> vertices;
 	std::vector<unsigned int> indices;
@@ -32,12 +32,22 @@ Mesh Map2d::addWall(int posX, int posZ, int alignment, const std::string& textur
 	Texture* texture;
 	Mesh mesh;
 
+	int normFlip = -1;
+	if (facingOut) {
+		normFlip = 1;
+	}
+
 	switch (alignment) {
 	case 0: //Left
 		v0 = {glm::vec3(posX * SIZE_X, 0, posZ * SIZE_Z)}; //baseUpper
 		v1 = { glm::vec3(posX * SIZE_X, 0, (posZ + 1) * SIZE_Z) }; //baseLower
 		v3 = { glm::vec3(posX * SIZE_X, SIZE_Y, posZ * SIZE_Z) }; //ceilUpper
 		v2 = { glm::vec3(posX * SIZE_X, SIZE_Y, (posZ + 1) * SIZE_Z) }; //ceilLower
+
+		v0.Normal = glm::vec3(normFlip * -1.f, 0.f, 0.f);
+		v1.Normal = glm::vec3(normFlip * -1.f, 0.f, 0.f);
+		v2.Normal = glm::vec3(normFlip * -1.f, 0.f, 0.f);
+		v3.Normal = glm::vec3(normFlip * -1.f, 0.f, 0.f);
 
 		break;
 	case 1: //Right
@@ -46,6 +56,11 @@ Mesh Map2d::addWall(int posX, int posZ, int alignment, const std::string& textur
 		v3 = { glm::vec3((posX + 1) * SIZE_X, SIZE_Y, posZ * SIZE_Z) }; //ceilUpper
 		v2 = { glm::vec3((posX + 1) * SIZE_X, SIZE_Y, (posZ + 1) * SIZE_Z) }; //ceilLower
 
+		v0.Normal = glm::vec3(normFlip * 1.f, 0.f, 0.f);
+		v1.Normal = glm::vec3(normFlip * 1.f, 0.f, 0.f);
+		v2.Normal = glm::vec3(normFlip * 1.f, 0.f, 0.f);
+		v3.Normal = glm::vec3(normFlip * 1.f, 0.f, 0.f);
+
 		break;
 	case 2: //Top
 		v0 = { glm::vec3(posX * SIZE_X, 0, posZ * SIZE_Z) }; //baseLeft
@@ -53,12 +68,23 @@ Mesh Map2d::addWall(int posX, int posZ, int alignment, const std::string& textur
 		v3 = { glm::vec3(posX * SIZE_X, SIZE_Y, posZ * SIZE_Z) }; //ceilLeft
 		v2 = { glm::vec3((posX + 1) * SIZE_X, SIZE_Y, posZ * SIZE_Z) }; //ceilRight
 
+		v0.Normal = glm::vec3(0.f, 0.f, normFlip * -1.f);
+		v1.Normal = glm::vec3(0.f, 0.f, normFlip * -1.f);
+		v2.Normal = glm::vec3(0.f, 0.f, normFlip * -1.f);
+		v3.Normal = glm::vec3(0.f, 0.f, normFlip * -1.f);
+
 		break;
 	case 3: //Bottom
 		v0 = { glm::vec3(posX * SIZE_X, 0, (posZ + 1) * SIZE_Z) }; //baseLeft
 		v1 = { glm::vec3((posX + 1) * SIZE_X, 0, (posZ + 1) * SIZE_Z) }; //baseRight
 		v3 = { glm::vec3(posX * SIZE_X, SIZE_Y, (posZ + 1) * SIZE_Z) }; //ceilLeft
 		v2 = { glm::vec3((posX + 1) * SIZE_X, SIZE_Y, (posZ + 1) * SIZE_Z) }; //ceilRight
+
+		v0.Normal = glm::vec3(0.f, 0.f, normFlip * 1.f);
+		v1.Normal = glm::vec3(0.f, 0.f, normFlip * 1.f);
+		v2.Normal = glm::vec3(0.f, 0.f, normFlip * 1.f);
+		v3.Normal = glm::vec3(0.f, 0.f, normFlip * 1.f);
+
 		break;
 	default:
 		break;
@@ -75,7 +101,7 @@ Mesh Map2d::addWall(int posX, int posZ, int alignment, const std::string& textur
 	vertices.push_back(v3);
 
 	indices = { 0, 1, 3,
-				1, 2, 3 };
+				1, 3, 2 };
 
 	texture = loadTextureFromFile("wall", texturePath);
 	//textures.push_back(texture);
@@ -91,7 +117,7 @@ Mesh Map2d::addWall(int posX, int posZ, int alignment, const std::string& textur
 	return mesh;
 }
 
-Mesh Map2d::addCorner(int posX, int posZ, int alignment, const std::string& texturePath, bool addToMeshes)
+Mesh Map2d::addCorner(int posX, int posZ, int alignment, bool facingOut, const std::string& texturePath, bool addToMeshes)
 {
 	Mesh mesh0;
 	Mesh mesh1;
@@ -99,20 +125,20 @@ Mesh Map2d::addCorner(int posX, int posZ, int alignment, const std::string& text
 
 	switch (alignment) {
 	case 0: //Top left
-		mesh0 = addWall(posX, posZ, 0, texturePath, false);
-		mesh1 = addWall(posX, posZ, 2, texturePath, false);
+		mesh0 = addWall(posX, posZ, 0, facingOut, texturePath, false);
+		mesh1 = addWall(posX, posZ, 2, facingOut, texturePath, false);
 		break;
 	case 1: //Top Right
-		mesh0 = addWall(posX, posZ, 1, texturePath, false);
-		mesh1 = addWall(posX, posZ, 2, texturePath, false);
+		mesh0 = addWall(posX, posZ, 1, facingOut, texturePath, false);
+		mesh1 = addWall(posX, posZ, 2, facingOut, texturePath, false);
 		break;
 	case 2: //Bottom Right
-		mesh0 = addWall(posX, posZ, 1, texturePath, false);
-		mesh1 = addWall(posX, posZ, 3, texturePath, false);
+		mesh0 = addWall(posX, posZ, 1, facingOut, texturePath, false);
+		mesh1 = addWall(posX, posZ, 3, facingOut, texturePath, false);
 		break;
 	case 3: //Bottom left
-		mesh0 = addWall(posX, posZ, 0, texturePath, false);
-		mesh1 = addWall(posX, posZ, 3, texturePath, false);
+		mesh0 = addWall(posX, posZ, 0, facingOut, texturePath, false);
+		mesh1 = addWall(posX, posZ, 3, facingOut, texturePath, false);
 		break;
 	default:
 		break;
@@ -131,8 +157,8 @@ Mesh Map2d::addBlock(int posX, int posZ, const std::string& texturePath, bool ad
 	Mesh mesh1;
 	Mesh newMesh;
 
-	mesh0 = addCorner(posX, posZ, 0, texturePath, false);
-	mesh1 = addCorner(posX, posZ, 2, texturePath, false);
+	mesh0 = addCorner(posX, posZ, 0, true, texturePath, false);
+	mesh1 = addCorner(posX, posZ, 2, true, texturePath, false);
 
 	newMesh = mesh0.combine(mesh1);
 
@@ -161,6 +187,11 @@ Mesh Map2d::addFloor(int posX, int posZ, const std::string& texturePath)
 	v3 = { glm::vec3(posX * SIZE_X, 0, (posZ + 1) * SIZE_Z) }; 
 	v2 = { glm::vec3((posX + 1) * SIZE_X, 0, (posZ + 1) * SIZE_Z) };
 
+	v0.Normal = glm::vec3(0.f, 1.f, 0.f);
+	v1.Normal = glm::vec3(0.f, 1.f, 0.f);
+	v2.Normal = glm::vec3(0.f, 1.f, 0.f);
+	v3.Normal = glm::vec3(0.f, 1.f, 0.f);
+
 
 	v0.TexCoords = glm::vec2(0.0f, 0.0f);
 	v1.TexCoords = glm::vec2(1.0f, 0.0f);
@@ -188,12 +219,9 @@ Mesh Map2d::addFloor(int posX, int posZ, const std::string& texturePath)
 
 void Map2d::Draw(Shader shader)
 {
-	
 	for (unsigned int i = 0; i < meshes.size(); i++) {
 		meshes[i].Draw(shader, texture_map[meshes[i].type]);
-		
 	}
-		
 }
 
 void Map2d::loadMap(int grid[], size_t gridSize, int width, int height, const std::string& wallTexturePath, const std::string& floorTexturePath)
@@ -207,28 +235,28 @@ void Map2d::loadMap(int grid[], size_t gridSize, int width, int height, const st
 			case 0:
 				break;
 			case 1:
-				addWall(j, i, 0, wallTexturePath);
+				addWall(j, i, 0, false, wallTexturePath);
 				break;
 			case 2:
-				addWall(j, i, 1, wallTexturePath);
+				addWall(j, i, 1, false, wallTexturePath);
 				break;
 			case 3:
-				addWall(j, i, 2, wallTexturePath);
+				addWall(j, i, 2, false, wallTexturePath);
 				break;
 			case 4:
-				addWall(j, i, 3, wallTexturePath);
+				addWall(j, i, 3, false, wallTexturePath);
 				break;
 			case 5:
-				addCorner(j, i, 0, wallTexturePath);
+				addCorner(j, i, 0, false, wallTexturePath);
 				break;
 			case 6:
-				addCorner(j, i, 1, wallTexturePath);
+				addCorner(j, i, 1, false, wallTexturePath);
 				break;
 			case 7:
-				addCorner(j, i, 2, wallTexturePath);
+				addCorner(j, i, 2, false, wallTexturePath);
 				break;
 			case 8:
-				addCorner(j, i, 3, wallTexturePath);
+				addCorner(j, i, 3, false, wallTexturePath);
 				break;
 			case 9:
 				addBlock(j, i, wallTexturePath);

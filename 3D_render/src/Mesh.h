@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <vector>
 
 #include <string>
@@ -22,6 +24,11 @@ struct Texture {
 	unsigned int id;
 	std::string type;
 	std::string path;
+
+	glm::vec3 ambient;
+	glm::vec3 diffuse;
+	glm::vec3 specular;
+	float shininess;
 };
 
 class Mesh {
@@ -35,13 +42,15 @@ public:
 	Mesh();
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture*> textures);
 	~Mesh();
-	void Draw(Shader shader);
+	void Draw(Shader shader, glm::vec3 worldPosition);
 	void Draw(Shader shader, Texture* texture);
 
 	Mesh combine(Mesh& other);
-private:
+
 	/*  Render data  */
 	unsigned int VAO, VBO, EBO;
+private:
+
 	/*  Functions    */
 	void setupMesh();
 };

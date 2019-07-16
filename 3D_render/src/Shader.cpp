@@ -29,12 +29,14 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 		vertexCode = stringStream.str();
 		stringStream.str(std::string());
 
-		fileStream.open(fragmentPath);
-		stringStream << fileStream.rdbuf();
-		fileStream.close();
-		fragmentCode = stringStream.str();
-		stringStream.str(std::string());
-
+		if (fragmentPath != nullptr)
+		{
+			fileStream.open(fragmentPath);
+			stringStream << fileStream.rdbuf();
+			fileStream.close();
+			fragmentCode = stringStream.str();
+			stringStream.str(std::string());
+		}
 		// if geometry shader path is present, also load a geometry shader
 		if (geometryPath != nullptr)
 		{
@@ -51,19 +53,24 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 	}
 
 	const char* vShaderCode = vertexCode.c_str();
-	const char* fShaderCode = fragmentCode.c_str();
 	// 2. compile shaders
-	unsigned int vertex, fragment;
+	unsigned int vertex;
 	// vertex shader
 	vertex = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertex, 1, &vShaderCode, NULL);
 	glCompileShader(vertex);
 	checkCompileErrors(vertex, "VERTEX");
+
 	// fragment Shader
-	fragment = glCreateShader(GL_FRAGMENT_SHADER);
-	glShaderSource(fragment, 1, &fShaderCode, NULL);
-	glCompileShader(fragment);
-	checkCompileErrors(fragment, "FRAGMENT");
+	unsigned int fragment;
+	if (fragmentPath != nullptr)
+	{
+		const char* fShaderCode = fragmentCode.c_str();
+		fragment = glCreateShader(GL_FRAGMENT_SHADER);
+		glShaderSource(fragment, 1, &fShaderCode, NULL);
+		glCompileShader(fragment);
+		checkCompileErrors(fragment, "FRAGMENT");
+	}
 	// if geometry shader is given, compile geometry shader
 	unsigned int geometry;
 	if (geometryPath != nullptr)
@@ -77,14 +84,16 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 	// shader Program
 	id = glCreateProgram();
 	glAttachShader(id, vertex);
-	glAttachShader(id, fragment);
+	if (fragmentPath != nullptr)
+		glAttachShader(id, fragment);
 	if (geometryPath != nullptr)
 		glAttachShader(id, geometry);
 	glLinkProgram(id);
 	checkCompileErrors(id, "PROGRAM");
 	// delete the shaders as they're linked into our program now and no longer necessery
 	glDeleteShader(vertex);
-	glDeleteShader(fragment);
+	if (fragmentPath != nullptr)
+		glDeleteShader(fragment);
 	if (geometryPath != nullptr)
 		glDeleteShader(geometry);
 }
@@ -92,6 +101,35 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 void Shader::use()
 {
 	glUseProgram(id);
+}
+
+void Shader::setModel(glm::mat4 modelMatrix)
+{
+	glUseProgram(id);
+	unsigned int modelLoc = glGetUniformLocation(id, "model");
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelMatrix));
+}
+
+void Shader::setView(glm::mat4 viewMatrix)
+{
+	glUseProgram(id);
+	unsigned int viewLoc = glGetUniformLocation(id, "view");
+	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+
+}
+
+void Shader::setProjection(glm::mat4 projectionMatrix)
+{
+	glUseProgram(id);
+	unsigned int projectionLoc = glGetUniformLocation(id, "projection");
+	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+}
+
+void Shader::setVector3(std::string const& name, glm::vec3 vector)
+{
+	glUseProgram(id);
+	unsigned int attribute = glGetUniformLocation(id, name.c_str());
+	glUniform3f(attribute, vector.x, vector.y, vector.z);
 }
 
 void Shader::checkCompileErrors(GLuint shader, std::string type)

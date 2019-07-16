@@ -38,6 +38,11 @@ void GameObject::render()
 	
 }
 
+void GameObject::setMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices)
+{
+	//mesh = new Mesh(vertices, indices);
+}
+
 
 
 

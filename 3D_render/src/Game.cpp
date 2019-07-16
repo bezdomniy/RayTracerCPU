@@ -4,6 +4,7 @@
 SDL_Event Game::event;
 const Uint8* Game::kb = SDL_GetKeyboardState(NULL);
 
+
 Game::Game(unsigned int w_width, unsigned int w_height)
 {
 	window = nullptr;
@@ -32,7 +33,7 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 	//Initialization flag
 	bool success = true;
 
-	//Use OpenGL 3.1 core 
+	//Use OpenGL 3.3 core 
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 ); 
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 3 ); 
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
@@ -77,6 +78,9 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 				}
 
 				shader = Shader("../../../src/shaders/vertexShader.vert","../../../src/shaders/fragmentShader.frag");
+				lightShader = Shader("../../../src/shaders/vertexShader.vert", "../../../src/shaders/fragmentColourShader.frag");
+				
+				
 				glEnable(GL_DEPTH_TEST);
 				initialiseObjects();
 
@@ -94,7 +98,8 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 
 void Game::initialiseObjects()
 {
-	//donut = Model("../../../resources/blender/donut.obj");
+	models.addModel("../../../resources/blender/WhiteCube.obj", "whiteCube");
+	models.setModelPosition("whiteCube", glm::vec3(2.f, 1.5f, 2.f));
 	//donutTop = Model("../../../resources/blender/donutTop.ply");
 
 	//int grid[] = {  5,3,3,3,3,3,3,3,3,6,
@@ -161,36 +166,29 @@ void Game::render()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	glm::mat4 model = glm::mat4(1.0f);
-	/*model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f, 1.0f, 0.0f));*/
-	//model = glm::rotate(model, glm::radians(1.0f)*timeStep/10.f  , glm::vec3(1.0f, 0.0f, 0.1f));
 
 	glm::mat4 view = glm::mat4(1.f);
 	view = glm::translate(view, glm::vec3(player.worldSpacePosition.x, player.worldSpacePosition.y, player.worldSpacePosition.z));
 	
-
 	glm::mat4 projection;
 	projection = glm::perspective(glm::radians(60.0f), float(window_width) / float(window_height), 0.1f, 100.0f);
 	projection = glm::rotate(projection, glm::radians(player.rotationDegrees) , glm::vec3(0.0f, 1.0f, 0.0f));
-	//glBindTexture(GL_TEXTURE_2D, texture.get());
 
-	shader.use();
+	lightShader.setView(view);
+	lightShader.setProjection(projection);
+	lightShader.setVector3("lightColour", glm::vec3(1.f, 1.f, 1.f));
+	lightShader.setVector3("lightPos", glm::vec3(2.f, 1.f, 2.f));
 
-	unsigned int modelLoc = glGetUniformLocation(shader.id, "model");
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	shader.setModel(model);
+	shader.setView(view);
+	shader.setProjection(projection);
+	shader.setVector3("lightColour", glm::vec3(1.f, 1.f, 1.f));
+	shader.setVector3("lightPos", models["whiteCube"]->worldPosition);
 
-	unsigned int viewLoc = glGetUniformLocation(shader.id, "view");
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
-	unsigned int projectionLoc = glGetUniformLocation(shader.id, "projection");
-	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-	glBindVertexArray(VAO);
-	glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, (void*)0);
-	glBindVertexArray(0);
-
-	//donut.Draw(shader);
 	map.Draw(shader);
-	//donutTop.Draw(shader);
+
+	models["whiteCube"]->Draw(lightShader);
 
 	SDL_GL_SwapWindow(window);	
 }

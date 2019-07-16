@@ -6,7 +6,7 @@
 
 #include <vector>
 #include <unordered_map>
-#include "Mesh.h"
+#include "Model.h"
 
 class GameObject
 {
@@ -23,12 +23,15 @@ public:
 
 	void render();
 
-	Mesh* mesh;
+	Model* model;
 
 	glm::vec3 worldSpacePosition;
 	glm::vec3 velocity;
 	glm::vec3 acceleration;
 	glm::vec3 forward;
+
+	void setMesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices);
+
 
 	float rotationDegrees = 0.f;
 

@@ -11,7 +11,7 @@
 
 #include "Timer.h"
 #include "Shader.h"
-//#include "Texture.h"
+#include "ModelManager.h"
 //#include "Model.h"
 #include "Map2d.h"
 #include "Player.h"
@@ -47,7 +47,7 @@ private:
 
 	SDL_GLContext context;
 	Timer* timer;
-	//Model donut;
+	ModelManager models;
 	//Model donutTop;
 	Map2d map;
 
@@ -56,6 +56,7 @@ private:
 	GLuint VBO;
 
 	Shader shader;
+	Shader lightShader;
 	Player player;
 	
 	//TextureClass texture;

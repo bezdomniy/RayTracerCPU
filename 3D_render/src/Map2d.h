@@ -17,8 +17,8 @@ public:
 	Map2d(char* path);
 	~Map2d();
 
-	Mesh addWall(int posX, int posZ, int alignment, const std::string& texturePath, bool addToMeshes = true);
-	Mesh addCorner(int posX, int posZ, int alignment, const std::string& texturePath, bool addToMeshes = true);
+	Mesh addWall(int posX, int posZ, int alignment, bool facingOut, const std::string& texturePath, bool addToMeshes = true);
+	Mesh addCorner(int posX, int posZ, int alignment, bool facingOut, const std::string& texturePath, bool addToMeshes = true);
 	Mesh addBlock(int posX, int posZ, const std::string& texturePath, bool addToMeshes = true);
 	Mesh addFloor(int posX, int posZ, const std::string& texturePath);
 
