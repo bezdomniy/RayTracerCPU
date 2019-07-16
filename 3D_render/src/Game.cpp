@@ -51,7 +51,7 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 	{
 		timer = new Timer();
 		
-		window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, SDL_WINDOW_OPENGL);
+		window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
 		if (window == NULL)
 		{
 			printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -98,8 +98,14 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 
 void Game::initialiseObjects()
 {
-	models.addModel("../../../resources/blender/WhiteCube.obj", "whiteCube");
-	models.setModelPosition("whiteCube", glm::vec3(2.f, 1.5f, 2.f));
+	pointLights.addModel("../../../resources/blender/WhiteCube.obj", "light1");
+	pointLights.setModelPosition("light1", glm::vec3(17.f, 1.5f, 17.f));
+
+	pointLights.addModel("../../../resources/blender/WhiteCube.obj", "light2");
+	pointLights.setModelPosition("light2", glm::vec3(2.f, 1.5f, 2.f));
+
+	//pointLights.addModel("../../../resources/blender/WhiteCube.obj", "light3");
+	//pointLights.setModelPosition("light3", glm::vec3(14.f, 1.5f, 2.f));
 	//donutTop = Model("../../../resources/blender/donutTop.ply");
 
 	//int grid[] = {  5,3,3,3,3,3,3,3,3,6,
@@ -182,13 +188,25 @@ void Game::render()
 	shader.setModel(model);
 	shader.setView(view);
 	shader.setProjection(projection);
-	shader.setVector3("lightColour", glm::vec3(1.f, 1.f, 1.f));
-	shader.setVector3("lightPos", models["whiteCube"]->worldPosition);
+
+
+
+	shader.setInt("pointLightSlotsFilled", pointLights.size());
+	int i = 0;
+	for (auto& light:pointLights.models) {
+		shader.setVector3("pointLights[" + std::to_string(i) + "].ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+		shader.setVector3("pointLights[" + std::to_string(i) + "].diffuse", glm::vec3(1.f, 1.f, 1.f));
+		shader.setVector3("pointLights[" + std::to_string(i) + "].position", light.second->worldPosition);
+		shader.setFloat("pointLights[" + std::to_string(i) + "].constant", 1.0f);
+		shader.setFloat("pointLights[" + std::to_string(i) + "].linear", 0.09f);
+		shader.setFloat("pointLights[" + std::to_string(i) + "].quadratic", 0.032f);
+
+		light.second->Draw(lightShader);
+		i++;
+	}
 
 
 	map.Draw(shader);
-
-	models["whiteCube"]->Draw(lightShader);
 
 	SDL_GL_SwapWindow(window);	
 }
@@ -212,6 +230,11 @@ bool Game::handleEvents()
 	case SDL_QUIT:
 		isRunning = false;
 		return true;
+	case SDL_WINDOWEVENT:
+		if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
+			glViewport(0, 0, event.window.data1, event.window.data2);
+		}
+		break;
 	default:
 		return true;
 	}

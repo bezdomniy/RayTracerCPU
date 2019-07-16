@@ -47,7 +47,7 @@ private:
 
 	SDL_GLContext context;
 	Timer* timer;
-	ModelManager models;
+	ModelManager pointLights;
 	//Model donutTop;
 	Map2d map;
 

@@ -125,6 +125,20 @@ void Shader::setProjection(glm::mat4 projectionMatrix)
 	glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 }
 
+void Shader::setFloat(std::string const& name, glm::float32 value)
+{
+	glUseProgram(id);
+	unsigned int attribute = glGetUniformLocation(id, name.c_str());
+	glUniform1f(attribute, value);
+}
+
+void Shader::setInt(std::string const& name, glm::int32 value)
+{
+	glUseProgram(id);
+	unsigned int attribute = glGetUniformLocation(id, name.c_str());
+	glUniform1i(attribute, value);
+}
+
 void Shader::setVector3(std::string const& name, glm::vec3 vector)
 {
 	glUseProgram(id);

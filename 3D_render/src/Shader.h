@@ -21,8 +21,11 @@ public:
 	void setModel(glm::mat4 viewMatrix);
 	void setView(glm::mat4 viewMatrix);
 	void setProjection(glm::mat4 projectionMatrix);
+	void setFloat(std::string const& name, glm::float32 value);
+	void setInt(std::string const& name, glm::int32 value);
 
 	void setVector3(std::string const& name, glm::vec3 vector);
+
 
 private:
 	void checkCompileErrors(GLuint shader, std::string type);

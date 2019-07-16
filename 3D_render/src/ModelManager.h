@@ -1,6 +1,6 @@
 #pragma once
 
-#include <unordered_map>
+#include <map>
 #include <glm/glm.hpp>
 
 #include "Model.h"
@@ -13,7 +13,10 @@ public:
 	void addModel(char* path, std::string const& name);
 	void setModelPosition(std::string const& name, glm::vec3 position);
 	Model* operator[](std::string const& name);
+	int size();
+
+	std::map<std::string, Model*> models;
 private:
-	std::unordered_map<std::string, Model*> models;
+
 	Shader moveObjectShader;
 };

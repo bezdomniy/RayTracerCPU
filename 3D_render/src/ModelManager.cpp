@@ -23,3 +23,8 @@ Model* ModelManager::operator[](std::string const& name)
 {
 	return models[name];
 }
+
+int ModelManager::size()
+{
+	return models.size();
+}
