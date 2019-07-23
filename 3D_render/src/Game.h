@@ -48,6 +48,7 @@ private:
 	SDL_GLContext context;
 	Timer* timer;
 	ModelManager pointLights;
+	ModelManager sprites;
 	//Model donutTop;
 	Map2d map;
 
@@ -69,5 +70,7 @@ private:
 	int window_height = 0;
 
 	bool isRunning;
+
+	bool startAnim = false;
 };
 

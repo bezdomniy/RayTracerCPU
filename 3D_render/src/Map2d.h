@@ -8,7 +8,7 @@
 #include <unordered_map>
 
 #include "Shader.h"
-#include "Mesh.h"
+#include "UtilityFunctions.h"
 
 class Map2d
 {
@@ -27,9 +27,9 @@ public:
 	void Draw(Shader shader);
 private:
 	std::vector<Mesh> meshes;
+	std::vector<glm::vec3> worldSpacePositions;
 	std::unordered_map<std::string, Texture*> texture_map;
 	std::string directory;
 
-	Texture* loadTextureFromFile(const std::string& name, const std::string& path);
 };
 

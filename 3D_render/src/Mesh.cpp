@@ -36,8 +36,10 @@ void Mesh::Draw(Shader shader, glm::vec3 worldPosition)
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, worldPosition);
 
-	unsigned int modelLoc = glGetUniformLocation(shader.id, "model");
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	//unsigned int modelLoc = glGetUniformLocation(shader.id, "model");
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	shader.setModel(model);
 
 	for (unsigned int i = 0; i < textures.size(); i++)
 	{
@@ -70,7 +72,7 @@ void Mesh::Draw(Shader shader, glm::vec3 worldPosition)
 	glActiveTexture(GL_TEXTURE0);
 }
 
-void Mesh::Draw(Shader shader, Texture* texture)
+void Mesh::Draw(Shader shader, Texture* texture, glm::vec3 worldPosition, int currentFrame, float playerRotationDegrees)
 {
 	shader.use();
 	// bind appropriate textures
@@ -80,10 +82,21 @@ void Mesh::Draw(Shader shader, Texture* texture)
 	unsigned int heightNr = 1;
 
 	glm::mat4 model = glm::mat4(1.0f);
-	//model = glm::translate(model, worldPosition);
+	model = glm::translate(model, worldPosition);
+	
+	
 
-	unsigned int modelLoc = glGetUniformLocation(shader.id, "model");
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	if (playerRotationDegrees) { // billboard
+		model = glm::rotate(model, glm::radians(playerRotationDegrees + 90.f), glm::vec3(0.0f, -1.0f, 0.0f));
+	}
+
+
+	//model = glm::translate(model, glm::vec3(0.f, 0.f, 0.f));
+	
+	//unsigned int modelLoc = glGetUniformLocation(shader.id, "model");
+	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+
+	shader.setModel(model);
 
 
 		glActiveTexture(GL_TEXTURE0); // active proper texture unit before binding
@@ -101,6 +114,10 @@ void Mesh::Draw(Shader shader, Texture* texture)
 
 												 // now set the sampler to the correct texture unit
 		glUniform1i(glGetUniformLocation(shader.id, (name + number).c_str()), 0);
+
+		//std::cout << this->vertices[1].Position.z << "\n";
+		glm::vec2 shift = { (this->vertices[0].TexCoords.x - this->vertices[1].TexCoords.x) * (float)currentFrame, 0.f };
+		shader.setVector2("TexCoordShift", shift);
 		// and finally bind the texture
 		//std::cout << glGetUniformLocation(shader.id, (name + number).c_str()) << "\n";
 		glBindTexture(GL_TEXTURE_2D, texture->id);
@@ -144,6 +161,14 @@ Mesh Mesh::combine(Mesh& other)
 	//std::cout << "\n";
 
 	return newMesh;
+}
+
+void Mesh::changeTexture(glm::vec2 newTexCoords[])
+{
+	//glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	//glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(newTexCoords), newTexCoords);
+
+
 }
 
 void Mesh::setupMesh()

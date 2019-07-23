@@ -24,6 +24,7 @@ public:
 	void setFloat(std::string const& name, glm::float32 value);
 	void setInt(std::string const& name, glm::int32 value);
 
+	void setVector2(std::string const& name, glm::vec2 vector);
 	void setVector3(std::string const& name, glm::vec3 vector);
 
 

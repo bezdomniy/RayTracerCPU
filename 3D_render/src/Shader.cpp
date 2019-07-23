@@ -139,6 +139,13 @@ void Shader::setInt(std::string const& name, glm::int32 value)
 	glUniform1i(attribute, value);
 }
 
+void Shader::setVector2(std::string const& name, glm::vec2 vector)
+{
+	glUseProgram(id);
+	unsigned int attribute = glGetUniformLocation(id, name.c_str());
+	glUniform2f(attribute, vector.x, vector.y);
+}
+
 void Shader::setVector3(std::string const& name, glm::vec3 vector)
 {
 	glUseProgram(id);

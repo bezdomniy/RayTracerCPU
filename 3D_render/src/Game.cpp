@@ -39,8 +39,6 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-	//SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
 	//Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
@@ -104,6 +102,12 @@ void Game::initialiseObjects()
 	pointLights.addModel("../../../resources/blender/WhiteCube.obj", "light2");
 	pointLights.setModelPosition("light2", glm::vec3(2.f, 1.5f, 2.f));
 
+	sprites.addSpritesheet(512.f, 512.f, "../../../resources/sprites/0x72_DungeonTilesetII_v1.1.png", "../../../resources/sprites/tiles_list_v1.1", false);
+
+	sprites.addSprite("ogre_run_anim", "0x72_DungeonTilesetII_v1.1.png", 5, 5);
+	sprites.addSprite("big_zombie_run_anim", "0x72_DungeonTilesetII_v1.1.png", 14, 5);
+	sprites.addSprite("chort_run_anim", "0x72_DungeonTilesetII_v1.1.png", 14, 14);
+
 	//pointLights.addModel("../../../resources/blender/WhiteCube.obj", "light3");
 	//pointLights.setModelPosition("light3", glm::vec3(14.f, 1.5f, 2.f));
 	//donutTop = Model("../../../resources/blender/donutTop.ply");
@@ -162,6 +166,14 @@ bool Game::update()
 	player.updateVelocity();
 	player.move(timeStep);
 
+	if (startAnim) {
+		for (auto& sprite : sprites.sprites) {
+			sprite.second->update(timeStep);
+		}
+	}
+
+	//sprites.sprites["ogre_idle_anim"]->update(timeStep);
+
 	timer->restart();
 	return success;
 }
@@ -208,6 +220,11 @@ void Game::render()
 
 	map.Draw(shader);
 
+	for (auto& sprite : sprites.sprites) {
+		sprite.second->Draw(shader, player.rotationDegrees);
+	}
+	//sprites.sprites["ogre_idle_anim"]->Draw(shader, player.rotationDegrees);
+
 	SDL_GL_SwapWindow(window);	
 }
 
@@ -230,6 +247,13 @@ bool Game::handleEvents()
 	case SDL_QUIT:
 		isRunning = false;
 		return true;
+	case SDL_KEYDOWN:
+		switch (event.key.keysym.sym) {
+		case SDLK_SPACE:
+			startAnim = true;
+			break;
+		}
+		break;
 	case SDL_WINDOWEVENT:
 		if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
 			glViewport(0, 0, event.window.data1, event.window.data2);

@@ -26,6 +26,8 @@ uniform vec3 lightColour;
 uniform int pointLightSlotsFilled;
 uniform Light pointLights[NR_POINT_LIGHTS];
 
+uniform vec2 TexCoordShift;
+
 
 vec3 CalcPointLight(Light light, vec3 normal, vec3 FragPos)
 {
@@ -50,10 +52,15 @@ void main() {
 	for(int i = 0; i < pointLightSlotsFilled; i++)
 		lighting += CalcPointLight(pointLights[i], Normal, FragPos);
 
+	vec2 FragTexCoord = TexCoord + TexCoordShift;
 
+	vec4 texColour = texture(texture_diffuse1, FragTexCoord);
+	if (texColour.a < 0.1)
+		discard;
 
+	
 
-	FragColor = vec4(lighting, 1.0) * texture(texture_diffuse1, TexCoord);
+	FragColor = vec4(lighting, 1.0) * texColour;
 
 
 }

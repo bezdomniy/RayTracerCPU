@@ -42,5 +42,5 @@ target_link_libraries(Game PRIVATE ${ASSIMP_LIBRARIES})
 
 
 
-#find_package(nlohmann_json CONFIG REQUIRED)
-#target_link_libraries(Game PRIVATE nlohmann_json nlohmann_json::nlohmann_json)
+find_package(nlohmann_json CONFIG REQUIRED)
+target_link_libraries(Game PRIVATE nlohmann_json nlohmann_json::nlohmann_json)

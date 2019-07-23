@@ -43,9 +43,14 @@ public:
 	Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture*> textures);
 	~Mesh();
 	void Draw(Shader shader, glm::vec3 worldPosition);
-	void Draw(Shader shader, Texture* texture);
+	void Draw(Shader shader, Texture* texture, glm::vec3 worldPosition, int currentFrame = 0, float playerRotationDegrees = 0.f);
+
+	float centreX = 0;
+	float centreY = 0;
+	float centreZ = 0;
 
 	Mesh combine(Mesh& other);
+	void changeTexture(glm::vec2 newTexCoords[]);
 
 	/*  Render data  */
 	unsigned int VAO, VBO, EBO;

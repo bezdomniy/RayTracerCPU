@@ -10,7 +10,7 @@ public:
 	Player();
 	~Player();
 
-	Player(std::string const& name, int x, int z);
+	Player(std::string const& name, float x, float z);
 
 	void updateVelocity();
 	
