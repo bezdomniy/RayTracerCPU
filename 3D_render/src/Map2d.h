@@ -22,7 +22,7 @@ public:
 	Mesh addBlock(int posX, int posZ, const std::string& texturePath, bool addToMeshes = true);
 	Mesh addFloor(int posX, int posZ, const std::string& texturePath);
 
-	void Map2d::loadMap(int grid[], size_t gridSize, int width, int height, const std::string& wallTexturePath, const std::string& floorTexturePath);
+	void loadMap(int grid[], size_t gridSize, int width, int height, const std::string& wallTexturePath, const std::string& floorTexturePath);
 	
 	void Draw(Shader shader);
 private:

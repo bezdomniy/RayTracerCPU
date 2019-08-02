@@ -1,9 +1,9 @@
 #pragma once
 
-#include <SDL.h>
-#include <gl/glew.h>
+#include "SDL.h"
+#include <GL/glew.h>
 #include <SDL_opengl.h> 
-#include <gl/glu.h>
+#include <GL/glu.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

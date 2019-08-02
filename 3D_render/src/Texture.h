@@ -3,7 +3,7 @@
 #include <string>
 #include <SDL.h>
 #include <SDL_image.h>
-#include <gl/glew.h>
+#include <GL/glew.h>
 
 class TextureClass
 {
