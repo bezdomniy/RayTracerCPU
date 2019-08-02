@@ -12,6 +12,7 @@ Shader::Shader(std::string* vertexPath, std::string* fragmentPath, std::string* 
 	std::string fragmentCode;
 	std::string geometryCode;
 
+
 	std::ifstream fileStream;
 	// ensure ifstream objects can throw exceptions:
 	fileStream.exceptions(std::ifstream::failbit | std::ifstream::badbit);

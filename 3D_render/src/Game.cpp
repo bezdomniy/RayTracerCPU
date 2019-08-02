@@ -34,8 +34,6 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 	//Initialization flag
 	bool success = true;
 
-
-
 	//Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 	{
@@ -80,8 +78,8 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 				}
 
 				std::string* vertexShader = new std::string(BUILD_DIR_FIX+"src/shaders/vertexShader.vert");
-				std::string* fragmentShader = new std::string(BUILD_DIR_FIX+"src/shaders/fragmentShader.vert");
-				std::string* fragmentColourShader = new std::string(BUILD_DIR_FIX+"src/shaders/fragmentColourShader.vert");
+				std::string* fragmentShader = new std::string(BUILD_DIR_FIX+"src/shaders/fragmentShader.frag");
+				std::string* fragmentColourShader = new std::string(BUILD_DIR_FIX+"src/shaders/fragmentColourShader.frag");
 
 				shader = Shader(vertexShader, fragmentShader);
 				lightShader = Shader(vertexShader, fragmentColourShader);

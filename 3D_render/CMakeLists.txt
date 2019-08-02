@@ -28,7 +28,7 @@ find_package(SDL2 REQUIRED)
 # include_directories(${SDL2_INCLUDE_DIR})
 # target_link_libraries(Game PRIVATE ${SDL2_LIBRARIES})
 
-find_package(SDL2_image REQUIRED)
+find_package(SDL2-image REQUIRED)
 include_directories(${SDL2_IMAGE_INCLUDE_DIR} ${GLEW_INCLUDE_DIR})
 # target_link_libraries(Game PRIVATE ${SDL2_IMAGE_LIBRARIES})
 
@@ -49,7 +49,7 @@ add_executable(Game ${SOURCES})
 # message(SEND_ERROR ${GLEW_INCLUDE_DIR})
 
 target_include_directories(Game PRIVATE dependencies/)
-target_link_libraries(Game PRIVATE ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES} ${GLEW_LIBRARIES} ${OPENGL_gl_LIBRARY} ${ASSIMP_LIBRARIES} glm)
+target_link_libraries(Game PRIVATE SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image ${GLEW_LIBRARIES} ${OPENGL_gl_LIBRARY} ${ASSIMP_LIBRARIES} glm)
 #set(INCLUDE_DIRS ${SDL2_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS})
 #set(LIBS ${LIBS} ${SDL2_LIBRARIES} ${GLEW_LIBRARIES} )
 
