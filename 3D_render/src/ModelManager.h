@@ -14,7 +14,7 @@ public:
 	ModelManager();
 	~ModelManager();
 
-	void addModel(char* path, std::string const& name);
+	void addModel(std::string const& path, std::string const& name);
 	void addSpritesheet(float sheetWidth, float sheetHeight, std::string const& sp, std::string const& cp, bool json);
 	void addSprite(std::string const& spriteName, std::string const& spriteSheetName, int posX, int posZ);
 	void setModelPosition(std::string const& name, glm::vec3 position);

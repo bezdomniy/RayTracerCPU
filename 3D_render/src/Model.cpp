@@ -4,7 +4,7 @@ Model::Model()
 {
 }
 
-Model::Model(char* path)
+Model::Model(std::string const& path)
 {
 	loadModel(path);
 	worldPosition = glm::vec3(0.f, 0.f, 0.f);
@@ -25,7 +25,7 @@ void Model::Draw(Shader shader)
 		meshes[i].Draw(shader, worldPosition);
 }
 
-void Model::loadModel(std::string path)
+void Model::loadModel(std::string const& path)
 {
 	Assimp::Importer import;
 	const aiScene* scene = import.ReadFile(path, aiProcess_Triangulate | aiProcess_FlipUVs);
@@ -226,10 +226,10 @@ void Model::loadColors(aiMaterial* mat, Vertex &vertex)
 
 }
 
-unsigned int Model::TextureFromFile(const char* path, const std::string& directory/*, bool gamma*/)
+unsigned int Model::TextureFromFile(std::string const& path, const std::string& directory/*, bool gamma*/)
 {
-	std::string filename = std::string(path);
-	filename = directory + '/' + filename;
+	//std::string filename = std::string(path);
+	std::string filename = directory + '/' + path;
 
 	SDL_Surface* loadedSurface = IMG_Load(filename.c_str());
 	GLuint textureID;

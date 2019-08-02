@@ -6,7 +6,7 @@ Shader::Shader()
 {
 }
 
-Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geometryPath)
+Shader::Shader(std::string* vertexPath, std::string* fragmentPath, std::string* geometryPath)
 {
 	std::string vertexCode;
 	std::string fragmentCode;
@@ -19,7 +19,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 	try
 	{
 		// open files
-		fileStream.open(vertexPath);
+		fileStream.open(*vertexPath);
 		std::stringstream stringStream;
 		// read file's buffer contents into streams
 		stringStream << fileStream.rdbuf();
@@ -31,7 +31,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 
 		if (fragmentPath != nullptr)
 		{
-			fileStream.open(fragmentPath);
+			fileStream.open(*fragmentPath);
 			stringStream << fileStream.rdbuf();
 			fileStream.close();
 			fragmentCode = stringStream.str();
@@ -40,7 +40,7 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath, const char* geo
 		// if geometry shader path is present, also load a geometry shader
 		if (geometryPath != nullptr)
 		{
-			fileStream.open(geometryPath);
+			fileStream.open(*geometryPath);
 			stringStream << fileStream.rdbuf();
 			fileStream.close();
 			geometryCode = stringStream.str();

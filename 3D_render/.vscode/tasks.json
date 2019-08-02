@@ -6,7 +6,7 @@
         {
             "label": "test",
             "type": "shell",
-            "command": "./build/Game",
+            "command": "./out/build/debug-linux/Game",
             "group": {
                 "kind": "test",
                 "isDefault": true

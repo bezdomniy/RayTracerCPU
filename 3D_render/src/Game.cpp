@@ -1,6 +1,7 @@
 #include "Game.h"
 #include <iostream>
 
+
 SDL_Event Game::event;
 const Uint8* Game::kb = SDL_GetKeyboardState(NULL);
 
@@ -33,11 +34,7 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 	//Initialization flag
 	bool success = true;
 
-	//Use OpenGL 3.3 core 
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 ); 
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 3 ); 
-	SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
 
 	//Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -47,6 +44,12 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 	}
 	else
 	{
+		//Use OpenGL 3.3 core 
+		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MAJOR_VERSION, 3 ); 
+		SDL_GL_SetAttribute( SDL_GL_CONTEXT_MINOR_VERSION, 3 ); 
+		SDL_GL_SetAttribute( SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE );
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
 		timer = new Timer();
 		
 		window = SDL_CreateWindow(title, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, window_width, window_height, SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL);
@@ -58,6 +61,7 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 		else
 		{
 			context = SDL_GL_CreateContext(window);
+			printf ("glGetString (GL_VERSION) returns %s\n", glGetString (GL_VERSION));
 
 			if (context == NULL) {
 				printf("Context could not be created! SDL Error: %s\n", SDL_GetError()); success = false;
@@ -75,9 +79,16 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 					printf("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
 				}
 
-				shader = Shader("../../../src/shaders/vertexShader.vert","../../../src/shaders/fragmentShader.frag");
-				lightShader = Shader("../../../src/shaders/vertexShader.vert", "../../../src/shaders/fragmentColourShader.frag");
+				std::string* vertexShader = new std::string(BUILD_DIR_FIX+"src/shaders/vertexShader.vert");
+				std::string* fragmentShader = new std::string(BUILD_DIR_FIX+"src/shaders/fragmentShader.vert");
+				std::string* fragmentColourShader = new std::string(BUILD_DIR_FIX+"src/shaders/fragmentColourShader.vert");
+
+				shader = Shader(vertexShader, fragmentShader);
+				lightShader = Shader(vertexShader, fragmentColourShader);
 				
+				delete vertexShader;
+				delete fragmentShader;
+				delete fragmentColourShader;
 				
 				glEnable(GL_DEPTH_TEST);
 				initialiseObjects();
@@ -96,13 +107,13 @@ bool Game::init(const char* title, int xpos, int ypos, bool fullscreen)
 
 void Game::initialiseObjects()
 {
-	pointLights.addModel("../../../resources/blender/WhiteCube.obj", "light1");
+	pointLights.addModel(BUILD_DIR_FIX+"resources/blender/WhiteCube.obj", "light1");
 	pointLights.setModelPosition("light1", glm::vec3(17.f, 1.5f, 17.f));
 
-	pointLights.addModel("../../../resources/blender/WhiteCube.obj", "light2");
+	pointLights.addModel(BUILD_DIR_FIX+"resources/blender/WhiteCube.obj", "light2");
 	pointLights.setModelPosition("light2", glm::vec3(2.f, 1.5f, 2.f));
 
-	sprites.addSpritesheet(512.f, 512.f, "../../../resources/sprites/0x72_DungeonTilesetII_v1.1.png", "../../../resources/sprites/tiles_list_v1.1", false);
+	sprites.addSpritesheet(512.f, 512.f, BUILD_DIR_FIX+"resources/sprites/0x72_DungeonTilesetII_v1.1.png", BUILD_DIR_FIX+"resources/sprites/tiles_list_v1.1", false);
 
 	sprites.addSprite("ogre_run_anim", "0x72_DungeonTilesetII_v1.1.png", 5, 5);
 	sprites.addSprite("big_zombie_run_anim", "0x72_DungeonTilesetII_v1.1.png", 14, 5);
@@ -147,7 +158,7 @@ void Game::initialiseObjects()
 					8,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,7 };
 
 
-	map.loadMap(grid, sizeof(grid) / sizeof(int), 20, 20, "../../../resources/textures/wall.jpg", "../../../resources/textures/floor.jpg");
+	map.loadMap(grid, sizeof(grid) / sizeof(int), 20, 20, BUILD_DIR_FIX+"resources/textures/wall.jpg", BUILD_DIR_FIX+"resources/textures/floor.jpg");
 	addPlayer(-1.5f, -1.5f);
 }
 

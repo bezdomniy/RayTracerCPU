@@ -19,6 +19,12 @@
 #include <iostream>
 #include <string>
 
+#ifdef _WIN32
+	#define BUILD_DIR_FIX std::string("../../../")
+#else
+	#define BUILD_DIR_FIX  std::string("./")
+#endif
+
 class Game
 {
 public:

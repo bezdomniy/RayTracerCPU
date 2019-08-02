@@ -20,7 +20,7 @@ class Model
 {
 public:
 	Model();
-	Model(char* path);
+	Model(std::string const& path);
 	~Model();
 
 	std::vector<Texture*> textures_loaded;
@@ -33,11 +33,11 @@ private:
 
 
 
-	void loadModel(std::string path);
+	void loadModel(std::string const& path);
 	void processNode(aiNode* node, const aiScene* scene);
 	Mesh processMesh(aiMesh* mesh, const aiScene* scene);
 
 	std::vector<Texture*> loadMaterialsTexture(aiMaterial* mat, aiTextureType type, std::string typeName);
 	void loadColors(aiMaterial* mat, Vertex& vertex);
-	unsigned int TextureFromFile(const char* path, const std::string& directory/*, bool gamma*/);
+	unsigned int TextureFromFile(std::string const& path, const std::string& directory/*, bool gamma*/);
 };

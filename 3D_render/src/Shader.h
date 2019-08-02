@@ -16,7 +16,7 @@ public:
 	GLuint id;
 
 	Shader();
-	Shader(const char* vertexPath, const char* fragmentPath = nullptr, const char* geometryPath = nullptr);
+	Shader(std::string* vertexPath, std::string* fragmentPath, std::string* geometryPath = nullptr);
 	void use();
 	void setModel(glm::mat4 viewMatrix);
 	void setView(glm::mat4 viewMatrix);

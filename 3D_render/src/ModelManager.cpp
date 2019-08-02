@@ -15,7 +15,7 @@ ModelManager::~ModelManager()
 {
 }
 
-void ModelManager::addModel(char* path, std::string const& name)
+void ModelManager::addModel(std::string const& path, std::string const& name)
 {
 	models[name] = new Model(path);
 }
