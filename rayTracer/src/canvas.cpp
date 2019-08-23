@@ -12,9 +12,74 @@ Canvas::~Canvas()
 }
 
 void Canvas::writePixel(unsigned int x, unsigned int y, glm::vec3 colour) {
-    pixels.at(y * width + x) = colour;
+    pixels[y * width + x] = colour;
 }
 
 glm::vec3 Canvas::getPixel(unsigned int x, unsigned int y) {
-    return pixels.at(y * width + x);
+    return pixels[y * width + x];
+}
+
+void Canvas::clear(glm::vec3 colour) {
+    for (int i = 0; i < width * height; i++) {
+        pixels[i] = colour;
+    }
+}
+
+void _writeRgbString(float f, int pixelIndex, int canvasWidth, bool& newLine, int& charsInLine, std::ofstream* streamPtr) {
+    std::string c;
+    if (f < 0.f) {
+        c = "0";
+    }
+    else if (f > 1.f) {
+        c = "255";
+    }
+    else {
+        c = std::to_string(int(f * 255));
+    }
+
+    charsInLine += c.length() + 1;
+    if (charsInLine >= 70) {
+        *(streamPtr) << "\n";
+        charsInLine = 0;
+        newLine = true;
+    }
+
+    if (!newLine) *(streamPtr) << " ";
+    *(streamPtr) << c;
+    newLine = false;
+} 
+
+void Canvas::writeToPPM(const std::string& fileName) {
+    std::ofstream out(fileName);
+
+    if (out.fail()) {
+        throw std::runtime_error("Failed to open file.");
+        return;
+    }
+
+    out << "P3\n" << std::to_string(width) << " " << std::to_string(height) << "\n255";
+
+    int i;
+    int charsInCurrentLine = 0;
+    bool newLine = true;
+
+    for (i = 0; i < width * height; i++) {
+        if (i % width == 0) {
+            out << "\n";
+            charsInCurrentLine = 0;
+            newLine = true;
+        }
+
+        _writeRgbString(pixels[i].x, i, width, newLine, charsInCurrentLine, &out);
+        _writeRgbString(pixels[i].y, i, width, newLine, charsInCurrentLine, &out);
+        _writeRgbString(pixels[i].z, i, width, newLine, charsInCurrentLine, &out);
+
+
+    }
+
+    // if (i % width != 0) {
+    //     out << "\n";
+    // }
+
+    out.close();
 }

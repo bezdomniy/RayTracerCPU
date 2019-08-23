@@ -1,4 +1,9 @@
 find_package(glm CONFIG REQUIRED)
 
-add_executable(RayTracer main.cpp)
+file(GLOB SOURCES
+    *.h
+    *.cpp
+)
+
+add_executable(RayTracer ${SOURCES})
 target_link_libraries(RayTracer PRIVATE glm)
