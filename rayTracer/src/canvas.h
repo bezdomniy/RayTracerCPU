@@ -12,6 +12,8 @@ private:
     unsigned int height;
     std::vector<glm::vec3> pixels;
 
+    void _writeRgbString(float f, bool& newLine, int& charsInLine, std::ofstream* streamPtr);
+
     
 public:
     Canvas(unsigned int, unsigned int);
@@ -22,6 +24,8 @@ public:
 
     void clear(glm::vec3);
 
-    void writeToPPM(const std::string&);
+    void writeToPPM(const std::string&, bool invertY);
+
+    Canvas projectile();
 };
 

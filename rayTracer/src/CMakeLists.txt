@@ -5,5 +5,7 @@ file(GLOB SOURCES
     *.cpp
 )
 
+message(${SOURCES})
+
 add_executable(RayTracer ${SOURCES})
 target_link_libraries(RayTracer PRIVATE glm)

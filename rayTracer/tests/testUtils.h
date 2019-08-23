@@ -1,3 +1,5 @@
+#pragma once
+
 #define ASSERT_THROW( condition )                             \
 {                                                                   \
   if( !( condition ) )                                              \

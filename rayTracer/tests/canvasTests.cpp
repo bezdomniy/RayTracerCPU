@@ -23,7 +23,7 @@ bool testWritePPM() {
     c.writePixel(3, 4, red);
     c.writePixel(4, 4, red);
 
-    c.writeToPPM("/home/ilia/dev/gamedev/sdl_game/rayTracer/tests/test.ppm");
+    //c.writeToPPM("/home/ilia/dev/gamedev/sdl_game/rayTracer/tests/test.ppm");
 
     return true;
 }

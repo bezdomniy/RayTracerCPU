@@ -25,7 +25,7 @@ void Canvas::clear(glm::vec3 colour) {
     }
 }
 
-void _writeRgbString(float f, int pixelIndex, int canvasWidth, bool& newLine, int& charsInLine, std::ofstream* streamPtr) {
+void Canvas::_writeRgbString(float f, bool& newLine, int& charsInLine, std::ofstream* streamPtr) {
     std::string c;
     if (f < 0.f) {
         c = "0";
@@ -49,7 +49,7 @@ void _writeRgbString(float f, int pixelIndex, int canvasWidth, bool& newLine, in
     newLine = false;
 } 
 
-void Canvas::writeToPPM(const std::string& fileName) {
+void Canvas::writeToPPM(const std::string& fileName, bool invertY = false) {
     std::ofstream out(fileName);
 
     if (out.fail()) {
@@ -59,27 +59,36 @@ void Canvas::writeToPPM(const std::string& fileName) {
 
     out << "P3\n" << std::to_string(width) << " " << std::to_string(height) << "\n255";
 
-    int i;
     int charsInCurrentLine = 0;
     bool newLine = true;
 
-    for (i = 0; i < width * height; i++) {
-        if (i % width == 0) {
+    if (invertY) {
+        for (int i = height - 1; i >= 0; i--) {
             out << "\n";
             charsInCurrentLine = 0;
             newLine = true;
+
+            for (int j = 0; j < width; j++) {
+                _writeRgbString(getPixel(j, i).x,  newLine, charsInCurrentLine, &out);
+                _writeRgbString(getPixel(j, i).y,  newLine, charsInCurrentLine, &out);
+                _writeRgbString(getPixel(j, i).z,  newLine, charsInCurrentLine, &out);
+            }
         }
+    }
+    else {
+        for (int i = 0; i < height; i++) {
+        out << "\n";
+        charsInCurrentLine = 0;
+        newLine = true;
 
-        _writeRgbString(pixels[i].x, i, width, newLine, charsInCurrentLine, &out);
-        _writeRgbString(pixels[i].y, i, width, newLine, charsInCurrentLine, &out);
-        _writeRgbString(pixels[i].z, i, width, newLine, charsInCurrentLine, &out);
-
-
+        for (int j = 0; j < width; j++) {
+            _writeRgbString(getPixel(j, i).x,  newLine, charsInCurrentLine, &out);
+            _writeRgbString(getPixel(j, i).y,  newLine, charsInCurrentLine, &out);
+            _writeRgbString(getPixel(j, i).z,  newLine, charsInCurrentLine, &out);
+        }
+    }
     }
 
-    // if (i % width != 0) {
-    //     out << "\n";
-    // }
 
     out.close();
 }
