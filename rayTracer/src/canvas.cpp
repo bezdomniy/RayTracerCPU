@@ -4,7 +4,8 @@ Canvas::Canvas(unsigned int w, unsigned int h)
 {
     width = w;
     height = h;
-    pixels.reserve(width * height);
+    pixels.resize(width * height);
+	//pixels.reserve(width * height);
 }
 
 Canvas::~Canvas()

@@ -26,6 +26,5 @@ public:
 
     void writeToPPM(const std::string&, bool invertY);
 
-    Canvas projectile();
 };
 

@@ -40,3 +40,4 @@
 /3D_render/out/build/x64-Clang-Debug
 3D_render/build
 3D_render/out
+target/

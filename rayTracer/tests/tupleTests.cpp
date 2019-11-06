@@ -1,6 +1,7 @@
 #include "../src/tuple.h"
 #include "testUtils.h"
 #include <iostream>
+#include <string>
 
 bool testVec() {
     glm::vec3 testVec(3.f,4.f,5.f);
