@@ -9,14 +9,14 @@ class Projectile
 private:
 
 public:
-    Projectile(glm::vec3 initialPosition, glm::vec3 initialVelocity);
-    Projectile(glm::vec3 initialPosition, glm::vec3 initialDirection, float initialMagnitude);
+    Projectile(glm::vec4 initialPosition, glm::vec4 initialVelocity);
+    Projectile(glm::vec4 initialPosition, glm::vec4 initialDirection, float initialMagnitude);
     ~Projectile();
 
     void setEnvironment(std::unique_ptr<Environment> &e);
 
-    glm::vec3 position;
-    glm::vec3 velocity;
+    glm::vec4 position;
+    glm::vec4 velocity;
 
     std::unique_ptr<Environment> environment;
 

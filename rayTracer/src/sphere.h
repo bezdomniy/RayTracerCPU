@@ -5,12 +5,13 @@
 class Sphere
 {
 public:
-	Sphere(unsigned int, glm::vec3, float);
+	Sphere(unsigned int, glm::vec4, float);
 	~Sphere();
 
     unsigned int id;
-	glm::vec3 position;
+	glm::vec4 position;
 	float radius;
+	glm::mat4 transform;
 private:
 
 };

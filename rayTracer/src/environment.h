@@ -7,10 +7,10 @@ class Environment
 private:
 
 public:
-    Environment(glm::vec3, glm::vec3);
+    Environment(glm::vec4, glm::vec4);
     ~Environment();
 
-    glm::vec3 gravity;
-    glm::vec3 wind;
+    glm::vec4 gravity;
+    glm::vec4 wind;
 };
 

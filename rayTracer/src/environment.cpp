@@ -1,6 +1,6 @@
 #include "environment.h"
 
-Environment::Environment(glm::vec3 g, glm::vec3 w)
+Environment::Environment(glm::vec4 g, glm::vec4 w)
 {
     gravity = g;
     wind = w;

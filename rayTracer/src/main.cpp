@@ -3,11 +3,13 @@
 #include "environment.h"
 #include "ray.h"
 #include "sphere.h"
+#include "geometry.h"
 #include <iostream>
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/quaternion.hpp>
+
 
 void drawCircle() {
 	Canvas c(100, 100);
@@ -42,9 +44,9 @@ void drawProjectile() {
 
 	c.clear(c2);
 
-	Projectile p(glm::vec3(0.f, 1.f, 0.f), glm::vec3(1.f, 1.8f, 0.f), 11.25f);
+	Projectile p(glm::vec4(0.f, 1.f, 0.f,1.f), glm::vec4(1.f, 1.8f, 0.f, 0.f), 11.25f);
 
-	std::unique_ptr<Environment> environment = std::make_unique<Environment>(glm::vec3(0.f, -0.1f, 0.f), glm::vec3(-0.01f, 0.f, 0.f));
+	std::unique_ptr<Environment> environment = std::make_unique<Environment>(glm::vec4(0.f, -0.1f, 0.f, 0.f), glm::vec4(-0.01f, 0.f, 0.f, 0.f));
 	p.setEnvironment(environment);
 
 	do {
@@ -57,21 +59,44 @@ void drawProjectile() {
 	c.writeToPPM("./test.ppm", true);
 }
 
-void countRaySphereIntersections() {
-	Sphere s(0, glm::vec3(0.f, 0.f, 0.f), 1.0);
-	Ray r(glm::vec3(-5.f, 0.f, 2.f), glm::vec3(1.f, 0.f, 0.f));
 
-	glm::vec3 oc = r.origin - s.position;
-    float a = glm::dot(r.direction, r.direction);
-    float b = 2.0 * glm::dot(oc, r.direction);
-    float c = glm::dot(oc,oc) - s.radius*s.radius;
-    float discriminant = b*b - 4*a*c;
-	// <0: no, ==0: one, >0: two
-    // std::cout << (discriminant>0) << std::endl;
-}
+
 
 int main(int argc, char const *argv[])
 {
-	countRaySphereIntersections();
-	return 0;
+	// Sphere s(0, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.0);
+	// Ray r(glm::vec4(-5.f, 0.f, 0.f, 1.f), glm::vec4(1.f, 0.f, 0.f, 0.f));
+	// std::vector<Geometry::Intersection> dists = Geometry::raySphereIntersection(r, s);
+
+	// Geometry::Intersection* hit = Geometry::hit(dists);
+	// if (hit) std::cout << "hit: " << hit->t << std::endl;
+
+	// Ray r(glm::vec4(1.f, 2.f, 3.f, 1.f), glm::vec4(0.f, 1.f, 0.f, 0.f));
+	// std::cout << r << std::endl;
+	// glm::mat4 m = glm::translate(glm::mat4(1.f), glm::vec3(3.f, 4.f, 5.f));
+	// r.transform(m);
+	// std::cout << r << std::endl;
+
+	// Ray r2(glm::vec4(1.f, 2.f, 3.f, 1.f), glm::vec4(0.f, 1.f, 0.f, 0.f));
+	// std::cout << r2 << std::endl;
+	// glm::mat4 m2 = glm::scale(glm::mat4(1.f), glm::vec3(2.f, 3.f, 4.f));
+	// r2.transform(m2);
+	// std::cout << r2 << std::endl;
+
+	Ray r3(glm::vec4(-5.f, 0.f, 0.f, 1.f), glm::vec4(1.f, 0.f, 0.f, 0.f));
+	Sphere s(0, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
+
+	s.transform = glm::scale(glm::mat4(1.f), glm::vec3(2.f, 2.f, 2.f));
+
+	std::optional<std::vector<Geometry::Intersection>> intersections = Geometry::intersectRaySphere(r3, s);
+
+	if (intersections.has_value()) {
+		for (auto& i: intersections.value()) {
+			std::cout << i.t << " ";
+		}
+		std::cout << std::endl;
+	}
+
+
+    return 0;
 }
