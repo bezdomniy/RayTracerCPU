@@ -4,6 +4,7 @@
 #include "ray.h"
 #include "sphere.h"
 #include "geometry.h"
+#include "renderer.h"
 #include <iostream>
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -83,19 +84,29 @@ int main(int argc, char const *argv[])
 	// r2.transform(m2);
 	// std::cout << r2 << std::endl;
 
-	Ray r3(glm::vec4(-5.f, 0.f, 0.f, 1.f), glm::vec4(1.f, 0.f, 0.f, 0.f));
+	// Ray r3(glm::vec4(-5.f, 0.f, 0.f, 1.f), glm::vec4(1.f, 0.f, 0.f, 0.f));
+	// Sphere s(0, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
+
+	// s.transform = glm::scale(glm::mat4(1.f), glm::vec3(2.f, 2.f, 2.f)); // should be 3 and 7
+	// // s.transform = glm::translate(glm::mat4(1.f), glm::vec3(0.f,5.f,0.f)); //should be none
+
+	// std::optional<std::vector<Geometry::Intersection>> intersections = Geometry::intersectRaySphere(r3, s);
+
+	// if (intersections.has_value()) {
+	// 	for (auto& i: intersections.value()) {
+	// 		std::cout << i.t << " ";
+	// 	}
+	// 	std::cout << std::endl;
+	// }
+
 	Sphere s(0, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
+	// scale not working when small shape, just expanding error. getting diamond instead of circle.
+	s.transform = glm::scale(glm::mat4(1.f), glm::vec3(1.f, 0.5f, 1.f));
+	std::shared_ptr<Canvas> canvas = std::make_shared<Canvas>(100, 100);
+	Renderer renderer(canvas);
+	renderer.render(s);
 
-	s.transform = glm::scale(glm::mat4(1.f), glm::vec3(2.f, 2.f, 2.f));
-
-	std::optional<std::vector<Geometry::Intersection>> intersections = Geometry::intersectRaySphere(r3, s);
-
-	if (intersections.has_value()) {
-		for (auto& i: intersections.value()) {
-			std::cout << i.t << " ";
-		}
-		std::cout << std::endl;
-	}
+	canvas->writeToPPM("./test.ppm", true);
 
 
     return 0;

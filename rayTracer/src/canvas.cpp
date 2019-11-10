@@ -82,12 +82,12 @@ void Canvas::writeToPPM(const std::string& fileName, bool invertY = false) {
         charsInCurrentLine = 0;
         newLine = true;
 
-        for (int j = 0; j < width; j++) {
-            _writeRgbString(getPixel(j, i).x,  newLine, charsInCurrentLine, &out);
-            _writeRgbString(getPixel(j, i).y,  newLine, charsInCurrentLine, &out);
-            _writeRgbString(getPixel(j, i).z,  newLine, charsInCurrentLine, &out);
+            for (int j = 0; j < width; j++) {
+                _writeRgbString(getPixel(j, i).x,  newLine, charsInCurrentLine, &out);
+                _writeRgbString(getPixel(j, i).y,  newLine, charsInCurrentLine, &out);
+                _writeRgbString(getPixel(j, i).z,  newLine, charsInCurrentLine, &out);
+            }
         }
-    }
     }
 
 

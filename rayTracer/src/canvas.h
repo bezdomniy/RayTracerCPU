@@ -8,16 +8,16 @@
 class Canvas
 {
 private:
-    unsigned int width;
-    unsigned int height;
     std::vector<glm::vec3> pixels;
-
     void _writeRgbString(float f, bool& newLine, int& charsInLine, std::ofstream* streamPtr);
 
     
 public:
     Canvas(unsigned int, unsigned int);
     ~Canvas();
+
+    unsigned int width;
+    unsigned int height;
 
     void writePixel(unsigned int, unsigned int, glm::vec3);
     glm::vec3 getPixel(unsigned int, unsigned int);

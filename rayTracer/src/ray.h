@@ -6,6 +6,7 @@
 class Ray
 {
 public:
+	Ray();
 	Ray(glm::vec4, glm::vec4);
 	~Ray();
 

@@ -7,7 +7,6 @@ using namespace Geometry;
 
 std::optional<std::vector<Intersection>> Geometry::intersectRaySphere(Ray& ray, Sphere& sphere) 
 {
-	
 	glm::mat4 inverseTransformSphere = glm::inverse(sphere.transform);
 	Ray transformedRay = ray.transform(inverseTransformSphere);
 
