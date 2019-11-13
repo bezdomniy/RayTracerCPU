@@ -5,9 +5,10 @@
 #include <glm/glm.hpp>
 #include <vector>
 // #include <utility>
-#include <optional>
+// #include <optional>
 #include <memory>
 #include <cmath>
+#include <glm/gtc/matrix_inverse.hpp>
 #include "ray.h"
 #include "sphere.h"
 
@@ -20,5 +21,5 @@ namespace Geometry {
     std::vector<Intersection> raySphereIntersection(Ray& r, Sphere& s);
 
     Intersection* hit(std::vector<Intersection>& intersections);
-    std::optional<std::vector<Intersection>> intersectRaySphere(Ray& ray, Sphere& sphere);
+    std::vector<Intersection> intersectRaySphere(Ray& ray, Sphere& sphere);
 }

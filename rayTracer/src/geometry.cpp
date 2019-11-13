@@ -5,20 +5,22 @@ using namespace Geometry;
 #include <iostream>
 #include "glm/gtx/string_cast.hpp"
 
-std::optional<std::vector<Intersection>> Geometry::intersectRaySphere(Ray& ray, Sphere& sphere) 
+std::vector<Intersection> Geometry::intersectRaySphere(Ray& ray, Sphere& sphere) 
 {
-	glm::mat4 inverseTransformSphere = glm::inverse(sphere.transform);
+	std::vector<Intersection> ret;
+
+	glm::mat4 inverseTransformSphere = glm::affineInverse(sphere.transform);
 	Ray transformedRay = ray.transform(inverseTransformSphere);
+
+	// std::cout << transformedRay <<std::endl;
 
 	glm::vec4 sphereToRay = transformedRay.origin - sphere.position;
 	float a = glm::dot(transformedRay.direction, transformedRay.direction);
 	float b = 2 * glm::dot(transformedRay.direction, sphereToRay);
-	float c = glm::dot(sphereToRay, sphereToRay) - 1;
+	float c = glm::dot(sphereToRay, sphereToRay) - (sphere.radius * sphere.radius);
 	float discriminant = b * b - 4 * a * c;
 
-	if (discriminant < 0) return std::optional<std::vector<Intersection>>();
-
-	std::vector<Intersection> ret;
+	if (discriminant < 0) return ret;
 
 	float t1 = (-b - std::sqrt(discriminant)) / (2 * a);
 	float t2 = (-b + std::sqrt(discriminant)) / (2 * a);

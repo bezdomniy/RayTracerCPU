@@ -99,11 +99,21 @@ int main(int argc, char const *argv[])
 	// 	std::cout << std::endl;
 	// }
 
-	Sphere s(0, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
-	// scale not working when small shape, just expanding error. getting diamond instead of circle.
-	s.transform = glm::scale(glm::mat4(1.f), glm::vec3(1.f, 0.5f, 1.f));
-	std::shared_ptr<Canvas> canvas = std::make_shared<Canvas>(100, 100);
+	Sphere s(0, glm::vec4(0.f, 0.f, 0.f, 1.f), 9.f);
+	float ambient = 0.1f;
+	float diffuse = 0.9f;
+	float specular = 0.9f;
+	float shininess = 200.f;
+	std::shared_ptr<Material> material = std::make_shared<Material>(glm::vec3(1.f,0.2f,1.f),ambient,diffuse,specular,shininess);
+	s.setMaterial(material);
+
+	std::shared_ptr<PointLight> light = std::make_shared<PointLight>(0, glm::vec4(-10.f,-3.f,-3.f,1.f),glm::vec3(1.f,1.f,1.f));
+
+
+	// s.transform = glm::scale(glm::mat4(1.f), glm::vec3(9.f, 9.f, 9.f));
+	std::shared_ptr<Canvas> canvas = std::make_shared<Canvas>(500, 500);
 	Renderer renderer(canvas);
+	renderer.addLight(light);
 	renderer.render(s);
 
 	canvas->writeToPPM("./test.ppm", true);
