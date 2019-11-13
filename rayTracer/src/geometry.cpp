@@ -31,6 +31,26 @@ std::vector<Intersection> Geometry::intersectRaySphere(Ray& ray, Sphere& sphere)
 	return ret;
 }
 
+bool compareIntersection(Intersection i1, Intersection i2) 
+{ 
+    return (i1.t < i2.t); 
+} 
+
+std::vector<Intersection> Geometry::intersectRayWorld(Ray& ray, World& world) {
+	std::vector<Intersection> ret;
+
+	for (auto& sphere: world.spheres) {
+		std::vector<Intersection> next = intersectRaySphere(ray, *sphere);
+		ret.insert( ret.end(), next.begin(), next.end() );
+	}
+
+	std::sort(ret.begin(), ret.end(), compareIntersection);
+
+	return ret;
+}
+
+
+
 Intersection* Geometry::hit(std::vector<Intersection>& intersections) {
     int retIndex = 0;
 

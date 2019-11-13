@@ -1,3 +1,5 @@
+#pragma once
+
 #include "shape.h"
 
 class PointLight: public Shape

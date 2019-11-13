@@ -91,7 +91,7 @@ void Renderer::render(Shape& shape) {
     }
 }
 
-void Renderer::addLight(std::shared_ptr<PointLight> light) {
+void Renderer::addLight(std::shared_ptr<PointLight>& light) {
     this->lights.push_back(light);
 }
 

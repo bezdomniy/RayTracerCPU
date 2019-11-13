@@ -7,6 +7,7 @@
 #include "ray.h"
 #include "geometry.h"
 #include "pointLight.h"
+#include "world.h"
 #include <iostream>
 #include <memory>
 #include <glm/glm.hpp>
@@ -23,7 +24,8 @@ public:
     Renderer(std::shared_ptr<Canvas> c);
     ~Renderer();
 
-    void addLight(std::shared_ptr<PointLight> light);
+    void addLight(std::shared_ptr<PointLight>& light);
+    void render(World& world);
     void render(Shape& shape);
 };
 
