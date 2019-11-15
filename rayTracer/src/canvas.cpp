@@ -16,13 +16,14 @@ Canvas::~Canvas()
 {
 }
 
-//TODO doesnt work with widescreen. index overrun
 void Canvas::writePixel(unsigned int x, unsigned int y, glm::vec3 colour) {
-    pixels[y * width + x] = colour;
+    if (height >= width) pixels[y * width + x] = colour;
+    else pixels[x * height + y] = colour;
 }
 
 glm::vec3 Canvas::getPixel(unsigned int x, unsigned int y) {
-    return pixels[y * width + x];
+    if (height >= width) return pixels[y * width + x];
+    return pixels[x * height + y];
 }
 
 void Canvas::clear(glm::vec3 colour) {

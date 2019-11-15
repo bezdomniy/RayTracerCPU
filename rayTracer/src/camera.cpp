@@ -8,6 +8,7 @@ Camera::Camera(glm::vec4 position, glm::vec4 forward, glm::vec4 up, float hsize,
     this->hsize = hsize;
     this->vsize = vsize;
     this->fov = fov;
+
     this->transform = glm::lookAt(glm::vec3(this->position), glm::vec3(this->forward), glm::vec3(this->up));
     // std::cout << glm::to_string(transform) << std::endl;
     setPixelSize();
@@ -32,9 +33,10 @@ void Camera::setPixelSize() {
     this->pixelSize = (this->halfWidth * 2) / this->hsize;
 }
 
+//TODO not getting right direction. maybe px py mixed up
 Ray Camera::rayForPixel(float px, float py) {
-    float xOffset = (px + 0.5f) / this->pixelSize;
-    float yOffset = (py + 0.5f) / this->pixelSize;
+    float xOffset = (px + 0.5f) * this->pixelSize;
+    float yOffset = (py + 0.5f) * this->pixelSize;
 
     float worldX = this->halfWidth - xOffset;
     float worldY = this->halfHeight - yOffset;
