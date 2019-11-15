@@ -5,6 +5,21 @@ using namespace Geometry;
 #include <iostream>
 #include "glm/gtx/string_cast.hpp"
 
+void Geometry::getIntersectionParameters(Intersection& intersection, Ray& ray) {
+	intersection.comps = std::make_unique<IntersectionParameters>();
+	intersection.comps->point = ray.origin + glm::normalize(ray.direction) * intersection.t;
+	intersection.comps->normalv = intersection.spherePtr->normalAt(intersection.comps->point);
+	intersection.comps->eyev = -ray.direction;
+
+	if (glm::dot(intersection.comps->normalv,intersection.comps->eyev) < 0) {
+		intersection.comps->inside = true;
+		intersection.comps->normalv = -intersection.comps->normalv;
+	}
+	else {
+		intersection.comps->inside = false;
+	}
+}
+
 std::vector<Intersection> Geometry::intersectRaySphere(Ray& ray, Sphere& sphere) 
 {
 	std::vector<Intersection> ret;
@@ -31,7 +46,7 @@ std::vector<Intersection> Geometry::intersectRaySphere(Ray& ray, Sphere& sphere)
 	return ret;
 }
 
-bool compareIntersection(Intersection i1, Intersection i2) 
+bool compareIntersection(Intersection& i1, Intersection& i2) 
 { 
     return (i1.t < i2.t); 
 } 
@@ -41,15 +56,13 @@ std::vector<Intersection> Geometry::intersectRayWorld(Ray& ray, World& world) {
 
 	for (auto& sphere: world.spheres) {
 		std::vector<Intersection> next = intersectRaySphere(ray, *sphere);
-		ret.insert( ret.end(), next.begin(), next.end() );
+		ret.insert( ret.end(), std::make_move_iterator(next.begin()), std::make_move_iterator(next.end()));
 	}
 
 	std::sort(ret.begin(), ret.end(), compareIntersection);
 
 	return ret;
 }
-
-
 
 Intersection* Geometry::hit(std::vector<Intersection>& intersections) {
     int retIndex = 0;
@@ -69,3 +82,6 @@ Intersection* Geometry::hit(std::vector<Intersection>& intersections) {
     return nullptr;
 }
 
+glm::vec3 Geometry::colourAt(Ray& ray, World& world) {
+
+}

@@ -102,12 +102,12 @@ int main(int argc, char const *argv[])
 	Sphere s(0, glm::vec4(0.f, 0.f, 0.f, 1.f), 9.f);
 	float ambient = 0.1f;
 	float diffuse = 0.9f;
-	float specular = 0.9f;
+	float specular = 0.1f;
 	float shininess = 200.f;
 	std::shared_ptr<Material> material = std::make_shared<Material>(glm::vec3(1.f,0.2f,1.f),ambient,diffuse,specular,shininess);
 	s.setMaterial(material);
 
-	std::shared_ptr<PointLight> light = std::make_shared<PointLight>(0, glm::vec4(-10.f,-3.f,-3.f,1.f),glm::vec3(1.f,1.f,1.f));
+	std::shared_ptr<PointLight> light = std::make_shared<PointLight>(0, glm::vec4(-10.f,10.f,-10.f,1.f),glm::vec3(0.2f,1.f,0.f));
 
 
 	// s.transform = glm::scale(glm::mat4(1.f), glm::vec3(9.f, 9.f, 9.f));

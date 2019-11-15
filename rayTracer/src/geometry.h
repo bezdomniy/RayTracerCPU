@@ -15,14 +15,25 @@
 #include "world.h"
 
 namespace Geometry {
+    struct IntersectionParameters {
+        glm::vec4 point;
+        glm::vec4 normalv;
+        glm::vec4 eyev;
+        bool inside;
+    };
+
     struct Intersection {
         float t;
         std::shared_ptr<Sphere> spherePtr;
+        std::unique_ptr<IntersectionParameters> comps;
     };
+
+    void getIntersectionParameters(Intersection& intersection, Ray& ray);
 
     // std::vector<Intersection> raySphereIntersection(Ray& r, Sphere& s);
 
     Intersection* hit(std::vector<Intersection>& intersections);
     std::vector<Intersection> intersectRaySphere(Ray& ray, Sphere& sphere);
     std::vector<Intersection> intersectRayWorld(Ray& ray, World& world);
+    glm::vec3 colourAt(Ray& ray, World& world);
 }
