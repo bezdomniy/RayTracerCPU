@@ -1,6 +1,7 @@
 #pragma once
 
 #include "canvas.h"
+#include "camera.h"
 // #include "shape.h"
 
 #include "sphere.h"
@@ -16,17 +17,15 @@
 class Renderer
 {
 private:
-    glm::vec3 lighting(std::shared_ptr<Material> material, std::shared_ptr<PointLight> light, glm::vec4 point, glm::vec4 eyev, glm::vec4 normalv);
-    std::shared_ptr<Canvas> canvas;
-    std::vector<std::shared_ptr<PointLight>> lights;
+    std::shared_ptr<Camera> camera;
+    
 public:
     Renderer();
-    Renderer(std::shared_ptr<Canvas> c);
+    Renderer(std::shared_ptr<Camera>& c);
     ~Renderer();
 
-    void addLight(std::shared_ptr<PointLight>& light);
+    glm::vec3 colourAt(Ray& ray, World& world);
+    Canvas canvas;
+
     void render(World& world);
-    void render(Shape& shape);
 };
-
-

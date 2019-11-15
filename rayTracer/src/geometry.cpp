@@ -82,6 +82,50 @@ Intersection* Geometry::hit(std::vector<Intersection>& intersections) {
     return nullptr;
 }
 
-glm::vec3 Geometry::colourAt(Ray& ray, World& world) {
+glm::vec3 Geometry::lighting(std::shared_ptr<Material> material, std::shared_ptr<PointLight> light, glm::vec4 point, glm::vec4 eyev, glm::vec4 normalv) {
+    glm::vec3 diffuse;
+    glm::vec3 specular;
 
+    //combine the surface color with the light's color/intensity​
+    glm::vec3 effectiveColour = material->colour * light->intensity;
+    glm::vec4 lightv = glm::normalize(light->position - point);
+
+    //compute the ambient contribution​
+    glm::vec3 ambient = effectiveColour * material->ambient;
+
+    //light_dot_normal represents the cosine of the angle between the​
+    //light vector and the normal vector. A negative number means the​
+    //light is on the other side of the surface.​
+
+    float lightDotNormal = glm::dot(lightv, normalv);
+    if (lightDotNormal < 0) {
+        diffuse = glm::vec3(0.f,0.f,0.f);
+        specular = glm::vec3(0.f,0.f,0.f);
+    }
+    else { 
+        //compute the diffuse contribution​
+        diffuse = effectiveColour * material->diffuse * lightDotNormal;
+
+        //reflect_dot_eye represents the cosine of the angle between the
+        //reflection vector and the eye vector. A negative number means the
+        //light reflects away from the eye.​
+        glm::vec4 reflectv = glm::reflect(-lightv, normalv);
+        float reflectDotEye = glm::dot(reflectv, eyev);
+
+        if (reflectDotEye <= 0) {
+            specular = glm::vec3(0.f,0.f,0.f);
+        }
+        else {
+            //compute the specular contribution​
+            float factor = std::pow(reflectDotEye, material->shininess);
+            specular = light->intensity * material->specular * factor;
+        }
+    }
+
+    return (ambient + diffuse + specular);
+}
+
+
+glm::vec3 Geometry::shadeHit(Intersection* hit, World& world) {
+	return lighting(hit->spherePtr->material, world.lights.at(0), hit->comps->point, hit->comps->eyev, hit->comps->normalv);
 }

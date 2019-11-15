@@ -1,5 +1,9 @@
 #include "canvas.h"
 
+Canvas::Canvas()
+{
+}
+
 Canvas::Canvas(unsigned int w, unsigned int h)
 {
     width = w;
@@ -12,6 +16,7 @@ Canvas::~Canvas()
 {
 }
 
+//TODO doesnt work with widescreen. index overrun
 void Canvas::writePixel(unsigned int x, unsigned int y, glm::vec3 colour) {
     pixels[y * width + x] = colour;
 }

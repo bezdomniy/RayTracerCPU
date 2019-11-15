@@ -35,5 +35,6 @@ namespace Geometry {
     Intersection* hit(std::vector<Intersection>& intersections);
     std::vector<Intersection> intersectRaySphere(Ray& ray, Sphere& sphere);
     std::vector<Intersection> intersectRayWorld(Ray& ray, World& world);
-    glm::vec3 colourAt(Ray& ray, World& world);
+    glm::vec3 lighting(std::shared_ptr<Material> material, std::shared_ptr<PointLight> light, glm::vec4 point, glm::vec4 eyev, glm::vec4 normalv);
+    glm::vec3 shadeHit(Intersection* hit, World& world);
 }

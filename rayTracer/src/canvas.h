@@ -13,6 +13,7 @@ private:
 
     
 public:
+    Canvas();
     Canvas(unsigned int, unsigned int);
     ~Canvas();
 

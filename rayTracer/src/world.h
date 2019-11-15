@@ -17,6 +17,7 @@ public:
     ~World();
 
     void addShape(Shape& shape);
+    void addSphere(Sphere& sphere);
     void addLight(std::shared_ptr<PointLight>& light);
 
     std::vector<std::shared_ptr<Sphere>> spheres;
