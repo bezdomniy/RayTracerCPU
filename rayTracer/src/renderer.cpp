@@ -15,11 +15,11 @@ Renderer::~Renderer()
 }
 
 void Renderer::render(World& world) {
-    for (int i = 0; i < this->canvas.height; i++) {
-        for (int j = 0; j < this->canvas.width; j++) {
-            Ray cast = this->camera->rayForPixel(i,j);
+    for (int y = 0; y < this->canvas.height; y++) {
+        for (int x = 0; x < this->canvas.width; x++) {
+            Ray cast = this->camera->rayForPixel(x,y);
             glm::vec3 cShape = colourAt(cast, world);
-            this->canvas.writePixel(i,j,cShape);
+            this->canvas.writePixel(x,y,cShape);
         }
     }
 }

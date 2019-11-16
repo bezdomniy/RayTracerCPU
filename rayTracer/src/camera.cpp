@@ -1,15 +1,15 @@
 #include "camera.h"
 
-Camera::Camera(glm::vec4 position, glm::vec4 forward, glm::vec4 up, float hsize, float vsize, float fov)
+Camera::Camera(glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize, float vsize, float fov)
 {
     this->position = position;
-    this->forward = forward;
+    this->centre = centre;
     this->up = up;
     this->hsize = hsize;
     this->vsize = vsize;
     this->fov = fov;
 
-    this->transform = glm::lookAt(glm::vec3(this->position), glm::vec3(this->forward), glm::vec3(this->up));
+    this->transform = glm::lookAt(glm::vec3(this->position), glm::vec3(this->centre), glm::vec3(this->up));
     // std::cout << glm::to_string(transform) << std::endl;
     setPixelSize();
 }

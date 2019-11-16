@@ -12,13 +12,13 @@ class Camera
 private:
     void setPixelSize();
 public:
-    Camera(glm::vec4 position, glm::vec4 forward, glm::vec4 up, float hsize, float vsize, float fov);
+    Camera(glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize, float vsize, float fov);
     ~Camera();
 
     Ray rayForPixel(float px, float py);
 
     glm::vec4 position;
-    glm::vec4 forward;
+    glm::vec4 centre;
     glm::vec4 up;
 
     float hsize;
