@@ -46,23 +46,12 @@ std::vector<Intersection> Geometry::intersectRaySphere(Ray& ray, Sphere& sphere)
 	return ret;
 }
 
-bool compareIntersection(Intersection& i1, Intersection& i2) 
+bool Geometry::compareIntersection(Intersection& i1, Intersection& i2) 
 { 
     return (i1.t < i2.t); 
 } 
 
-std::vector<Intersection> Geometry::intersectRayWorld(Ray& ray, World& world) {
-	std::vector<Intersection> ret;
 
-	for (auto& sphere: world.spheres) {
-		std::vector<Intersection> next = intersectRaySphere(ray, *sphere);
-		ret.insert( ret.end(), std::make_move_iterator(next.begin()), std::make_move_iterator(next.end()));
-	}
-
-	std::sort(ret.begin(), ret.end(), compareIntersection);
-
-	return ret;
-}
 
 Intersection* Geometry::hit(std::vector<Intersection>& intersections) {
     int retIndex = 0;
@@ -82,16 +71,17 @@ Intersection* Geometry::hit(std::vector<Intersection>& intersections) {
     return nullptr;
 }
 
-glm::vec3 Geometry::lighting(std::shared_ptr<Material> material, std::shared_ptr<PointLight> light, glm::vec4 point, glm::vec4 eyev, glm::vec4 normalv) {
+glm::vec3 Geometry::lighting(std::shared_ptr<Material> material, std::shared_ptr<PointLight> light, glm::vec4 point, glm::vec4 eyev, glm::vec4 normalv, bool inShadow) {
     glm::vec3 diffuse;
     glm::vec3 specular;
 
     //combine the surface color with the light's color/intensity​
     glm::vec3 effectiveColour = material->colour * light->intensity;
-    glm::vec4 lightv = glm::normalize(light->position - point);
-
     //compute the ambient contribution​
     glm::vec3 ambient = effectiveColour * material->ambient;
+    if (inShadow) return ambient;
+
+    glm::vec4 lightv = glm::normalize(light->position - point);
 
     //light_dot_normal represents the cosine of the angle between the​
     //light vector and the normal vector. A negative number means the​
@@ -126,6 +116,5 @@ glm::vec3 Geometry::lighting(std::shared_ptr<Material> material, std::shared_ptr
 }
 
 
-glm::vec3 Geometry::shadeHit(Intersection* hit, World& world) {
-	return lighting(hit->spherePtr->material, world.lights.at(0), hit->comps->point, hit->comps->eyev, hit->comps->normalv);
-}
+
+

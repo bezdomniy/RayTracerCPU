@@ -25,12 +25,12 @@ void Renderer::render(World& world) {
 }
 
 glm::vec3 Renderer::colourAt(Ray& ray, World& world) {
-    std::vector<Geometry::Intersection> intersections = Geometry::intersectRayWorld(ray, world);
+    std::vector<Geometry::Intersection> intersections = world.intersectRay(ray);
     Geometry::Intersection* hit;
 
     if ((hit = Geometry::hit(intersections))) {
         Geometry::getIntersectionParameters(*hit, ray);
-        return Geometry::shadeHit(hit, world);
+        return world.shadeHit(hit);
     }
     return glm::vec3(0.f, 0.f, 0.f);
 }
