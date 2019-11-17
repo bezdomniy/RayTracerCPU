@@ -54,17 +54,20 @@ bool Geometry::compareIntersection(Intersection& i1, Intersection& i2)
 
 
 Intersection* Geometry::hit(std::vector<Intersection>& intersections) {
-    int retIndex = 0;
+    int retIndex = -1;
 
     if (!intersections.empty()) {
         for (int i = 0; i < intersections.size(); i++) {
 			// std::cout << intersections.at(i).t << " ";
-            if (intersections.at(i).t > 0 && intersections.at(i).t < intersections.at(retIndex).t) {
+            if (retIndex == -1 && intersections.at(i).t > 0) {
+                retIndex = i;
+            }
+            else if (intersections.at(i).t > 0 && intersections.at(i).t < intersections.at(retIndex).t) {
                 retIndex = i;
             }
         }
 
-        if (intersections.at(retIndex).t > 0) {
+        if (retIndex != -1 && intersections.at(retIndex).t > 0) {
             return &intersections.at(retIndex);
         }
     }

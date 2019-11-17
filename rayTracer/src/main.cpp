@@ -104,7 +104,7 @@ int main(int argc, char const *argv[])
 	
 	// std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::vec4(1.f, 3.f, 2.f, 1.f),glm::vec4(4.f, -2.f, 8.f, 0.f),glm::vec4(1.f, 1.f, 0.f, 0.f), 100.f, 50.f, glm::pi<float>() / 3);
 
-	std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::vec4(0.f, 1.5f, -5.f, 1.f),glm::vec4(0.f, 1.f, 0.f, 1.f),glm::vec4(0.f, 1.f, 0.f, 0.f), 100.f, 50.f, glm::radians(60.f));
+	std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::vec4(0.f, 1.5f, -5.f, 1.f),glm::vec4(0.f, 1.f, 0.f, 1.f),glm::vec4(0.f, 1.f, 0.f, 0.f), 1000.f, 500.f, glm::radians(60.f));
 
 	Sphere s(0, glm::vec4(0.f,0.f,0.f,1.f), 1.f);
 	Sphere s2(0, glm::vec4(0.f,0.f,0.f, 1.f), 1.f);
