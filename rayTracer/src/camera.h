@@ -7,26 +7,26 @@
 // #include <iostream>
 #include "ray.h"
 
-class Camera
-{
+class Camera {
 private:
-    void setPixelSize();
+  void setPixelSize();
+
 public:
-    Camera(glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize, float vsize, float fov);
-    ~Camera();
+  Camera(glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize,
+         float vsize, float fov);
+  ~Camera();
 
-    Ray rayForPixel(float px, float py);
+  Ray rayForPixel(float px, float py);
 
-    glm::vec4 position;
-    glm::vec4 centre;
-    glm::vec4 up;
+  glm::vec4 position;
+  glm::vec4 centre;
+  glm::vec4 up;
 
-    float hsize;
-    float vsize;
-    float halfWidth;
-    float halfHeight;
-    float fov;
-    float pixelSize;
-    glm::mat4 transform;
+  float hsize;
+  float vsize;
+  float halfWidth;
+  float halfHeight;
+  float fov;
+  float pixelSize;
+  glm::mat4 transform;
 };
-

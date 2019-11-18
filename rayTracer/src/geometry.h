@@ -3,43 +3,40 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <glm/gtx/intersect.hpp>
 #include <glm/glm.hpp>
+#include <glm/gtx/intersect.hpp>
 #include <vector>
-// #include <utility>
-// #include <optional>
-#include <memory>
-#include <cmath>
-#include <algorithm>
-#include <glm/gtc/matrix_inverse.hpp>
-#include "ray.h"
-#include "sphere.h"
+#include "shape.h"
 #include "pointLight.h"
-// #include "world.h"
+#include "ray.h"
+#include "material.h"
+#include <algorithm>
+#include <cmath>
+#include <glm/gtc/matrix_inverse.hpp>
+#include <limits>
+#include <memory>
 
-namespace Geometry {
-    struct IntersectionParameters {
-        glm::vec4 point;
-        glm::vec4 normalv;
-        glm::vec4 eyev;
-        bool inside;
-    };
+namespace Geometry
+{
+static const float EPSILON = 0.0001f;
+struct IntersectionParameters
+{
+  glm::vec4 point;
+  glm::vec4 normalv;
+  glm::vec4 eyev;
+  glm::vec4 overPoint;
+  bool inside;
+};
 
-    struct Intersection {
-        float t;
-        std::shared_ptr<Sphere> spherePtr;
-        std::unique_ptr<IntersectionParameters> comps;
-    };
+struct Intersection
+{
+  float t;
+  std::shared_ptr<Shape> shapePtr;
+  std::unique_ptr<IntersectionParameters> comps;
+};
 
-    void getIntersectionParameters(Intersection& intersection, Ray& ray);
+void getIntersectionParameters(Intersection &intersection, Ray &ray);
+bool compareIntersection(Intersection &i1, Intersection &i2);
+Intersection *hit(std::vector<Intersection> &intersections);
 
-    bool compareIntersection(Intersection& i1, Intersection& i2);
-
-    // std::vector<Intersection> raySphereIntersection(Ray& r, Sphere& s);
-
-    Intersection* hit(std::vector<Intersection>& intersections);
-    std::vector<Intersection> intersectRaySphere(Ray& ray, Sphere& sphere);
-    // std::vector<Intersection> intersectRayWorld(Ray& ray, World& world);
-    glm::vec3 lighting(std::shared_ptr<Material> material, std::shared_ptr<PointLight> light, glm::vec4 point, glm::vec4 eyev, glm::vec4 normalv, bool inShadow);
-    // glm::vec3 shadeHit(Intersection* hit, World& world);
-}
+} // namespace Geometry

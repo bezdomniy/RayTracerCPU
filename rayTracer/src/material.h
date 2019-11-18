@@ -2,20 +2,19 @@
 
 #include <glm/glm.hpp>
 
-class Material
-{
+class Material {
 private:
-    /* data */
+  /* data */
 public:
-    Material();
-    Material(glm::vec3 colour, float ambient, float diffuse, float specular, float shininess);
-    
-    ~Material();
+  Material();
+  Material(glm::vec3 colour, float ambient, float diffuse, float specular,
+           float shininess);
 
-    glm::vec3 colour;
-    float ambient;
-    float diffuse;
-    float specular;
-    float shininess;
+  ~Material();
+
+  glm::vec3 colour;
+  float ambient;
+  float diffuse;
+  float specular;
+  float shininess;
 };
-

@@ -1,31 +1,29 @@
 #pragma once
 
-#include <vector>
-#include <string>
 #include <fstream>
 #include <glm/glm.hpp>
+#include <string>
+#include <vector>
 
-class Canvas
-{
+
+class Canvas {
 private:
-    std::vector<glm::vec3> pixels;
-    void _writeRgbString(float f, bool& newLine, int& charsInLine, std::ofstream* streamPtr);
+  std::vector<glm::vec3> pixels;
+  void _writeRgbString(float f, bool &newLine, int &charsInLine,
+                       std::ofstream *streamPtr);
 
-    
 public:
-    Canvas();
-    Canvas(unsigned int, unsigned int);
-    ~Canvas();
+  Canvas();
+  Canvas(unsigned int, unsigned int);
+  ~Canvas();
 
-    unsigned int width;
-    unsigned int height;
+  unsigned int width;
+  unsigned int height;
 
-    void writePixel(unsigned int, unsigned int, glm::vec3);
-    glm::vec3 getPixel(unsigned int, unsigned int);
+  void writePixel(unsigned int, unsigned int, glm::vec3);
+  glm::vec3 getPixel(unsigned int, unsigned int);
 
-    void clear(glm::vec3);
+  void clear(glm::vec3);
 
-    void writeToPPM(const std::string&, bool invertY);
-
+  void writeToPPM(const std::string &, bool invertY);
 };
-

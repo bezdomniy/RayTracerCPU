@@ -1,31 +1,30 @@
 #pragma once
 
-#include <glm/glm.hpp>
-#include <vector>
-#include <memory>
-#include <iostream>
-#include "shape.h"
-#include "sphere.h"
+#include "geometry.h"
 #include "pointLight.h"
 #include "ray.h"
-#include "geometry.h"
+#include "shape.h"
+#include "sphere.h"
+#include <glm/glm.hpp>
+#include <iostream>
+#include <memory>
+#include <vector>
 
 class World
 {
 private:
-    /* data */
+  /* data */
 public:
-    World();
-    ~World();
+  World();
+  ~World();
 
-    void addShape(Shape& shape);
-    void addSphere(Sphere& sphere);
-    void addLight(std::shared_ptr<PointLight>& light);
+  void addShape(Shape &shape);
+  void addSphere(Sphere &sphere);
+  void addLight(std::shared_ptr<PointLight> &light);
 
-    bool isShadowed(glm::vec4 point);
-    std::vector<Geometry::Intersection> intersectRay(Ray& ray);
-    glm::vec3 shadeHit(Geometry::Intersection* hit);
+  bool isShadowed(glm::vec4 point);
+  std::vector<Geometry::Intersection> intersectRay(Ray &ray);
 
-    std::vector<std::shared_ptr<Sphere>> spheres;
-    std::vector<std::shared_ptr<PointLight>> lights;
+  std::vector<std::shared_ptr<Sphere>> spheres;
+  std::vector<std::shared_ptr<PointLight>> lights;
 };
