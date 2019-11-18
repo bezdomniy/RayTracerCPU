@@ -31,19 +31,19 @@ void World::addShape(Shape &shape)
   }
 }
 
-std::vector<Geometry::Intersection> World::intersectRay(Ray &ray)
+std::vector<Geometry::Intersection<Shape>> World::intersectRay(Ray &ray)
 {
-  std::vector<Geometry::Intersection> ret;
+  std::vector<Geometry::Intersection<Shape>> ret;
 
   for (auto &sphere : this->spheres)
   {
-    std::vector<Geometry::Intersection> next =
+    std::vector<Geometry::Intersection<Shape>> next =
         sphere->intersectRay(ray);
     ret.insert(ret.end(), std::make_move_iterator(next.begin()),
                std::make_move_iterator(next.end()));
   }
 
-  std::sort(ret.begin(), ret.end(), Geometry::compareIntersection);
+  std::sort(ret.begin(), ret.end(), Geometry::compareIntersection<Shape>);
 
   return ret;
 }

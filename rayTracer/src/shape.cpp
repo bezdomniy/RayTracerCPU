@@ -4,6 +4,13 @@ Shape::Shape(unsigned int id, glm::vec4 position)
 {
   this->id = id;
   this->position = position;
+  this->transform = glm::mat4(1.f);
+}
+
+std::vector<Geometry::Intersection<Shape>> Shape::intersectRay(Ray &ray)
+{
+  std::vector<Geometry::Intersection<Shape>> ret;
+  return ret;
 }
 
 glm::vec4 Shape::normalAt(glm::vec4 point)

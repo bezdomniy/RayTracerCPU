@@ -4,14 +4,13 @@ Sphere::Sphere(unsigned int id, glm::vec4 position, float radius)
     : Shape(id, position)
 {
   this->radius = radius;
-  this->transform = glm::mat4(1.f);
 }
 
 Sphere::~Sphere() {}
 
-std::vector<Geometry::Intersection> Sphere::intersectRay(Ray &ray)
+std::vector<Geometry::Intersection<Shape>> Sphere::intersectRay(Ray &ray)
 {
-  std::vector<Geometry::Intersection> ret;
+  std::vector<Geometry::Intersection<Shape>> ret;
 
   Ray transformedRay = transformRay(ray);
 
@@ -30,8 +29,8 @@ std::vector<Geometry::Intersection> Sphere::intersectRay(Ray &ray)
   float t1 = (-b - std::sqrt(discriminant)) / (2 * a);
   float t2 = (-b + std::sqrt(discriminant)) / (2 * a);
 
-  ret.push_back(Geometry::Intersection{t1, std::make_shared<Sphere>(*this)});
-  ret.push_back(Geometry::Intersection{t2, std::make_shared<Sphere>(*this)});
+  ret.push_back(Geometry::Intersection<Shape>{t1, std::make_shared<Sphere>(*this)});
+  ret.push_back(Geometry::Intersection<Shape>{t2, std::make_shared<Sphere>(*this)});
 
   return ret;
 }

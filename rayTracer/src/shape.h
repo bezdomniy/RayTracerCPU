@@ -2,9 +2,11 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
+#include <vector>
 
 #include "ray.h"
 #include "material.h"
+#include "geometry.h"
 
 class Shape
 {
@@ -13,6 +15,8 @@ private:
 public:
   Shape(unsigned int id, glm::vec4 position);
   virtual ~Shape();
+
+  virtual std::vector<Geometry::Intersection<Shape>> intersectRay(Ray &ray);
 
   glm::mat4 transform;
 

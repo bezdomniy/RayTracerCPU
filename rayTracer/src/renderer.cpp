@@ -26,12 +26,12 @@ void Renderer::render(World &world)
 
 glm::vec3 Renderer::colourAt(Ray &ray, World &world)
 {
-  std::vector<Geometry::Intersection> intersections = world.intersectRay(ray);
-  Geometry::Intersection *hit;
+  std::vector<Geometry::Intersection<Shape>> intersections = world.intersectRay(ray);
+  Geometry::Intersection<Shape> *hit;
 
-  if ((hit = Geometry::hit(intersections)))
+  if ((hit = Geometry::hit<Shape>(intersections)))
   {
-    Geometry::getIntersectionParameters(*hit, ray);
+    Geometry::getIntersectionParameters<Shape>(*hit, ray);
     return shadeHit(hit, world);
   }
   return glm::vec3(0.f, 0.f, 0.f);
@@ -89,7 +89,7 @@ glm::vec3 Renderer::lighting(std::shared_ptr<Material> material,
   return (ambient + diffuse + specular);
 }
 
-glm::vec3 Renderer::shadeHit(Geometry::Intersection *hit, World &world)
+glm::vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world)
 {
   bool inShadow = this->isShadowed(hit->comps->overPoint, world);
   return lighting(hit->shapePtr->material, world.lights.at(0),
@@ -104,9 +104,9 @@ bool Renderer::isShadowed(glm::vec4 point, World &world)
   glm::vec4 direction = glm::normalize(v);
 
   Ray ray = Ray(point, direction);
-  std::vector<Geometry::Intersection> intersections = world.intersectRay(ray);
+  std::vector<Geometry::Intersection<Shape>> intersections = world.intersectRay(ray);
 
-  Geometry::Intersection *hit = Geometry::hit(intersections);
+  Geometry::Intersection<Shape> *hit = Geometry::hit<Shape>(intersections);
   if (hit && hit->t < distance)
   {
     return true;

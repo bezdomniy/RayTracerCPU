@@ -2,12 +2,15 @@
 
 #include "shape.h"
 
-class PointLight : public Shape {
+class PointLight
+{
 private:
   /* data */
 public:
   PointLight(unsigned int id, glm::vec4 position, glm::vec3 intensity);
   ~PointLight();
 
+  int id;
+  glm::vec4 position;
   glm::vec3 intensity;
 };

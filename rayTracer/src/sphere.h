@@ -1,9 +1,9 @@
 #pragma once
 
-#include "material.h"
+// #include "material.h"
 #include "shape.h"
 #include "geometry.h"
-#include <glm/glm.hpp>
+// #include <glm/glm.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <memory>
 
@@ -14,7 +14,7 @@ public:
   ~Sphere();
 
   float radius;
-  std::vector<Geometry::Intersection> intersectRay(Ray &ray);
+  std::vector<Geometry::Intersection<Shape>> intersectRay(Ray &ray);
 
 private:
 };
