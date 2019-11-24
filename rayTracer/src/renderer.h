@@ -26,8 +26,8 @@ public:
   ~Renderer();
 
   glm::vec3 colourAt(Ray &ray, World &world);
-  glm::vec3 lighting(std::shared_ptr<Material> material,
-                     std::shared_ptr<PointLight> light, glm::vec4 point,
+  glm::vec3 lighting(std::shared_ptr<Shape>& shape,
+                     std::shared_ptr<PointLight>& light, glm::vec4 point,
                      glm::vec4 eyev, glm::vec4 normalv, bool inShadow);
   glm::vec3 shadeHit(Geometry::Intersection<Shape> *hit, World &world);
   bool isShadowed(glm::vec4 point, World &world);

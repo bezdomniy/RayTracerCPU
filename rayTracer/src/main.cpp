@@ -6,6 +6,8 @@
 #include "sphere.h"
 #include "plane.h"
 #include "world.h"
+#include "pattern.h"
+#include "stripedPattern.h"
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -38,12 +40,18 @@ int main(int argc, char const *argv[])
         glm::vec3(1.f, 0.8f, 0.1f), ambient, diffuse, specular, shininess);
     std::shared_ptr<Material> materialFloor = std::make_shared<Material>(
         glm::vec3(1.f, 0.9f, 0.9f), ambient, diffuse, specular, shininess);
+
+    std::shared_ptr<Pattern> stripes = std::make_shared<StripedPattern>(glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+    stripes->transform *= glm::rotate(glm::mat4(1.f), glm::radians(90.f), glm::vec3(0.f, 0.f, 1.f));
+    material->setPattern(stripes);
+    
+
     s->setMaterial(material);
     s2->setMaterial(material2);
     s3->setMaterial(material3);
     floor->setMaterial(materialFloor);
     backWall->setMaterial(materialFloor);
-	//test
+
     s->transform = glm::translate(glm::mat4(1.f), glm::vec3(-0.5f, 1.f, 0.5f));
     s->transform *= glm::scale(glm::mat4(1.f), glm::vec3(1.f, 1.f, 1.f));
     // s.transform = glm::scale(glm::mat4(1.f), glm::vec3(9.f, 9.f, 9.f));

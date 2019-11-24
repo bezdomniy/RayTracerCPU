@@ -37,17 +37,21 @@ glm::vec3 Renderer::colourAt(Ray &ray, World &world)
   return glm::vec3(0.f, 0.f, 0.f);
 }
 
-glm::vec3 Renderer::lighting(std::shared_ptr<Material> material,
-                             std::shared_ptr<PointLight> light, glm::vec4 point,
+glm::vec3 Renderer::lighting(std::shared_ptr<Shape>& shape,
+                             std::shared_ptr<PointLight>& light, glm::vec4 point,
                              glm::vec4 eyev, glm::vec4 normalv, bool inShadow)
 {
   glm::vec3 diffuse;
   glm::vec3 specular;
+  glm::vec3 effectiveColour;
+
+  if (shape->material->pattern == nullptr) effectiveColour = shape->material->colour * light->intensity;
+  else effectiveColour = shape->patternAt(point) * light->intensity;
 
   // combine the surface color with the light's color/intensity​
-  glm::vec3 effectiveColour = material->colour * light->intensity;
+  // glm::vec3 effectiveColour = material->colour * light->intensity;
   // compute the ambient contribution​
-  glm::vec3 ambient = effectiveColour * material->ambient;
+  glm::vec3 ambient = effectiveColour * shape->material->ambient;
   if (inShadow)
     return ambient;
 
@@ -66,7 +70,7 @@ glm::vec3 Renderer::lighting(std::shared_ptr<Material> material,
   else
   {
     // compute the diffuse contribution​
-    diffuse = effectiveColour * material->diffuse * lightDotNormal;
+    diffuse = effectiveColour * shape->material->diffuse * lightDotNormal;
 
     // reflect_dot_eye represents the cosine of the angle between the
     // reflection vector and the eye vector. A negative number means the
@@ -81,8 +85,8 @@ glm::vec3 Renderer::lighting(std::shared_ptr<Material> material,
     else
     {
       // compute the specular contribution​
-      float factor = std::pow(reflectDotEye, material->shininess);
-      specular = light->intensity * material->specular * factor;
+      float factor = std::pow(reflectDotEye, shape->material->shininess);
+      specular = light->intensity * shape->material->specular * factor;
     }
   }
 
@@ -92,7 +96,7 @@ glm::vec3 Renderer::lighting(std::shared_ptr<Material> material,
 glm::vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world)
 {
   bool inShadow = this->isShadowed(hit->comps->overPoint, world);
-  return lighting(hit->shapePtr->material, world.lights.at(0),
+  return lighting(hit->shapePtr, world.lights.at(0),
                   hit->comps->overPoint, hit->comps->eyev,
                   hit->comps->normalv, inShadow);
 }

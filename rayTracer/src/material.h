@@ -1,6 +1,8 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <memory>
+#include "pattern.h"
 
 class Material {
 private:
@@ -17,4 +19,7 @@ public:
   float diffuse;
   float specular;
   float shininess;
+
+  std::shared_ptr<Pattern> pattern;
+  void setPattern(std::shared_ptr<Pattern>& pattern);
 };

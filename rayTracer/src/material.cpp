@@ -12,3 +12,7 @@ Material::Material(glm::vec3 colour, float ambient, float diffuse,
 }
 
 Material::~Material() {}
+
+void Material::setPattern(std::shared_ptr<Pattern>& pattern) {
+  this->pattern = pattern;
+}
