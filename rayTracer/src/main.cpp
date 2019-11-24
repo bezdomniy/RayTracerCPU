@@ -54,8 +54,10 @@ int main(int argc, char const *argv[])
         glm::translate(glm::mat4(1.f), glm::vec3(-1.5f, 0.33f, -0.75f));
     s3->transform *= glm::scale(glm::mat4(1.f), glm::vec3(0.33f, 0.33f, 0.33f));
 
-    backWall->transform *= glm::rotate(glm::mat4(1.f), glm::radians(90.f), glm::vec3(1.f, 0.f, 0.f));
-    backWall->transform *= glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 100.f));
+	// floor->transform *= glm::rotate(glm::mat4(1.f), glm::pi<float>()/2, glm::vec3(1.f, 0.f, 0.f));
+	backWall->transform *= glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 2.5f));
+    backWall->transform *= glm::rotate(glm::mat4(1.f), glm::radians(270.f), glm::vec3(1.f, 0.f, 0.f));
+    // backWall->transform *= glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 5.f));
     // left.transform ← translation(-1.5, 0.33, -0.75) * scaling(0.33, 0.33, 0.33)
 
     std::shared_ptr<PointLight> light = std::make_shared<PointLight>(
