@@ -43,7 +43,7 @@ int main(int argc, char const *argv[])
     s3->setMaterial(material3);
     floor->setMaterial(materialFloor);
     backWall->setMaterial(materialFloor);
-
+	//test
     s->transform = glm::translate(glm::mat4(1.f), glm::vec3(-0.5f, 1.f, 0.5f));
     s->transform *= glm::scale(glm::mat4(1.f), glm::vec3(1.f, 1.f, 1.f));
     // s.transform = glm::scale(glm::mat4(1.f), glm::vec3(9.f, 9.f, 9.f));
