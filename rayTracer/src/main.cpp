@@ -7,7 +7,7 @@
 #include "plane.h"
 #include "world.h"
 #include "pattern.h"
-#include "stripedPattern.h"
+#include "patterns.h"
 #include <iostream>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -42,8 +42,18 @@ int main(int argc, char const *argv[])
         glm::vec3(1.f, 0.9f, 0.9f), ambient, diffuse, specular, shininess);
 
     std::shared_ptr<Pattern> stripes = std::make_shared<StripedPattern>(glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-    stripes->transform *= glm::rotate(glm::mat4(1.f), glm::radians(90.f), glm::vec3(0.f, 0.f, 1.f));
-    material->setPattern(stripes);
+    std::shared_ptr<Pattern> rings = std::make_shared<RingPattern>(glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+    std::shared_ptr<Pattern> gradient = std::make_shared<GradientPattern>(glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 1.f));
+    std::shared_ptr<Pattern> checks = std::make_shared<CheckedPattern>(glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+    
+
+    rings->transform *= glm::rotate(glm::mat4(1.f), glm::radians(90.f), glm::vec3(1.f, 0.f, 0.f));
+    rings->transform *= glm::scale(glm::mat4(1.f), glm::vec3(0.25f, 0.25f, 0.25f));
+    stripes->transform *= glm::scale(glm::mat4(1.f), glm::vec3(0.5f, 0.5f, 0.5f));
+
+    std::shared_ptr<Pattern> blended = std::make_shared<BlendedPattern>(rings, stripes);
+
+    material->setPattern(blended);
     
 
     s->setMaterial(material);
