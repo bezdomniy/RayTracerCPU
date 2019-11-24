@@ -26,6 +26,6 @@ public:
   std::shared_ptr<Material> material;
   void setMaterial(std::shared_ptr<Material> mat);
 
-  glm::vec4 normalAt(glm::vec4 point);
+  virtual glm::vec4 normalAt(glm::vec4 point);
   Ray transformRay(Ray &ray);
 };

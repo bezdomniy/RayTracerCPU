@@ -21,7 +21,7 @@
 
 namespace Geometry
 {
-static const float EPSILON = 0.0001f;
+static const float EPSILON = 0.00001f;
 struct IntersectionParameters
 {
   glm::vec4 point;

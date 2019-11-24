@@ -9,36 +9,19 @@ void World::addLight(std::shared_ptr<PointLight> &light)
   this->lights.push_back(light);
 }
 
-void World::addSphere(Sphere &sphere)
+void World::addShape(std::shared_ptr<Shape> &shape_ptr)
 {
-  ;
-  // std::make_shared<Author>(std::move(t_author));
-  this->spheres.push_back(std::make_shared<Sphere>(std::move(sphere)));
-}
-
-void World::addShape(Shape &shape)
-{
-  try
-  {
-    std::shared_ptr<Sphere> sphere_ptr =
-        std::make_shared<Sphere>(std::move(*dynamic_cast<Sphere *>(&shape)));
-    this->spheres.push_back(sphere_ptr);
-  }
-  catch (std::bad_cast &bc)
-  {
-    std::cerr << "bad_cast caught: " << bc.what() << '\n';
-    // return;
-  }
+  this->shapes.push_back(shape_ptr);
 }
 
 std::vector<Geometry::Intersection<Shape>> World::intersectRay(Ray &ray)
 {
   std::vector<Geometry::Intersection<Shape>> ret;
 
-  for (auto &sphere : this->spheres)
+  for (auto &shape : this->shapes)
   {
     std::vector<Geometry::Intersection<Shape>> next =
-        sphere->intersectRay(ray);
+        shape->intersectRay(ray);
     ret.insert(ret.end(), std::make_move_iterator(next.begin()),
                std::make_move_iterator(next.end()));
   }
