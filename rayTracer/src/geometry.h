@@ -27,6 +27,7 @@ struct IntersectionParameters
   glm::vec4 point;
   glm::vec4 normalv;
   glm::vec4 eyev;
+  glm::vec4 reflectv;
   glm::vec4 overPoint;
   bool inside;
 };
@@ -48,6 +49,7 @@ void getIntersectionParameters(Intersection<T> &intersection, Ray &ray)
   intersection.comps->normalv =
       intersection.shapePtr->normalAt(intersection.comps->point);
   intersection.comps->eyev = -ray.direction;
+  intersection.comps->reflectv = glm::reflect(ray.direction, intersection.comps->normalv);
   intersection.comps->overPoint =
       intersection.comps->point + intersection.comps->normalv * EPSILON;
 

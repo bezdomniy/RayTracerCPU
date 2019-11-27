@@ -4,7 +4,8 @@
 #include <memory>
 #include "pattern.h"
 
-class Material {
+class Material
+{
 private:
   /* data */
 public:
@@ -19,7 +20,8 @@ public:
   float diffuse;
   float specular;
   float shininess;
+  float reflective;
 
   std::shared_ptr<Pattern> pattern;
-  void setPattern(std::shared_ptr<Pattern>& pattern);
+  void setPattern(std::shared_ptr<Pattern> &pattern);
 };

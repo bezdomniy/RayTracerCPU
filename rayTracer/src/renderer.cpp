@@ -12,19 +12,20 @@ Renderer::~Renderer() {}
 
 void Renderer::render(World &world)
 {
+  const int RAY_BOUNCE_LIMIT = 5;
   // this->world = std::make_shared<World>(world);
   for (int y = 0; y < this->canvas.height; y++)
   {
     for (int x = 0; x < this->canvas.width; x++)
     {
       Ray cast = this->camera->rayForPixel(x, y);
-      glm::vec3 cShape = colourAt(cast, world);
+      glm::vec3 cShape = colourAt(cast, world, RAY_BOUNCE_LIMIT);
       this->canvas.writePixel(x, y, cShape);
     }
   }
 }
 
-glm::vec3 Renderer::colourAt(Ray &ray, World &world)
+glm::vec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
 {
   std::vector<Geometry::Intersection<Shape>> intersections = world.intersectRay(ray);
   Geometry::Intersection<Shape> *hit;
@@ -32,21 +33,33 @@ glm::vec3 Renderer::colourAt(Ray &ray, World &world)
   if ((hit = Geometry::hit<Shape>(intersections)))
   {
     Geometry::getIntersectionParameters<Shape>(*hit, ray);
-    return shadeHit(hit, world);
+    return shadeHit(hit, world, remaining);
   }
   return glm::vec3(0.f, 0.f, 0.f);
 }
 
-glm::vec3 Renderer::lighting(std::shared_ptr<Shape>& shape,
-                             std::shared_ptr<PointLight>& light, glm::vec4 point,
+glm::vec3 Renderer::reflectColour(Geometry::Intersection<Shape> *hit, World &world, short remaining)
+{
+  if (hit->shapePtr->material->reflective == 0 || remaining <= 0)
+    return glm::vec3(0.f, 0.f, 0.f);
+
+  Ray reflectRay = Ray(hit->comps->overPoint, hit->comps->reflectv);
+  glm::vec3 colour = colourAt(reflectRay, world, remaining - 1);
+  return colour * hit->shapePtr->material->reflective;
+}
+
+glm::vec3 Renderer::lighting(std::shared_ptr<Shape> &shape,
+                             std::shared_ptr<PointLight> &light, glm::vec4 point,
                              glm::vec4 eyev, glm::vec4 normalv, bool inShadow)
 {
   glm::vec3 diffuse;
   glm::vec3 specular;
   glm::vec3 effectiveColour;
 
-  if (shape->material->pattern == nullptr) effectiveColour = shape->material->colour * light->intensity;
-  else effectiveColour = shape->patternAt(point) * light->intensity;
+  if (shape->material->pattern == nullptr)
+    effectiveColour = shape->material->colour * light->intensity;
+  else
+    effectiveColour = shape->patternAt(point) * light->intensity;
 
   // combine the surface color with the light's color/intensity​
   // glm::vec3 effectiveColour = material->colour * light->intensity;
@@ -93,12 +106,16 @@ glm::vec3 Renderer::lighting(std::shared_ptr<Shape>& shape,
   return (ambient + diffuse + specular);
 }
 
-glm::vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world)
+glm::vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world, short remaining)
 {
   bool inShadow = this->isShadowed(hit->comps->overPoint, world);
-  return lighting(hit->shapePtr, world.lights.at(0),
-                  hit->comps->overPoint, hit->comps->eyev,
-                  hit->comps->normalv, inShadow);
+  glm::vec3 surface = lighting(hit->shapePtr, world.lights.at(0),
+                               hit->comps->overPoint, hit->comps->eyev,
+                               hit->comps->normalv, inShadow);
+
+  glm::vec3 reflection = reflectColour(hit, world, remaining);
+
+  return surface + reflection;
 }
 
 bool Renderer::isShadowed(glm::vec4 point, World &world)
