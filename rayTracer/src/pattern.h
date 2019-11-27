@@ -2,16 +2,14 @@
 
 #include <glm/glm.hpp>
 
-class Pattern
-{
+class Pattern {
 private:
-    /* data */
+  /* data */
 public:
-    Pattern();
-    virtual ~Pattern();
+  Pattern();
+  virtual ~Pattern();
 
-    virtual glm::vec3 patternAt(glm::vec4 point) = 0;
+  virtual glm::vec3 patternAt(glm::vec4 point) = 0;
 
-    glm::mat4 transform;
+  glm::mat4 transform;
 };
-
