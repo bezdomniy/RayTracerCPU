@@ -55,7 +55,7 @@ int main(int argc, char const *argv[])
     std::shared_ptr<Pattern> gradient = std::make_shared<GradientPattern>(
         glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 1.f));
     std::shared_ptr<Pattern> checks = std::make_shared<CheckedPattern>(
-        glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+        glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 1.f));
 
     rings->transform *=
         glm::rotate(glm::mat4(1.f), glm::radians(90.f), glm::vec3(1.f, 0.f, 0.f));
@@ -70,6 +70,8 @@ int main(int argc, char const *argv[])
         std::make_shared<PerturbedPattern>(stripes);
 
     // material->setPattern(perturbed);
+    materialFloor->setPattern(checks);
+    materialBackWall->setPattern(checks);
 
     s->setMaterial(material);
     s2->setMaterial(material2);
@@ -77,7 +79,7 @@ int main(int argc, char const *argv[])
     floor->setMaterial(materialFloor);
     backWall->setMaterial(materialBackWall);
 
-    floor->material->reflective = 0.5f;
+    floor->material->reflective = 0.0f;
     s->material->reflective = 1.f;
 
     s->transform = glm::translate(glm::mat4(1.f), glm::vec3(-0.5f, 1.f, 0.5f));

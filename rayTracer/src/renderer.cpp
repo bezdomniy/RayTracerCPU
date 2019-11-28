@@ -32,7 +32,7 @@ glm::vec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
 
   if ((hit = Geometry::hit<Shape>(intersections)))
   {
-    Geometry::getIntersectionParameters<Shape>(*hit, ray);
+    Geometry::getIntersectionParameters<Shape>(*hit, ray, intersections);
     return shadeHit(hit, world, remaining);
   }
   return glm::vec3(0.f, 0.f, 0.f);

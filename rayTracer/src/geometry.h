@@ -29,6 +29,9 @@ struct IntersectionParameters
   glm::vec4 eyev;
   glm::vec4 reflectv;
   glm::vec4 overPoint;
+  glm::vec4 underPoint;
+  float n1;
+  float n2;
   bool inside;
 };
 
@@ -40,8 +43,35 @@ struct Intersection
   std::unique_ptr<IntersectionParameters> comps;
 };
 
+// ​ 	containers ← empty list
+// ​
+// ​ 	​for​ i ← each intersection in xs
+// ​ 	  ​if​ i = hit ​then​
+// ​ 	    ​if​ containers is empty
+// ​ 	      comps.n1 ← 1.0
+// ​ 	    ​else​
+// ​ 	      comps.n1 ← last(containers).material.refractive_index
+// ​ 	    ​end​ ​if​
+// ​ 	  ​end​ ​if​
+// ​
+// ​ 	  ​if​ containers includes i.object ​then​
+// ​ 	    remove i.object from containers
+// ​ 	  ​else​
+// ​ 	    append i.object onto containers
+// ​ 	  ​end​ ​if​
+// ​ 	  ​if​ i = hit ​then​
+// ​ 	    ​if​ containers is empty
+// ​ 	      comps.n2 ← 1.0
+// ​ 	    ​else​
+// ​ 	      comps.n2 ← last(containers).material.refractive_index
+// ​ 	    ​end​ ​if​
+// ​
+// ​ 	    terminate loop
+// ​ 	  ​end​ ​if​
+// ​ 	​end​ ​for​
+
 template <typename T>
-void getIntersectionParameters(Intersection<T> &intersection, Ray &ray)
+void getIntersectionParameters(Intersection<T> &intersection, Ray &ray, std::vector<Intersection<T>> &intersections)
 {
   intersection.comps = std::make_unique<IntersectionParameters>();
   intersection.comps->point =
@@ -62,6 +92,8 @@ void getIntersectionParameters(Intersection<T> &intersection, Ray &ray)
   {
     intersection.comps->inside = false;
   }
+
+  getRefractiveIndexFromTo<T>(intersections, intersection.comps);
 }
 
 template <typename T>
@@ -79,7 +111,6 @@ Intersection<T> *hit(std::vector<Intersection<T>> &intersections)
   {
     for (int i = 0; i < intersections.size(); i++)
     {
-      // std::cout << intersections.at(i).t << " ";
       if (retIndex == -1 && intersections.at(i).t > 0)
       {
         retIndex = i;
@@ -97,6 +128,39 @@ Intersection<T> *hit(std::vector<Intersection<T>> &intersections)
     }
   }
   return nullptr;
+}
+
+template <typename T>
+void getRefractiveIndexFromTo(std::vector<Intersection<T>> &intersections, std::unique_ptr<IntersectionParameters> &comps)
+{
+  std::vector<T *> objects;
+  Intersection<T> *hitIntersection = hit(intersections);
+
+  for (auto &intersection : intersections)
+  {
+    if (&intersection == hitIntersection)
+    {
+      if (objects.empty())
+        comps->n1 = 1.f;
+      else
+        comps->n1 = objects.back()->material->refractiveIndex;
+    }
+
+    typename std::vector<T *>::iterator position = std::find(objects.begin(), objects.end(), intersection.shapePtr.get());
+    if (position != objects.end())
+      objects.erase(position);
+    else
+      objects.push_back(intersection.shapePtr.get());
+
+    if (&intersection == hitIntersection)
+    {
+      if (objects.empty())
+        comps->n2 = 1.f;
+      else
+        comps->n2 = objects.back()->material->refractiveIndex;
+      break;
+    }
+  }
 }
 
 } // namespace Geometry

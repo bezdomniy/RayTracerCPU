@@ -20,14 +20,12 @@ public:
   virtual glm::vec4 normalAt(glm::vec4 point) = 0;
 
   glm::mat4 transform;
-
   unsigned int id;
   glm::vec4 position;
 
   std::shared_ptr<Material> material;
-  void setMaterial(std::shared_ptr<Material>& mat);
+  void setMaterial(std::shared_ptr<Material> &mat);
   glm::vec3 patternAt(glm::vec4 point);
 
-  
   Ray transformRay(Ray &ray);
 };

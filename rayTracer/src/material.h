@@ -21,6 +21,8 @@ public:
   float specular;
   float shininess;
   float reflective;
+  float transparency;
+  float refractiveIndex;
 
   std::shared_ptr<Pattern> pattern;
   void setPattern(std::shared_ptr<Pattern> &pattern);

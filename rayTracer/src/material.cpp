@@ -11,6 +11,8 @@ Material::Material(glm::vec3 colour, float ambient, float diffuse,
   this->specular = specular;
   this->shininess = shininess;
   this->reflective = 0;
+  this->transparency = 0;
+  this->refractiveIndex = 0;
 }
 
 Material::~Material() {}
