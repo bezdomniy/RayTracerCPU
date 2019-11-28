@@ -1,3 +1,1 @@
-[submodule "rayTracer/libnoise"]
-	path = rayTracer/libnoise
-	url = https://github.com/eXpl0it3r/libnoise.git
+
