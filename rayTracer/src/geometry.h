@@ -43,33 +43,6 @@ struct Intersection
   std::unique_ptr<IntersectionParameters> comps;
 };
 
-// ​ 	containers ← empty list
-// ​
-// ​ 	​for​ i ← each intersection in xs
-// ​ 	  ​if​ i = hit ​then​
-// ​ 	    ​if​ containers is empty
-// ​ 	      comps.n1 ← 1.0
-// ​ 	    ​else​
-// ​ 	      comps.n1 ← last(containers).material.refractive_index
-// ​ 	    ​end​ ​if​
-// ​ 	  ​end​ ​if​
-// ​
-// ​ 	  ​if​ containers includes i.object ​then​
-// ​ 	    remove i.object from containers
-// ​ 	  ​else​
-// ​ 	    append i.object onto containers
-// ​ 	  ​end​ ​if​
-// ​ 	  ​if​ i = hit ​then​
-// ​ 	    ​if​ containers is empty
-// ​ 	      comps.n2 ← 1.0
-// ​ 	    ​else​
-// ​ 	      comps.n2 ← last(containers).material.refractive_index
-// ​ 	    ​end​ ​if​
-// ​
-// ​ 	    terminate loop
-// ​ 	  ​end​ ​if​
-// ​ 	​end​ ​for​
-
 template <typename T>
 void getIntersectionParameters(Intersection<T> &intersection, Ray &ray, std::vector<Intersection<T>> &intersections)
 {
@@ -82,6 +55,8 @@ void getIntersectionParameters(Intersection<T> &intersection, Ray &ray, std::vec
   intersection.comps->reflectv = glm::reflect(ray.direction, intersection.comps->normalv);
   intersection.comps->overPoint =
       intersection.comps->point + intersection.comps->normalv * EPSILON;
+  intersection.comps->underPoint =
+      intersection.comps->point - intersection.comps->normalv * EPSILON;
 
   if (glm::dot(intersection.comps->normalv, intersection.comps->eyev) < 0)
   {

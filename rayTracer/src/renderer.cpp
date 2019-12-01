@@ -25,6 +25,15 @@ void Renderer::render(World &world)
   }
 }
 
+glm::vec3 Renderer::refractedColour(World &world, Geometry::Intersection<Shape> *hit, short remaining)
+{
+  if (hit->shapePtr->material->transparency == 0 || remaining == 0)
+  {
+    return glm::vec3(0.f, 0.f, 0.f);
+  }
+  return glm::vec3(1.f, 1.f, 1.f);
+}
+
 glm::vec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
 {
   std::vector<Geometry::Intersection<Shape>> intersections = world.intersectRay(ray);
