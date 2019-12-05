@@ -25,13 +25,22 @@ void Renderer::render(World &world)
   }
 }
 
-glm::vec3 Renderer::refractedColour(World &world, Geometry::Intersection<Shape> *hit, short remaining)
+glm::vec3 Renderer::refractedColour(Geometry::Intersection<Shape> *hit, World &world, short remaining)
 {
-  if (hit->shapePtr->material->transparency == 0 || remaining == 0)
+  float nRatio = hit->comps->n1 / hit->comps->n2;
+  float cosI = glm::dot(hit->comps->eyev, hit->comps->normalv);
+  float sin2T = nRatio * nRatio * (1 - (cosI * cosI));
+
+  if (hit->shapePtr->material->transparency == 0 || sin2T > 1 || remaining == 0)
   {
     return glm::vec3(0.f, 0.f, 0.f);
   }
-  return glm::vec3(1.f, 1.f, 1.f);
+
+  float cosT = std::sqrt(1.f - sin2T);
+  glm::vec4 direction = hit->comps->normalv * (nRatio * cosI * cosT) - hit->comps->eyev * nRatio;
+  Ray refractedRay(hit->comps->underPoint, direction);
+
+  return colourAt(refractedRay, world, remaining - 1) * hit->shapePtr->material->transparency;
 }
 
 glm::vec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
@@ -123,8 +132,9 @@ glm::vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world, s
                                hit->comps->normalv, inShadow);
 
   glm::vec3 reflection = reflectColour(hit, world, remaining);
+  glm::vec3 refraction = refractedColour(hit, world, remaining);
 
-  return surface + reflection;
+  return surface + reflection + refraction;
 }
 
 bool Renderer::isShadowed(glm::vec4 point, World &world)
