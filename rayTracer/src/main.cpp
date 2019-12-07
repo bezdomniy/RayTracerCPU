@@ -131,12 +131,24 @@ int main(int argc, char const *argv[])
         std::make_shared<Sphere>(0, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
     s->transform *= glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 0.f));
 
-    std::shared_ptr<Material> materialS = std::make_shared<Material>(
-        glm::vec3(1.f, 1.f, 1.f), 0.5, 0.f, 0.f, 0.f);
+    std::shared_ptr<Shape> s2 =
+        std::make_shared<Sphere>(0, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
+    s2->transform *= glm::scale(glm::mat4(1.f), glm::vec3(0.5f, 0.5f, 0.5f));
 
-    materialS->transparency = 0.5f;
-    materialS->refractiveIndex = 1.5f;
+    std::shared_ptr<Material> materialS = std::make_shared<Material>(
+        glm::vec3(0.f, 0.f, 0.f), 1.f, 0.f, 0.f, 0.f);
+
+    std::shared_ptr<Material> materialS2 = std::make_shared<Material>(
+        glm::vec3(0.f, 0.f, 0.f), 1.f, 0.f, 0.f, 0.f);
+
+    materialS->transparency = 1.f;
+    materialS->refractiveIndex = 1.52f;
+
+    materialS2->transparency = 1.f;
+    materialS2->refractiveIndex = 1.00026f;
+
     s->setMaterial(materialS);
+    s2->setMaterial(materialS2);
 
     std::shared_ptr<PointLight> light = std::make_shared<PointLight>(
         0, glm::vec4(10.f, 10.f, 10.f, 1.f), glm::vec3(1.f, 1.f, 1.f));
@@ -144,6 +156,7 @@ int main(int argc, char const *argv[])
     World world;
     world.addShape(floor);
     world.addShape(s);
+    //world.addShape(s2);
 
     world.addLight(light);
 
