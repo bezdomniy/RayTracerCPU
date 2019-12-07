@@ -38,6 +38,19 @@ glm::vec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
   return glm::vec3(0.f, 0.f, 0.f);
 }
 
+glm::vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world, short remaining)
+{
+  bool inShadow = this->isShadowed(hit->comps->overPoint, world);
+  glm::vec3 surface = lighting(hit->shapePtr, world.lights.at(0),
+                               hit->comps->overPoint, hit->comps->eyev,
+                               hit->comps->normalv, inShadow);
+
+  glm::vec3 reflection = reflectColour(hit, world, remaining);
+  glm::vec3 refraction = refractedColour(hit, world, remaining);
+
+  return surface + reflection + refraction;
+}
+
 glm::vec3 Renderer::reflectColour(Geometry::Intersection<Shape> *hit, World &world, short remaining)
 {
   if (hit->shapePtr->material->reflective == 0 || remaining <= 0)
@@ -67,7 +80,7 @@ glm::vec3 Renderer::refractedColour(Geometry::Intersection<Shape> *hit, World &w
   return colour * hit->shapePtr->material->transparency;
 }
 
-glm::vec3 Renderer::lighting(std::shared_ptr<Shape> &shape,
+glm::vec3 Renderer::lighting(Shape *shape,
                              std::shared_ptr<PointLight> &light, glm::vec4 point,
                              glm::vec4 eyev, glm::vec4 normalv, bool inShadow)
 {
@@ -123,19 +136,6 @@ glm::vec3 Renderer::lighting(std::shared_ptr<Shape> &shape,
   }
 
   return (ambient + diffuse + specular);
-}
-
-glm::vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world, short remaining)
-{
-  bool inShadow = this->isShadowed(hit->comps->overPoint, world);
-  glm::vec3 surface = lighting(hit->shapePtr, world.lights.at(0),
-                               hit->comps->overPoint, hit->comps->eyev,
-                               hit->comps->normalv, inShadow);
-
-  glm::vec3 reflection = reflectColour(hit, world, remaining);
-  glm::vec3 refraction = refractedColour(hit, world, remaining);
-
-  return surface + reflection + refraction;
 }
 
 bool Renderer::isShadowed(glm::vec4 point, World &world)

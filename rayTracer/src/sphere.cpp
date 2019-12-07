@@ -29,8 +29,8 @@ std::vector<Geometry::Intersection<Shape>> Sphere::intersectRay(Ray &ray)
   float t1 = (-b - std::sqrt(discriminant)) / (2 * a);
   float t2 = (-b + std::sqrt(discriminant)) / (2 * a);
 
-  ret.push_back(Geometry::Intersection<Shape>{t1, std::make_shared<Sphere>(*this)});
-  ret.push_back(Geometry::Intersection<Shape>{t2, std::make_shared<Sphere>(*this)});
+  ret.push_back(Geometry::Intersection<Shape>{t1, this});
+  ret.push_back(Geometry::Intersection<Shape>{t2, this});
 
   return ret;
 }

@@ -39,9 +39,41 @@ template <typename T>
 struct Intersection
 {
   float t;
-  std::shared_ptr<T> shapePtr;
+  T* shapePtr;
   std::unique_ptr<IntersectionParameters> comps;
 };
+
+template <typename T>
+void getRefractiveIndexFromTo(std::vector<Intersection<T>> &intersections, Intersection<T>& hit)
+{
+  std::vector<T *> objects;
+
+  for (auto &intersection : intersections)
+  {
+    if (&intersection == &hit)
+    {
+      if (objects.empty())
+        intersection.comps->n1 = 1.f;
+      else
+        intersection.comps->n1 = objects.back()->material->refractiveIndex;
+    }
+
+    typename std::vector<T *>::iterator position = std::find(objects.begin(), objects.end(), intersection.shapePtr);
+    if (position != objects.end())
+      objects.erase(position);
+    else
+      objects.push_back(intersection.shapePtr);
+
+    if (&intersection == &hit)
+    {
+      if (objects.empty())
+        intersection.comps->n2 = 1.f;
+      else
+        intersection.comps->n2 = objects.back()->material->refractiveIndex;
+      break;
+    }
+  }
+}
 
 template <typename T>
 void getIntersectionParameters(Intersection<T> &intersection, Ray &ray, std::vector<Intersection<T>> &intersections)
@@ -68,7 +100,7 @@ void getIntersectionParameters(Intersection<T> &intersection, Ray &ray, std::vec
     intersection.comps->inside = false;
   }
 
-  getRefractiveIndexFromTo<T>(intersections, intersection.comps);
+  getRefractiveIndexFromTo<T>(intersections, intersection);
 }
 
 template <typename T>
@@ -86,12 +118,8 @@ Intersection<T> *hit(std::vector<Intersection<T>> &intersections)
   {
     for (int i = 0; i < intersections.size(); i++)
     {
-      if (retIndex == -1 && intersections.at(i).t > 0)
-      {
-        retIndex = i;
-      }
-      else if (intersections.at(i).t > 0 &&
-               intersections.at(i).t < intersections.at(retIndex).t)
+      if ((retIndex == -1 && intersections.at(i).t > 0) || (intersections.at(i).t > 0 &&
+               intersections.at(i).t < intersections.at(retIndex).t))
       {
         retIndex = i;
       }
@@ -105,37 +133,6 @@ Intersection<T> *hit(std::vector<Intersection<T>> &intersections)
   return nullptr;
 }
 
-template <typename T>
-void getRefractiveIndexFromTo(std::vector<Intersection<T>> &intersections, std::unique_ptr<IntersectionParameters> &comps)
-{
-  std::vector<T *> objects;
-  Intersection<T> *hitIntersection = hit(intersections);
 
-  for (auto &intersection : intersections)
-  {
-    if (&intersection == hitIntersection)
-    {
-      if (objects.empty())
-        comps->n1 = 1.f;
-      else
-        comps->n1 = objects.back()->material->refractiveIndex;
-    }
-
-    typename std::vector<T *>::iterator position = std::find(objects.begin(), objects.end(), intersection.shapePtr.get());
-    if (position != objects.end())
-      objects.erase(position);
-    else
-      objects.push_back(intersection.shapePtr.get());
-
-    if (&intersection == hitIntersection)
-    {
-      if (objects.empty())
-        comps->n2 = 1.f;
-      else
-        comps->n2 = objects.back()->material->refractiveIndex;
-      break;
-    }
-  }
-}
 
 } // namespace Geometry

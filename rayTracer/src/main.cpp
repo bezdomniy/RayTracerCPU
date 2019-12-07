@@ -111,10 +111,10 @@ int main(int argc, char const *argv[])
     // Scene 2
     std::shared_ptr<Camera> camera = std::make_shared<Camera>(
         glm::vec4(0.f, 2.5f, 0.f, 1.f), glm::vec4(0.f, 0.f, 0.f, 1.f),
-        glm::vec4(0.f, 0.f, 1.f, 0.f), 500.f, 500.f, glm::radians(60.f));
+        glm::vec4(0.f, 0.f, 1.f, 0.f), 10.f, 10.f, glm::radians(60.f));
 
     std::shared_ptr<Shape> floor =
-        std::make_shared<Plane>(0, glm::vec4(0.f, 0.f, 0.f, 1.f));
+        std::make_shared<Plane>(33, glm::vec4(0.f, 0.f, 0.f, 1.f));
     floor->transform = glm::translate(glm::mat4(1.f), glm::vec3(0.f, -1.f, 0.f));
 
     std::shared_ptr<Material> materialFloor = std::make_shared<Material>(
@@ -128,11 +128,11 @@ int main(int argc, char const *argv[])
     floor->setMaterial(materialFloor);
 
     std::shared_ptr<Shape> s =
-        std::make_shared<Sphere>(0, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
+        std::make_shared<Sphere>(11, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
     s->transform *= glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 0.f));
 
     std::shared_ptr<Shape> s2 =
-        std::make_shared<Sphere>(0, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
+        std::make_shared<Sphere>(22, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
     s2->transform *= glm::scale(glm::mat4(1.f), glm::vec3(0.5f, 0.5f, 0.5f));
 
     std::shared_ptr<Material> materialS = std::make_shared<Material>(
@@ -142,7 +142,8 @@ int main(int argc, char const *argv[])
         glm::vec3(0.f, 0.f, 0.f), 1.f, 0.f, 0.f, 0.f);
 
     materialS->transparency = 1.f;
-    materialS->refractiveIndex = 1.52f;
+    // materialS->reflective = 0.5f;
+    materialS->refractiveIndex = 1.f;
 
     materialS2->transparency = 1.f;
     materialS2->refractiveIndex = 1.00026f;

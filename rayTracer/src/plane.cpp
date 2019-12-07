@@ -17,7 +17,7 @@ std::vector<Geometry::Intersection<Shape>> Plane::intersectRay(Ray &ray)
 
     float t = -transformedRay.origin.y / transformedRay.direction.y;
 
-    ret.push_back(Geometry::Intersection<Shape>{t, std::make_shared<Plane>(*this)});
+    ret.push_back(Geometry::Intersection<Shape>{t, this});
 
     return ret;
 }

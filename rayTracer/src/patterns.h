@@ -4,7 +4,7 @@
 #include "pattern.h"
 #include <glm/gtc/matrix_inverse.hpp>
 #include <memory>
-#include <noise/noise.h>
+#include <libnoise/noise.h>
 #include <vector>
 
 class StripedPattern : public Pattern {
