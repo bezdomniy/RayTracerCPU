@@ -48,6 +48,10 @@ glm::vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world, s
   glm::vec3 reflection = reflectColour(hit, world, remaining);
   glm::vec3 refraction = refractedColour(hit, world, remaining);
 
+  if (hit->shapePtr->material->reflective > 0 && hit->shapePtr->material->transparency > 0) {
+    float reflectance = Geometry::schlick<Shape>(hit->comps);
+    return surface + reflection * reflectance + refraction * (1 - reflectance);
+  }
   return surface + reflection + refraction;
 }
 
@@ -73,6 +77,7 @@ glm::vec3 Renderer::refractedColour(Geometry::Intersection<Shape> *hit, World &w
 
   float cosT = std::sqrt(1.f - sin2T);
   glm::vec4 direction = hit->comps->normalv * ((nRatio * cosI) - cosT) - (hit->comps->eyev * nRatio);
+
   Ray refractedRay(hit->comps->underPoint, direction);
 
   glm::vec3 colour = colourAt(refractedRay, world, remaining - 1);

@@ -1,1 +1,4 @@
 
+[submodule "rayTracer/yaml-cpp"]
+	path = rayTracer/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp.git

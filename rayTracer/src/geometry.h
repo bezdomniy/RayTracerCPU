@@ -84,11 +84,6 @@ void getIntersectionParameters(Intersection<T> &intersection, Ray &ray, std::vec
   intersection.comps->normalv =
       intersection.shapePtr->normalAt(intersection.comps->point);
   intersection.comps->eyev = -ray.direction;
-  intersection.comps->reflectv = glm::reflect(ray.direction, intersection.comps->normalv);
-  intersection.comps->overPoint =
-      intersection.comps->point + intersection.comps->normalv * EPSILON;
-  intersection.comps->underPoint =
-      intersection.comps->point - intersection.comps->normalv * EPSILON;
 
   if (glm::dot(intersection.comps->normalv, intersection.comps->eyev) < 0)
   {
@@ -99,6 +94,12 @@ void getIntersectionParameters(Intersection<T> &intersection, Ray &ray, std::vec
   {
     intersection.comps->inside = false;
   }
+
+  intersection.comps->reflectv = glm::reflect(ray.direction, intersection.comps->normalv);
+  intersection.comps->overPoint =
+      intersection.comps->point + intersection.comps->normalv * EPSILON;
+  intersection.comps->underPoint =
+      intersection.comps->point - intersection.comps->normalv * EPSILON;
 
   getRefractiveIndexFromTo<T>(intersections, intersection);
 }
@@ -133,6 +134,19 @@ Intersection<T> *hit(std::vector<Intersection<T>> &intersections)
   return nullptr;
 }
 
-
+template <typename T>
+float schlick(std::unique_ptr<IntersectionParameters>& comps) {
+  float cos = glm::dot(comps->eyev,comps->normalv);
+  if (comps->n1 > comps->n2) {
+    float n = comps->n1 / comps->n2;
+    float sin2T = std::pow(n, 2) * (1.f - std::pow(cos, 2));
+      if (sin2T > 1.f) return 1.f;
+    
+    float cosT = std::sqrt(1.f - sin2T);
+    cos = cosT;
+  }
+  float r0 = std::pow((comps->n1 - comps->n2) / (comps->n1 + comps->n2), 2);
+  return r0 + (1.f - r0) * std::pow(1.f - cos, 5);
+}
 
 } // namespace Geometry

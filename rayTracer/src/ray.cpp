@@ -1,5 +1,7 @@
 #include "ray.h"
 
+Ray::Ray() {}
+
 Ray::Ray(glm::vec4 origin, glm::vec4 direction) {
   this->origin = origin;
   this->direction = direction;
