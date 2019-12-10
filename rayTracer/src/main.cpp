@@ -10,7 +10,7 @@
 #include "world.h"
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
-// #include "yaml-cpp/yaml.h"
+
 
 int main(int argc, char const *argv[])
 {

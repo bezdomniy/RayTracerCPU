@@ -5,6 +5,7 @@
 #include "ray.h"
 #include "shape.h"
 #include "sphere.h"
+#include "yaml-cpp/yaml.h"
 #include <glm/glm.hpp>
 #include <iostream>
 #include <memory>
@@ -18,6 +19,8 @@ private:
 public:
   World();
   ~World();
+
+  void loadFromFile(std::string& fileName);
 
   void addShape(std::shared_ptr<Shape> &shape_ptr);
   void addLight(std::shared_ptr<PointLight> &light);

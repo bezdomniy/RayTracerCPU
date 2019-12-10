@@ -30,3 +30,7 @@ std::vector<Geometry::Intersection<Shape>> World::intersectRay(Ray &ray)
 
   return ret;
 }
+
+void World::loadFromFile(std::string& fileName) {
+    YAML::Node root = YAML::LoadFile(fileName);
+}
