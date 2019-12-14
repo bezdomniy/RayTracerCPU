@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <map>
 #include <vector>
 #include <string>
 #include <glm/glm.hpp>
@@ -14,18 +15,23 @@
 class ObjectLoader
 {
 private:
-    struct definition
+    struct Definition
     {
-        std::shared_ptr<definition> inheritFrom;
+        std::string name;
+        std::shared_ptr<Definition> inheritFrom;
         std::unordered_map<std::string, float> scalarValues;
-        std::unordered_map<std::string, glm::vec4> vectorValues;
+        std::unordered_map<std::string, glm::vec3> vectorValues;
     };
 
-    std::unique_ptr<Shape> add(YAML::Node &shapeNode);
-    /* data */
+    std::unique_ptr<Shape> addShape(const YAML::Node &shapeNode);
+    void addDefinition(const YAML::Node &definitionNode);
+    void assignDefinition(std::unique_ptr<Shape> &shapePtr, Definition &definition);
+    void parseMaterial(const YAML::Node &node, Definition &definition);
+    void parseTransform(const YAML::Node &node, Definition &definition);
+
 public:
     ObjectLoader(/* args */);
     ~ObjectLoader();
     std::vector<std::unique_ptr<Shape>> loadYaml(std::string &fileName);
-    std::unordered_map<std::string, definition> definitions;
+    std::unordered_map<std::string, std::shared_ptr<Definition>> definitions;
 };
