@@ -21,7 +21,6 @@ public:
 
   glm::mat4 transform;
   unsigned int id;
-  glm::vec4 position;
 
   std::shared_ptr<Material> material;
   void setMaterial(std::shared_ptr<Material> &mat);

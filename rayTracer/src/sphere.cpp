@@ -16,7 +16,7 @@ std::vector<Geometry::Intersection<Shape>> Sphere::intersectRay(Ray &ray)
 
   // std::cout << transformedRay <<std::endl;
 
-  glm::vec4 sphereToRay = transformedRay.origin - this->position;
+  glm::vec4 sphereToRay = transformedRay.origin - glm::vec4(0.f, 0.f, 0.f, 1.f);
   float a = glm::dot(transformedRay.direction, transformedRay.direction);
   float b = 2 * glm::dot(transformedRay.direction, sphereToRay);
   float c =

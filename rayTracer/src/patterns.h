@@ -4,10 +4,16 @@
 #include "pattern.h"
 #include <glm/gtc/matrix_inverse.hpp>
 #include <memory>
-#include <libnoise/noise.h>
 #include <vector>
 
-class StripedPattern : public Pattern {
+#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+#include <noise/noise.h>
+#elif __LINUX__
+#include <libnoise/noise.h>
+#endif
+
+class StripedPattern : public Pattern
+{
 private:
   /* data */
 public:
@@ -19,7 +25,8 @@ public:
   glm::vec3 colourB;
 };
 
-class GradientPattern : public Pattern {
+class GradientPattern : public Pattern
+{
 private:
   /* data */
 public:
@@ -31,7 +38,8 @@ public:
   glm::vec3 colourB;
 };
 
-class RingPattern : public Pattern {
+class RingPattern : public Pattern
+{
 private:
   /* data */
 public:
@@ -43,7 +51,8 @@ public:
   glm::vec3 colourB;
 };
 
-class CheckedPattern : public Pattern {
+class CheckedPattern : public Pattern
+{
 private:
   /* data */
 public:
@@ -55,7 +64,8 @@ public:
   glm::vec3 colourB;
 };
 
-class BlendedPattern : public Pattern {
+class BlendedPattern : public Pattern
+{
 private:
   /* data */
 public:
@@ -70,7 +80,8 @@ public:
   std::shared_ptr<Pattern> patternB;
 };
 
-class PerturbedPattern : public Pattern {
+class PerturbedPattern : public Pattern
+{
 private:
   /* data */
 public:

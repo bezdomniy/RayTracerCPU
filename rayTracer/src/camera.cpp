@@ -1,15 +1,16 @@
 #include "camera.h"
 
-Camera::Camera(glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize,
-               float vsize, float fov) {
-  this->position = position;
+Camera::Camera(unsigned int id, glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize,
+               float vsize, float fov) : Shape(id, position)
+{
+  // this->position = position;
   this->centre = centre;
   this->up = up;
   this->hsize = hsize;
   this->vsize = vsize;
   this->fov = fov;
 
-  this->transform = glm::lookAt(glm::vec3(this->position),
+  this->transform = glm::lookAt(glm::vec3(position),
                                 glm::vec3(this->centre), glm::vec3(this->up));
   // std::cout << glm::to_string(transform) << std::endl;
   setPixelSize();
@@ -17,21 +18,26 @@ Camera::Camera(glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize,
 
 Camera::~Camera() {}
 
-void Camera::setPixelSize() {
+void Camera::setPixelSize()
+{
   float halfView = glm::tan(this->fov / 2);
   float aspect = this->hsize / this->vsize;
 
-  if (aspect >= 1) {
+  if (aspect >= 1)
+  {
     this->halfWidth = halfView;
     this->halfHeight = halfView / aspect;
-  } else {
+  }
+  else
+  {
     this->halfWidth = halfView * aspect;
     this->halfHeight = halfView;
   }
   this->pixelSize = (this->halfWidth * 2) / this->hsize;
 }
 
-Ray Camera::rayForPixel(float px, float py) {
+Ray Camera::rayForPixel(float px, float py)
+{
   float xOffset = (px + 0.5f) * this->pixelSize;
   float yOffset = (py + 0.5f) * this->pixelSize;
 
@@ -45,4 +51,14 @@ Ray Camera::rayForPixel(float px, float py) {
   glm::vec4 direction = glm::normalize(pixel - origin);
 
   return Ray(origin, direction);
+}
+
+glm::vec4 Camera::normalAt(glm::vec4 point)
+{
+  return glm::vec4();
+}
+
+std::vector<Geometry::Intersection<Shape>> Camera::intersectRay(Ray &ray)
+{
+  return std::vector<Geometry::Intersection<Shape>>();
 }

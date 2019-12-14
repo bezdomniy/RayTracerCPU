@@ -11,14 +11,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
-
 int main(int argc, char const *argv[])
 {
 
     // Scene 1
-    std::shared_ptr<Camera> camera = std::make_shared<Camera>(
-        glm::vec4(0.f, 1.5f, -5.f, 1.f), glm::vec4(0.f, 1.f, 0.f, 1.f),
-        glm::vec4(0.f, 1.f, 0.f, 0.f), 500.f, 250.f, glm::radians(60.f));
+    std::shared_ptr<Camera> camera = std::make_shared<Camera>(0,
+                                                              glm::vec4(0.f, 1.5f, -5.f, 1.f), glm::vec4(0.f, 1.f, 0.f, 1.f),
+                                                              glm::vec4(0.f, 1.f, 0.f, 0.f), 500.f, 250.f, glm::radians(60.f));
 
     std::shared_ptr<Shape> s =
         std::make_shared<Sphere>(0, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
@@ -116,7 +115,7 @@ int main(int argc, char const *argv[])
 
     // std::shared_ptr<Shape> floor =
     //     std::make_shared<Plane>(33, glm::vec4(0.f, 0.f, 0.f, 1.f));
-    
+
     // floor->transform *= glm::translate(glm::mat4(1.f), glm::vec3(0.f, 0.f, 10.f));
     // floor->transform *= glm::rotate(glm::mat4(1.f),1.5708f, glm::vec3(1.f, 0.f, 0.f));
 
