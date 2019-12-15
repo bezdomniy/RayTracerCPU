@@ -36,7 +36,10 @@ std::vector<std::unique_ptr<Shape>> ObjectLoader::loadYaml(std::string &fileName
 std::unique_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
 {
     std::string shapeType;
-    Definition tempDefinition;
+    Definition materialDefinition;
+    Definition transformDefinition;
+    Definition cameraDefinition;
+    Definition lightDefinition;
     std::unique_ptr<Shape> ret;
 
     for (YAML::const_iterator it = shapeNode.begin(); it != shapeNode.end(); ++it)
@@ -49,11 +52,48 @@ std::unique_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
         }
         else if (nextKey == "material")
         {
-            parseMaterial(it->second, tempDefinition);
+            parseMaterial(it->second, materialDefinition);
         }
         else if (nextKey == "transform")
         {
-            parseTransform(it->second, tempDefinition);
+            parseTransform(it->second, transformDefinition);
+        }
+        else if (nextKey == "width")
+        {
+            cameraDefinition.scalarValues["width"] = it->second.as<float>();
+        }
+        else if (nextKey == "height")
+        {
+            cameraDefinition.scalarValues["height"] = it->second.as<float>();
+        }
+        else if (nextKey == "field-of-view")
+        {
+            cameraDefinition.scalarValues["field-of-view"] = it->second.as<float>();
+        }
+        else if (nextKey == "from")
+        {
+            glm::vec3 from(it->second[0].as<float>(), it->second[1].as<float>(), it->second[2].as<float>());
+            cameraDefinition.vectorValues["from"] = from;
+        }
+        else if (nextKey == "to")
+        {
+            glm::vec3 to(it->second[0].as<float>(), it->second[1].as<float>(), it->second[2].as<float>());
+            cameraDefinition.vectorValues["to"] = to;
+        }
+        else if (nextKey == "up")
+        {
+            glm::vec3 up(it->second[0].as<float>(), it->second[1].as<float>(), it->second[2].as<float>());
+            cameraDefinition.vectorValues["up"] = up;
+        }
+        else if (nextKey == "at")
+        {
+            glm::vec3 at(it->second[0].as<float>(), it->second[1].as<float>(), it->second[2].as<float>());
+            lightDefinition.vectorValues["at"] = at;
+        }
+        else if (nextKey == "intensity")
+        {
+            glm::vec3 intensity(it->second[0].as<float>(), it->second[1].as<float>(), it->second[2].as<float>());
+            lightDefinition.vectorValues["intensity"] = intensity;
         }
         else
         {
@@ -69,18 +109,109 @@ std::unique_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
     {
         ret = std::make_unique<Plane>(1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
     }
+    else if (shapeType == "camera")
+    {
+        ret = std::make_unique<Camera>(0,
+                                       glm::vec4(cameraDefinition.vectorValues["from"], 1.f),
+                                       glm::vec4(cameraDefinition.vectorValues["to"], 1.f),
+                                       glm::vec4(cameraDefinition.vectorValues["up"], 0.f),
+                                       cameraDefinition.scalarValues["height"],
+                                       cameraDefinition.scalarValues["width"],
+                                       cameraDefinition.scalarValues["field-of-view"]);
+    }
+    else if (shapeType == "light")
+    {
+        ret = std::make_unique<PointLight>(0,
+                                           glm::vec4(lightDefinition.vectorValues["at"], 1.f),
+                                           lightDefinition.vectorValues["intensity"]);
+    }
     else
     {
         throw std::invalid_argument("this shape is not implemented");
     }
 
-    assignDefinition(ret, tempDefinition);
+    if (!materialDefinition.name.empty())
+        assignDefinition(ret, materialDefinition);
+    if (!transformDefinition.name.empty())
+        assignDefinition(ret, transformDefinition);
 
     return ret;
 }
 
 void ObjectLoader::assignDefinition(std::unique_ptr<Shape> &shapePtr, Definition &definition)
 {
+    if (definition.inheritFrom)
+    {
+        assignDefinition(shapePtr, *definition.inheritFrom);
+    }
+    for (auto &scalar : definition.scalarValues)
+    {
+        if (scalar.first == "diffuse")
+        {
+            shapePtr->material->diffuse = scalar.second;
+        }
+        else if (scalar.first == "ambient")
+        {
+            shapePtr->material->ambient = scalar.second;
+        }
+        else if (scalar.first == "specular")
+        {
+            shapePtr->material->specular = scalar.second;
+        }
+        else if (scalar.first == "shininess")
+        {
+            shapePtr->material->shininess = scalar.second;
+        }
+        else if (scalar.first == "reflective")
+        {
+            shapePtr->material->reflective = scalar.second;
+        }
+        else if (scalar.first == "transparency")
+        {
+            shapePtr->material->transparency = scalar.second;
+        }
+        else if (scalar.first == "refractive-index")
+        {
+            shapePtr->material->refractiveIndex = scalar.second;
+        }
+        else if (scalar.first == "rotate-x")
+        {
+            glm::mat4 rotation = glm::rotate(glm::mat4(), scalar.second, glm::vec3(1.f, 0.f, 0.f));
+            shapePtr->transform *= rotation;
+        }
+        else if (scalar.first == "rotate-y")
+        {
+            glm::mat4 rotation = glm::rotate(glm::mat4(), scalar.second, glm::vec3(0.f, 1.f, 0.f));
+            shapePtr->transform *= rotation;
+        }
+        else if (scalar.first == "rotate-z")
+        {
+            glm::mat4 rotation = glm::rotate(glm::mat4(), scalar.second, glm::vec3(0.f, 0.f, 1.f));
+            shapePtr->transform *= rotation;
+        }
+        else
+        {
+            throw std::invalid_argument("invalid operator in value statement");
+        }
+    }
+
+    for (auto &vector : definition.vectorValues)
+    {
+        if (vector.first == "color")
+        {
+            shapePtr->material->colour = vector.second;
+        }
+        else if (vector.first == "translate")
+        {
+            glm::mat4 translation = glm::translate(glm::mat4(), vector.second);
+            shapePtr->transform *= translation;
+        }
+        else if (vector.first == "scale")
+        {
+            glm::mat4 scale = glm::scale(glm::mat4(), vector.second);
+            shapePtr->transform *= scale;
+        }
+    }
 }
 
 // TODO: add patterns
@@ -193,8 +324,15 @@ void ObjectLoader::parseTransform(const YAML::Node &node, Definition &definition
         }
         else if (item.IsSequence())
         {
-            glm::vec3 vec(item[1].as<float>(), item[2].as<float>(), item[3].as<float>());
-            definition.vectorValues[item[0].as<std::string>()] = vec;
+            if (item[0].as<std::string>().substr(0, 7) == "rotate")
+            {
+                definition.scalarValues[item[0].as<std::string>()] = item[1].as<float>();
+            }
+            else
+            {
+                glm::vec3 vec(item[1].as<float>(), item[2].as<float>(), item[3].as<float>());
+                definition.vectorValues[item[0].as<std::string>()] = vec;
+            }
         }
         else
         {

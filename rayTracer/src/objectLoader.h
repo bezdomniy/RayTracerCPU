@@ -5,12 +5,15 @@
 #include <vector>
 #include <string>
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 #include "yaml-cpp/yaml.h"
 #include "shape.h"
 #include "sphere.h"
 #include "plane.h"
 #include "patterns.h"
 #include "material.h"
+#include "camera.h"
+#include "pointLight.h"
 
 class ObjectLoader
 {
