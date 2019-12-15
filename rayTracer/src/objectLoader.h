@@ -26,15 +26,16 @@ private:
         std::unordered_map<std::string, glm::vec3> vectorValues;
     };
 
-    std::unique_ptr<Shape> addShape(const YAML::Node &shapeNode);
+    std::unordered_map<std::string, std::shared_ptr<Definition>> definitions;
+
+    std::shared_ptr<Shape> addShape(const YAML::Node &shapeNode);
     void addDefinition(const YAML::Node &definitionNode);
-    void assignDefinition(std::unique_ptr<Shape> &shapePtr, Definition &definition);
+    void assignDefinition(std::shared_ptr<Shape> &shapePtr, Definition &definition);
     void parseMaterial(const YAML::Node &node, Definition &definition);
     void parseTransform(const YAML::Node &node, Definition &definition);
 
 public:
     ObjectLoader(/* args */);
     ~ObjectLoader();
-    std::vector<std::unique_ptr<Shape>> loadYaml(std::string &fileName);
-    std::unordered_map<std::string, std::shared_ptr<Definition>> definitions;
+    std::pair<std::shared_ptr<Camera>, std::vector<std::shared_ptr<Shape>>> loadYaml(const std::string &fileName);
 };

@@ -8,19 +8,33 @@ ObjectLoader::~ObjectLoader()
 {
 }
 
-std::vector<std::unique_ptr<Shape>> ObjectLoader::loadYaml(std::string &fileName)
+std::pair<std::shared_ptr<Camera>, std::vector<std::shared_ptr<Shape>>> ObjectLoader::loadYaml(const std::string &fileName)
 {
-    std::vector<std::unique_ptr<Shape>> ret;
+    std::vector<std::shared_ptr<Shape>> ret;
+    std::shared_ptr<Camera> camera;
 
     YAML::Node root = YAML::LoadFile(fileName);
     for (YAML::const_iterator it = root.begin(); it != root.end(); ++it)
     {
-        if (it->first.as<std::string>() == "add")
+        assert((*it).Type() == YAML::NodeType::Map);
+        if (it->begin()->first.as<std::string>() == "add")
         {
-            YAML::Node n = it->second;
-            ret.push_back(addShape(n));
+            auto test = it->begin()->second.as<std::string>();
+            auto l1 = std::string("camera").length();
+            auto l2 = test.length();
+            auto test2 = test == "camera";
+            auto test3 = test.compare(std::string("camera"));
+
+            if (it->begin()->second.as<std::string>() == "camera")
+            {
+                camera = std::dynamic_pointer_cast<Camera>(addShape(*it));
+            }
+            else
+            {
+                ret.push_back(addShape(*it));
+            }
         }
-        else if (it->first.as<std::string>() == "define")
+        else if (it->begin()->first.as<std::string>() == "define")
         {
             addDefinition(*it);
         }
@@ -30,17 +44,17 @@ std::vector<std::unique_ptr<Shape>> ObjectLoader::loadYaml(std::string &fileName
         }
     }
 
-    return ret;
+    return std::pair<std::shared_ptr<Camera>, std::vector<std::shared_ptr<Shape>>>(camera, ret);
 }
 
-std::unique_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
+std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
 {
     std::string shapeType;
     Definition materialDefinition;
     Definition transformDefinition;
     Definition cameraDefinition;
     Definition lightDefinition;
-    std::unique_ptr<Shape> ret;
+    std::shared_ptr<Shape> ret;
 
     for (YAML::const_iterator it = shapeNode.begin(); it != shapeNode.end(); ++it)
     {
@@ -103,15 +117,15 @@ std::unique_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
 
     if (shapeType == "sphere")
     {
-        ret = std::make_unique<Sphere>(1.f, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
+        ret = std::make_shared<Sphere>(1.f, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
     }
     else if (shapeType == "plane")
     {
-        ret = std::make_unique<Plane>(1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
+        ret = std::make_shared<Plane>(1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
     }
     else if (shapeType == "camera")
     {
-        ret = std::make_unique<Camera>(0,
+        ret = std::make_shared<Camera>(0,
                                        glm::vec4(cameraDefinition.vectorValues["from"], 1.f),
                                        glm::vec4(cameraDefinition.vectorValues["to"], 1.f),
                                        glm::vec4(cameraDefinition.vectorValues["up"], 0.f),
@@ -121,7 +135,7 @@ std::unique_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
     }
     else if (shapeType == "light")
     {
-        ret = std::make_unique<PointLight>(0,
+        ret = std::make_shared<PointLight>(0,
                                            glm::vec4(lightDefinition.vectorValues["at"], 1.f),
                                            lightDefinition.vectorValues["intensity"]);
     }
@@ -138,7 +152,7 @@ std::unique_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
     return ret;
 }
 
-void ObjectLoader::assignDefinition(std::unique_ptr<Shape> &shapePtr, Definition &definition)
+void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr, Definition &definition)
 {
     if (definition.inheritFrom)
     {

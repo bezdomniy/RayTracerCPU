@@ -31,10 +31,14 @@ std::vector<Geometry::Intersection<Shape>> World::intersectRay(Ray &ray)
   return ret;
 }
 
-void World::loadFromFile(std::string &fileName)
+std::shared_ptr<Camera> World::loadFromFile(const std::string &fileName)
 {
   if (!objectLoader)
     objectLoader = std::make_unique<ObjectLoader>();
 
-  objectLoader->loadYaml(fileName);
+  std::pair<std::shared_ptr<Camera>, std::vector<std::shared_ptr<Shape>>> ret =
+      objectLoader->loadYaml(fileName);
+
+  this->shapes = ret.second;
+  return ret.first;
 }
