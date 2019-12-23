@@ -18,12 +18,18 @@
 class ObjectLoader
 {
 private:
+    struct Value
+    {
+        bool isScalar;
+        float scalar;
+        std::unique_ptr<glm::vec3> vector;
+    };
+
     struct Definition
     {
         bool empty = true;
         std::shared_ptr<Definition> inheritFrom;
-        std::unordered_map<std::string, float> scalarValues;
-        std::unordered_map<std::string, glm::vec3> vectorValues;
+        std::unordered_map<std::string, Value> values;
     };
 
     std::unordered_map<std::string, std::shared_ptr<Definition>> definitions;

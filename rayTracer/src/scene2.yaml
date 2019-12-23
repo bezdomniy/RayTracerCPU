@@ -48,4 +48,4 @@
   material: white-material
   transform:
     - [translate, 0, 0, 2.5]
-    - [rotate-x, 4.71239]
+    - [rotate-x, 1.5708]
