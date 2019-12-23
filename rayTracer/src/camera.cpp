@@ -3,7 +3,7 @@
 Camera::Camera(unsigned int id, glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize,
                float vsize, float fov) : Shape(id, position)
 {
-  // this->position = position;
+  this->position = position;
   this->centre = centre;
   this->up = up;
   this->hsize = hsize;
@@ -61,4 +61,9 @@ glm::vec4 Camera::normalAt(glm::vec4 point)
 std::vector<Geometry::Intersection<Shape>> Camera::intersectRay(Ray &ray)
 {
   return std::vector<Geometry::Intersection<Shape>>();
+}
+
+std::string Camera::type()
+{
+  return "Camera";
 }

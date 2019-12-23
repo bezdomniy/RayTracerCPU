@@ -45,3 +45,8 @@ glm::vec4 Sphere::normalAt(glm::vec4 point)
 
   return glm::normalize(worldNormal);
 }
+
+std::string Sphere::type()
+{
+  return "Sphere";
+}

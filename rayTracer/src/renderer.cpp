@@ -48,7 +48,8 @@ glm::vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world, s
   glm::vec3 reflection = reflectColour(hit, world, remaining);
   glm::vec3 refraction = refractedColour(hit, world, remaining);
 
-  if (hit->shapePtr->material->reflective > 0 && hit->shapePtr->material->transparency > 0) {
+  if (hit->shapePtr->material->reflective > 0 && hit->shapePtr->material->transparency > 0)
+  {
     float reflectance = Geometry::schlick<Shape>(hit->comps);
     return surface + reflection * reflectance + refraction * (1 - reflectance);
   }

@@ -1,6 +1,16 @@
 #include "material.h"
 
-Material::Material() {}
+Material::Material()
+{
+  this->colour = glm::vec3();
+  this->ambient = 0.f;
+  this->diffuse = 0.f;
+  this->specular = 0.f;
+  this->shininess = 0.f;
+  this->reflective = 0;
+  this->transparency = 0;
+  this->refractiveIndex = 1.f;
+}
 
 // TODO make 2 material constructors, 1 with colour, the other with pattern
 Material::Material(glm::vec3 colour, float ambient, float diffuse,

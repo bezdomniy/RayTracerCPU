@@ -18,6 +18,7 @@ public:
 
   virtual std::vector<Geometry::Intersection<Shape>> intersectRay(Ray &ray) = 0;
   virtual glm::vec4 normalAt(glm::vec4 point) = 0;
+  virtual std::string type() = 0;
 
   glm::mat4 transform;
   unsigned int id;

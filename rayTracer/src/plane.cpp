@@ -32,3 +32,8 @@ glm::vec4 Plane::normalAt(glm::vec4 point)
 
     return glm::normalize(worldNormal);
 }
+
+std::string Plane::type()
+{
+    return "{lane";
+}

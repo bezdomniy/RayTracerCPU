@@ -14,6 +14,7 @@ private:
   void setPixelSize();
   virtual glm::vec4 normalAt(glm::vec4 point) override;
   virtual std::vector<Geometry::Intersection<Shape>> intersectRay(Ray &ray) override;
+  virtual std::string type() override;
 
 public:
   Camera(unsigned int id, glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize,
@@ -22,7 +23,7 @@ public:
 
   Ray rayForPixel(float px, float py);
 
-  // glm::vec4 position;
+  glm::vec4 position;
   glm::vec4 centre;
   glm::vec4 up;
 

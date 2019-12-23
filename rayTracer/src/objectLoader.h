@@ -20,7 +20,7 @@ class ObjectLoader
 private:
     struct Definition
     {
-        std::string name;
+        bool empty = true;
         std::shared_ptr<Definition> inheritFrom;
         std::unordered_map<std::string, float> scalarValues;
         std::unordered_map<std::string, glm::vec3> vectorValues;
@@ -35,7 +35,7 @@ private:
     void parseTransform(const YAML::Node &node, Definition &definition);
 
 public:
-    ObjectLoader(/* args */);
+    ObjectLoader();
     ~ObjectLoader();
     std::pair<std::shared_ptr<Camera>, std::vector<std::shared_ptr<Shape>>> loadYaml(const std::string &fileName);
 };

@@ -36,9 +36,21 @@ std::shared_ptr<Camera> World::loadFromFile(const std::string &fileName)
   if (!objectLoader)
     objectLoader = std::make_unique<ObjectLoader>();
 
-  std::pair<std::shared_ptr<Camera>, std::vector<std::shared_ptr<Shape>>> ret =
+  std::pair<std::shared_ptr<Camera>, std::vector<std::shared_ptr<Shape>>> shapes =
       objectLoader->loadYaml(fileName);
 
-  this->shapes = ret.second;
-  return ret.first;
+  for (auto &shape : shapes.second)
+  {
+    if (shape->type() == "PointLight")
+    {
+      auto t = std::dynamic_pointer_cast<PointLight>(shape);
+      this->addLight(t);
+    }
+    else
+    {
+      this->addShape(shape);
+    }
+  }
+
+  return shapes.first;
 }
