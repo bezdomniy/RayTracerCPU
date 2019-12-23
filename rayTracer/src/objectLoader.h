@@ -10,6 +10,7 @@
 #include "shape.h"
 #include "sphere.h"
 #include "plane.h"
+#include "cube.h"
 #include "patterns.h"
 #include "material.h"
 #include "camera.h"

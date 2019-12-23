@@ -35,5 +35,5 @@ glm::vec4 Plane::normalAt(glm::vec4 point)
 
 std::string Plane::type()
 {
-    return "{lane";
+    return "plane";
 }

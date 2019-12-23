@@ -112,6 +112,10 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
     {
         ret = std::make_shared<Plane>(1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
     }
+    else if (shapeType == "cube")
+    {
+        ret = std::make_shared<Cube>(1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
+    }
     else if (shapeType == "camera")
     {
         ret = std::make_shared<Camera>(0,

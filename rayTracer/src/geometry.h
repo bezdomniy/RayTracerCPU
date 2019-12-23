@@ -39,12 +39,12 @@ template <typename T>
 struct Intersection
 {
   float t;
-  T* shapePtr;
+  T *shapePtr;
   std::unique_ptr<IntersectionParameters> comps;
 };
 
 template <typename T>
-void getRefractiveIndexFromTo(std::vector<Intersection<T>> &intersections, Intersection<T>& hit)
+void getRefractiveIndexFromTo(std::vector<Intersection<T>> &intersections, Intersection<T> &hit)
 {
   std::vector<T *> objects;
 
@@ -120,7 +120,7 @@ Intersection<T> *hit(std::vector<Intersection<T>> &intersections)
     for (int i = 0; i < intersections.size(); i++)
     {
       if ((retIndex == -1 && intersections.at(i).t > 0) || (intersections.at(i).t > 0 &&
-               intersections.at(i).t < intersections.at(retIndex).t))
+                                                            intersections.at(i).t < intersections.at(retIndex).t))
       {
         retIndex = i;
       }
@@ -135,18 +135,50 @@ Intersection<T> *hit(std::vector<Intersection<T>> &intersections)
 }
 
 template <typename T>
-float schlick(std::unique_ptr<IntersectionParameters>& comps) {
-  float cos = glm::dot(comps->eyev,comps->normalv);
-  if (comps->n1 > comps->n2) {
+float schlick(std::unique_ptr<IntersectionParameters> &comps)
+{
+  float cos = glm::dot(comps->eyev, comps->normalv);
+  if (comps->n1 > comps->n2)
+  {
     float n = comps->n1 / comps->n2;
     float sin2T = std::pow(n, 2) * (1.f - std::pow(cos, 2));
-      if (sin2T > 1.f) return 1.f;
-    
+    if (sin2T > 1.f)
+      return 1.f;
+
     float cosT = std::sqrt(1.f - sin2T);
     cos = cosT;
   }
   float r0 = std::pow((comps->n1 - comps->n2) / (comps->n1 + comps->n2), 2);
   return r0 + (1.f - r0) * std::pow(1.f - cos, 5);
 }
+
+template <typename T>
+std::pair<float, float> checkAxis(float origin, float direction)
+{
+  float tmin_numerator = -1 - origin;
+  float tmax_numerator = 1 - origin;
+
+  std::pair<float, float> ret;
+
+  if (std::abs(direction) >= EPSILON)
+  {
+    ret.first = tmin_numerator / direction;
+    ret.second = tmax_numerator / direction;
+  }
+  else
+  {
+    ret.first = tmin_numerator * std::numeric_limits<float>::infinity();
+    ret.second = tmax_numerator * std::numeric_limits<float>::infinity();
+  }
+  if (ret.first > ret.second)
+    std::swap(ret.first, ret.second);
+
+  return ret;
+}
+
+// ​ 	  ​if​ tmin > tmax ​then​ swap(tmin, tmax)
+// ​
+// ​ 	  ​return​ tmin, tmax
+// ​ 	​end​ ​function
 
 } // namespace Geometry

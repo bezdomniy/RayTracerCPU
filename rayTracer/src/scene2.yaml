@@ -28,10 +28,12 @@
 #   value:
 #     - [translate, 1, -1, 1]
 #     - [scale, 0.5, 0.5, 0.5]
-- add: sphere
+- add: cube
   material: blue-material
   transform:
     - [translate, -0.5, 1, 0.5]
+    - [rotate-y, 1]
+    - [rotate-x, 1]
 - add: sphere
   material: blue-material
   transform:
