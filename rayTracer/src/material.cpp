@@ -2,7 +2,7 @@
 
 Material::Material()
 {
-  this->colour = glm::vec3();
+  this->colour = glm::vec3(0.f);
   this->ambient = 0.f;
   this->diffuse = 0.f;
   this->specular = 0.f;
@@ -28,7 +28,7 @@ Material::Material(glm::vec3 colour, float ambient, float diffuse,
 
 Material::~Material() {}
 
-void Material::setPattern(std::shared_ptr<Pattern> &pattern)
+void Material::setPattern(std::unique_ptr<Pattern> &pattern)
 {
-  this->pattern = pattern;
+  this->pattern = std::move(pattern);
 }

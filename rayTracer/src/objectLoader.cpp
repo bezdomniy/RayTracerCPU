@@ -160,16 +160,6 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr, Definition
         {
             shapePtr->material->colour = *value.second.vector;
         }
-        else if (value.first == "translate")
-        {
-            glm::mat4 translation = glm::translate(glm::mat4(1.f), *value.second.vector);
-            shapePtr->transform *= translation;
-        }
-        else if (value.first == "scale")
-        {
-            glm::mat4 scale = glm::scale(glm::mat4(1.f), *value.second.vector);
-            shapePtr->transform *= scale;
-        }
         else if (value.first == "diffuse")
         {
             shapePtr->material->diffuse = value.second.scalar;
@@ -198,26 +188,38 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr, Definition
         {
             shapePtr->material->refractiveIndex = value.second.scalar;
         }
+        else if (value.first == "translate")
+        {
+            glm::mat4 translation = glm::translate(glm::mat4(1.f), *value.second.vector);
+            shapePtr->transform = translation * shapePtr->transform;
+        }
+        else if (value.first == "scale")
+        {
+            glm::mat4 scale = glm::scale(glm::mat4(1.f), *value.second.vector);
+            shapePtr->transform = scale * shapePtr->transform;
+        }
         else if (value.first == "rotate-x")
         {
             glm::mat4 rotation = glm::rotate(glm::mat4(1.f), value.second.scalar, glm::vec3(1.f, 0.f, 0.f));
-            shapePtr->transform *= rotation;
+            shapePtr->transform = rotation * shapePtr->transform;
         }
         else if (value.first == "rotate-y")
         {
             glm::mat4 rotation = glm::rotate(glm::mat4(1.f), value.second.scalar, glm::vec3(0.f, 1.f, 0.f));
-            shapePtr->transform *= rotation;
+            shapePtr->transform = rotation * shapePtr->transform;
         }
         else if (value.first == "rotate-z")
         {
             glm::mat4 rotation = glm::rotate(glm::mat4(1.f), value.second.scalar, glm::vec3(0.f, 0.f, 1.f));
-            shapePtr->transform *= rotation;
+            shapePtr->transform = rotation * shapePtr->transform;
         }
         else
         {
             throw std::invalid_argument("invalid operator in value statement");
         }
     }
+    if (definition.pattern)
+        shapePtr->material->setPattern(definition.pattern);
 }
 
 // TODO: add patterns
@@ -312,6 +314,10 @@ void ObjectLoader::parseMaterial(const YAML::Node &node, Definition &definition)
                 float refractiveIndex = valueIt->second.as<float>();
                 definition.values["refractive-index"] = Value{true, refractiveIndex};
             }
+            else if (valueKey == "pattern")
+            {
+                parsePattern(valueIt->second, definition);
+            }
             else
             {
                 throw std::invalid_argument("invalid operator in value statement");
@@ -319,6 +325,102 @@ void ObjectLoader::parseMaterial(const YAML::Node &node, Definition &definition)
         }
     }
     definition.empty = false;
+}
+
+void ObjectLoader::parsePattern(const YAML::Node &node, Definition &definition)
+{
+    std::string type;
+    std::unique_ptr<Pattern> pattern;
+    for (YAML::const_iterator valueIt = node.begin(); valueIt != node.end(); ++valueIt)
+    {
+        std::string valueKey = valueIt->first.as<std::string>();
+
+        if (valueKey == "type")
+        {
+            type = valueKey;
+            if (valueIt->second.as<std::string>() == "stripes")
+            {
+                pattern = std::make_unique<StripedPattern>(glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+            }
+            else if (valueIt->second.as<std::string>() == "gradient")
+            {
+                pattern = std::make_unique<GradientPattern>(glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+            }
+            else if (valueIt->second.as<std::string>() == "rings")
+            {
+                pattern = std::make_unique<RingPattern>(glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+            }
+            else if (valueIt->second.as<std::string>() == "checkers")
+            {
+                pattern = std::make_unique<CheckedPattern>(glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+            }
+            else if (valueIt->second.as<std::string>() == "blended")
+            {
+                // pattern = std::make_unique<BlendedPattern>(glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+            }
+            else if (valueIt->second.as<std::string>() == "perturbed")
+            {
+                // pattern = std::make_unique<PerturbedPattern>(glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
+            }
+            else
+            {
+                throw std::invalid_argument("invalid pattern type");
+            }
+        }
+        else if (valueKey == "colors")
+        {
+            if (type == "blended")
+                throw std::invalid_argument("invalid arguement for blended pattern");
+            if (type == "perturbed")
+                throw std::invalid_argument("invalid arguement for perturbed pattern");
+            // std::unique_ptr<ColourPattern> colourPattern = std::dynamic_pointer_cast<ColourPattern>(pattern);
+            ColourPattern *colourPattern = dynamic_cast<ColourPattern *>(pattern.get());
+
+            glm::vec3 colourA(valueIt->second[0][0].as<float>(), valueIt->second[0][1].as<float>(), valueIt->second[0][2].as<float>());
+            glm::vec3 colourB(valueIt->second[1][0].as<float>(), valueIt->second[1][1].as<float>(), valueIt->second[1][2].as<float>());
+
+            colourPattern->setColour(colourA, 0);
+            colourPattern->setColour(colourB, 1);
+        }
+        else if (valueKey == "transform")
+        {
+            for (auto &transformValue : valueIt->second)
+            {
+                if (transformValue[0].as<std::string>() == "translate")
+                {
+                    glm::vec3 vector(transformValue[1].as<float>(), transformValue[2].as<float>(), transformValue[3].as<float>());
+                    glm::mat4 translation = glm::translate(glm::mat4(1.f), vector);
+                    pattern->multiplyTransform(translation);
+                }
+                else if (transformValue[0].as<std::string>() == "scale")
+                {
+                    glm::vec3 vector(transformValue[1].as<float>(), transformValue[2].as<float>(), transformValue[3].as<float>());
+                    glm::mat4 scale = glm::scale(glm::mat4(1.f), vector);
+                    pattern->multiplyTransform(scale);
+                }
+                else if (transformValue[0].as<std::string>() == "rotate-x")
+                {
+                    glm::mat4 rotation = glm::rotate(glm::mat4(1.f), transformValue[1].as<float>(), glm::vec3(1.f, 0.f, 0.f));
+                    pattern->multiplyTransform(rotation);
+                }
+                else if (transformValue[0].as<std::string>() == "rotate-y")
+                {
+                    glm::mat4 rotation = glm::rotate(glm::mat4(1.f), transformValue[1].as<float>(), glm::vec3(0.f, 1.f, 0.f));
+                    pattern->multiplyTransform(rotation);
+                }
+                else if (transformValue[0].as<std::string>() == "rotate-z")
+                {
+                    glm::mat4 rotation = glm::rotate(glm::mat4(1.f), transformValue[1].as<float>(), glm::vec3(0.f, 0.f, 1.f));
+                    pattern->multiplyTransform(rotation);
+                }
+            }
+        }
+        else
+        {
+            throw std::invalid_argument("invalid key in pattern definition");
+        }
+    }
+    definition.pattern = std::move(pattern);
 }
 
 void ObjectLoader::parseTransform(const YAML::Node &node, Definition &definition)

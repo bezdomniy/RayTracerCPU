@@ -12,7 +12,7 @@
 #include <libnoise/noise.h>
 #endif
 
-class StripedPattern : public Pattern
+class StripedPattern : public ColourPattern
 {
 private:
   /* data */
@@ -20,12 +20,10 @@ public:
   StripedPattern(glm::vec3 colourA, glm::vec3 colourB);
   ~StripedPattern();
   virtual glm::vec3 patternAt(glm::vec4 point) override;
-
-  glm::vec3 colourA;
-  glm::vec3 colourB;
+  // virtual void setColour(glm::vec3 colour, int index) override;
 };
 
-class GradientPattern : public Pattern
+class GradientPattern : public ColourPattern
 {
 private:
   /* data */
@@ -33,12 +31,10 @@ public:
   GradientPattern(glm::vec3 colourA, glm::vec3 colourB);
   ~GradientPattern();
   virtual glm::vec3 patternAt(glm::vec4 point) override;
-
-  glm::vec3 colourA;
-  glm::vec3 colourB;
+  // virtual void setColour(glm::vec3 colour, int index) override;
 };
 
-class RingPattern : public Pattern
+class RingPattern : public ColourPattern
 {
 private:
   /* data */
@@ -46,12 +42,10 @@ public:
   RingPattern(glm::vec3 colourA, glm::vec3 colourB);
   ~RingPattern();
   virtual glm::vec3 patternAt(glm::vec4 point) override;
-
-  glm::vec3 colourA;
-  glm::vec3 colourB;
+  // virtual void setColour(glm::vec3 colour, int index) override;
 };
 
-class CheckedPattern : public Pattern
+class CheckedPattern : public ColourPattern
 {
 private:
   /* data */
@@ -59,9 +53,7 @@ public:
   CheckedPattern(glm::vec3 colourA, glm::vec3 colourB);
   ~CheckedPattern();
   virtual glm::vec3 patternAt(glm::vec4 point) override;
-
-  glm::vec3 colourA;
-  glm::vec3 colourB;
+  // virtual void setColour(glm::vec3 colour, int index) override;
 };
 
 class BlendedPattern : public Pattern

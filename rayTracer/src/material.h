@@ -24,6 +24,6 @@ public:
   float transparency;
   float refractiveIndex;
 
-  std::shared_ptr<Pattern> pattern;
-  void setPattern(std::shared_ptr<Pattern> &pattern);
+  std::unique_ptr<Pattern> pattern;
+  void setPattern(std::unique_ptr<Pattern> &pattern);
 };

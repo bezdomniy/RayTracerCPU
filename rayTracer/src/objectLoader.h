@@ -31,6 +31,7 @@ private:
         bool empty = true;
         std::shared_ptr<Definition> inheritFrom;
         std::unordered_map<std::string, Value> values;
+        std::unique_ptr<Pattern> pattern;
     };
 
     std::unordered_map<std::string, std::shared_ptr<Definition>> definitions;
@@ -40,6 +41,7 @@ private:
     void assignDefinition(std::shared_ptr<Shape> &shapePtr, Definition &definition);
     void parseMaterial(const YAML::Node &node, Definition &definition);
     void parseTransform(const YAML::Node &node, Definition &definition);
+    void parsePattern(const YAML::Node &node, Definition &definition);
 
 public:
     ObjectLoader();

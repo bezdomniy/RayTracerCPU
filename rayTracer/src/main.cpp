@@ -46,13 +46,16 @@ int main(int argc, char const *argv[])
     // std::shared_ptr<Material> materialBackWall = std::make_shared<Material>(
     //     glm::vec3(1.f, 0.9f, 0.9f), ambient, diffuse, specular, shininess);
 
-    // std::shared_ptr<Pattern> stripes = std::make_shared<StripedPattern>(
+    // std::unique_ptr<Pattern> stripes = std::make_unique<StripedPattern>(
     //     glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-    // std::shared_ptr<Pattern> rings = std::make_shared<RingPattern>(
+    // std::unique_ptr<Pattern> rings = std::make_unique<RingPattern>(
     //     glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f));
-    // std::shared_ptr<Pattern> gradient = std::make_shared<GradientPattern>(
+    // std::unique_ptr<Pattern> gradient = std::make_unique<GradientPattern>(
     //     glm::vec3(1.f, 0.f, 0.f), glm::vec3(0.f, 0.f, 1.f));
-    // std::shared_ptr<Pattern> checks = std::make_shared<CheckedPattern>(
+    // std::unique_ptr<Pattern> checks = std::make_unique<CheckedPattern>(
+    //     glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 1.f));
+
+    // std::unique_ptr<Pattern> checks2 = std::make_unique<CheckedPattern>(
     //     glm::vec3(0.f, 0.f, 0.f), glm::vec3(1.f, 1.f, 1.f));
 
     // rings->transform *=
@@ -61,15 +64,15 @@ int main(int argc, char const *argv[])
     //     glm::scale(glm::mat4(1.f), glm::vec3(0.25f, 0.25f, 0.25f));
     // stripes->transform *= glm::scale(glm::mat4(1.f), glm::vec3(0.25f, 0.25f, 0.25f));
 
-    // std::shared_ptr<Pattern> blended =
-    //     std::make_shared<BlendedPattern>(rings, stripes);
+    // // std::shared_ptr<Pattern> blended =
+    // //     std::make_unique<BlendedPattern>(std::move(rings), std::move(stripes));
 
-    // std::shared_ptr<Pattern> perturbed =
-    //     std::make_shared<PerturbedPattern>(stripes);
+    // // std::shared_ptr<Pattern> perturbed =
+    // //     std::make_unique<PerturbedPattern>(std::move(stripes));
 
     // // material->setPattern(perturbed);
     // materialFloor->setPattern(checks);
-    // materialBackWall->setPattern(checks);
+    // materialBackWall->setPattern(checks2);
 
     // s->setMaterial(material);
     // s2->setMaterial(material2);
@@ -164,8 +167,7 @@ int main(int argc, char const *argv[])
     // world.addLight(light);
 
     World world;
-
-    std::shared_ptr<Camera> camera = world.loadFromFile("./src/coverScene.yaml");
+    std::shared_ptr<Camera> camera = world.loadFromFile("./src/scene2.yaml");
 
     Renderer renderer(camera);
     renderer.render(world);

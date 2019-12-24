@@ -1,10 +1,8 @@
 #include "patterns.h"
 
 StripedPattern::StripedPattern(glm::vec3 colourA, glm::vec3 colourB)
-    : Pattern()
+    : ColourPattern(colourA, colourB)
 {
-  this->colourA = colourA;
-  this->colourB = colourB;
 }
 
 StripedPattern::~StripedPattern() {}
@@ -17,10 +15,8 @@ glm::vec3 StripedPattern::patternAt(glm::vec4 point)
 }
 
 GradientPattern::GradientPattern(glm::vec3 colourA, glm::vec3 colourB)
-    : Pattern()
+    : ColourPattern(colourA, colourB)
 {
-  this->colourA = colourA;
-  this->colourB = colourB;
 }
 
 GradientPattern::~GradientPattern() {}
@@ -33,10 +29,8 @@ glm::vec3 GradientPattern::patternAt(glm::vec4 point)
   return this->colourA + distance * fraction;
 }
 
-RingPattern::RingPattern(glm::vec3 colourA, glm::vec3 colourB) : Pattern()
+RingPattern::RingPattern(glm::vec3 colourA, glm::vec3 colourB) : ColourPattern(colourA, colourB)
 {
-  this->colourA = colourA;
-  this->colourB = colourB;
 }
 
 RingPattern::~RingPattern() {}
@@ -50,10 +44,8 @@ glm::vec3 RingPattern::patternAt(glm::vec4 point)
 }
 
 CheckedPattern::CheckedPattern(glm::vec3 colourA, glm::vec3 colourB)
-    : Pattern()
+    : ColourPattern(colourA, colourB)
 {
-  this->colourA = colourA;
-  this->colourB = colourB;
 }
 
 CheckedPattern::~CheckedPattern() {}

@@ -19,6 +19,7 @@ class Renderer
 {
 private:
   std::shared_ptr<Camera> camera;
+  static const int RAY_BOUNCE_LIMIT = 3;
 
 public:
   Renderer();
@@ -27,7 +28,7 @@ public:
 
   glm::vec3 colourAt(Ray &ray, World &world, short remaining);
   glm::vec3 reflectColour(Geometry::Intersection<Shape> *hit, World &world, short remaining);
-  glm::vec3 lighting(Shape* shape,
+  glm::vec3 lighting(Shape *shape,
                      std::shared_ptr<PointLight> &light, glm::vec4 point,
                      glm::vec4 eyev, glm::vec4 normalv, bool inShadow);
   glm::vec3 shadeHit(Geometry::Intersection<Shape> *hit, World &world, short remaining);

@@ -12,7 +12,7 @@ Renderer::~Renderer() {}
 
 void Renderer::render(World &world)
 {
-  const int RAY_BOUNCE_LIMIT = 5;
+
   // this->world = std::make_shared<World>(world);
   for (int y = 0; y < this->canvas.height; y++)
   {
@@ -41,9 +41,15 @@ glm::vec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
 glm::vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world, short remaining)
 {
   bool inShadow = this->isShadowed(hit->comps->overPoint, world);
-  glm::vec3 surface = lighting(hit->shapePtr, world.lights.at(0),
-                               hit->comps->overPoint, hit->comps->eyev,
-                               hit->comps->normalv, inShadow);
+
+  glm::vec3 surface(0.f);
+
+  for (auto &light : world.lights)
+  {
+    surface += lighting(hit->shapePtr, light,
+                        hit->comps->overPoint, hit->comps->eyev,
+                        hit->comps->normalv, inShadow);
+  }
 
   glm::vec3 reflection = reflectColour(hit, world, remaining);
   glm::vec3 refraction = refractedColour(hit, world, remaining);
