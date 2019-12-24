@@ -165,7 +165,7 @@ int main(int argc, char const *argv[])
 
     World world;
 
-    std::shared_ptr<Camera> camera = world.loadFromFile("./src/scene2.yaml");
+    std::shared_ptr<Camera> camera = world.loadFromFile("./src/coverScene.yaml");
 
     Renderer renderer(camera);
     renderer.render(world);

@@ -32,15 +32,23 @@ glm::vec4 Cube::normalAt(glm::vec4 point)
 {
     glm::mat4 transformInverse(glm::affineInverse(this->transform));
     glm::vec4 objectPoint = transformInverse * point;
+    glm::vec4 objectNormal;
 
-    float maxC = std::max({std::abs(objectPoint.x), std::abs(objectPoint.y), std::abs(objectPoint.z)});
+    float points[3] = {std::abs(objectPoint.x), std::abs(objectPoint.y), std::abs(objectPoint.z)};
+    const int N = sizeof(points) / sizeof(float);
+    int indexMaxC = std::distance(points, std::max_element(points, points + N));
 
-    if (std::fabs(maxC - std::abs(objectPoint.x)) <= std::numeric_limits<float>::epsilon())
-        return glm::normalize(glm::vec4(objectPoint.x, 0.f, 0.f, 0.f));
-    if (std::fabs(maxC - std::abs(objectPoint.y)) <= std::numeric_limits<float>::epsilon())
-        return glm::normalize(glm::vec4(0.f, objectPoint.y, 0.f, 0.f));
+    if (indexMaxC == 0)
+        objectNormal = glm::normalize(glm::vec4(objectPoint.x, 0.f, 0.f, 0.f));
+    else if (indexMaxC == 1)
+        objectNormal = glm::normalize(glm::vec4(0.f, objectPoint.y, 0.f, 0.f));
+    else
+        objectNormal = glm::normalize(glm::vec4(0.f, 0.f, objectPoint.z, 0.f));
 
-    return glm::normalize(glm::vec4(0.f, 0.f, objectPoint.z, 0.f));
+    glm::vec4 worldNormal = glm::transpose(transformInverse) * objectNormal;
+    worldNormal.w = 0.f;
+
+    return glm::normalize(worldNormal);
 }
 
 std::string Cube::type()

@@ -3,7 +3,8 @@
 #include "shape.h"
 #include "geometry.h"
 #include <glm/glm.hpp>
-// #include <vector>
+#include <iterator>
+#include <algorithm>
 
 class Cube : public Shape
 {

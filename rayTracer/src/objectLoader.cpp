@@ -310,7 +310,7 @@ void ObjectLoader::parseMaterial(const YAML::Node &node, Definition &definition)
             else if (valueKey == "refractive-index")
             {
                 float refractiveIndex = valueIt->second.as<float>();
-                definition.values["refractiveIndex"] = Value{true, refractiveIndex};
+                definition.values["refractive-index"] = Value{true, refractiveIndex};
             }
             else
             {
