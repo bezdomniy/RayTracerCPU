@@ -3,10 +3,10 @@
 Material::Material()
 {
   this->colour = glm::vec3(0.f);
-  this->ambient = 0.f;
-  this->diffuse = 0.f;
-  this->specular = 0.f;
-  this->shininess = 0.f;
+  this->ambient = 0.1f;
+  this->diffuse = 0.9f;
+  this->specular = 0.9f;
+  this->shininess = 200;
   this->reflective = 0;
   this->transparency = 0;
   this->refractiveIndex = 1.f;

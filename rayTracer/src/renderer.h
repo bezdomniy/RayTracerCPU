@@ -19,7 +19,7 @@ class Renderer
 {
 private:
   std::shared_ptr<Camera> camera;
-  static const int RAY_BOUNCE_LIMIT = 3;
+  static const int RAY_BOUNCE_LIMIT = 5;
 
 public:
   Renderer();
