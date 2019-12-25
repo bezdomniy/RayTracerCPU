@@ -49,6 +49,7 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
     Definition cameraDefinition;
     Definition lightDefinition;
     std::shared_ptr<Shape> ret;
+    std::vector<Value> args;
 
     for (YAML::const_iterator it = shapeNode.begin(); it != shapeNode.end(); ++it)
     {
@@ -57,6 +58,10 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
         if (nextKey == "add")
         {
             shapeType = it->second.as<std::string>();
+        }
+        else if (nextKey == "args")
+        {
+            parseArgs(it->second, args);
         }
         else if (nextKey == "material")
         {
@@ -116,6 +121,10 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
     {
         ret = std::make_shared<Cube>();
     }
+    else if (shapeType == "triangle")
+    {
+        ret = std::make_shared<Triangle>(Triangle(*args.at(0).vector, *args.at(1).vector, *args.at(2).vector));
+    }
     else if (shapeType == "camera")
     {
         ret = std::make_shared<Camera>(glm::vec4(*cameraDefinition.values["from"].vector, 1.f),
@@ -141,6 +150,29 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
         assignDefinition(ret, transformDefinition);
 
     return ret;
+}
+
+void ObjectLoader::parseArgs(const YAML::Node &node, std::vector<Value> &args)
+{
+    for (auto &item : node)
+    {
+        if (item.IsSequence())
+        {
+            args.push_back(Value{false, 0.f,
+                                 std::make_unique<glm::vec3>(
+                                     item[0].as<float>(),
+                                     item[1].as<float>(),
+                                     item[2].as<float>())});
+        }
+        else if (item.IsScalar())
+        {
+            args.push_back(Value{true, item.as<float>()});
+        }
+        else
+        {
+            throw std::invalid_argument("invalid arguement in shape definition");
+        }
+    }
 }
 
 void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr, Definition &definition)

@@ -11,6 +11,7 @@
 #include "sphere.h"
 #include "plane.h"
 #include "cube.h"
+#include "triangle.h"
 #include "patterns.h"
 #include "material.h"
 #include "camera.h"
@@ -42,6 +43,7 @@ private:
     void parseMaterial(const YAML::Node &node, Definition &definition);
     void parseTransform(const YAML::Node &node, Definition &definition);
     void parsePattern(const YAML::Node &node, Definition &definition);
+    void parseArgs(const YAML::Node &node, std::vector<Value> &args);
 
 public:
     ObjectLoader();

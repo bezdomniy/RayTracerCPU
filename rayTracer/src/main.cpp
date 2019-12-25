@@ -167,7 +167,7 @@ int main(int argc, char const *argv[])
     // world.addLight(light);
 
     World world;
-    std::shared_ptr<Camera> camera = world.loadFromFile("./src/reflectionScene.yaml");
+    std::shared_ptr<Camera> camera = world.loadFromFile("./src/triangleScene.yaml");
 
     Renderer renderer(camera);
     renderer.render(world);
