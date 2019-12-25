@@ -93,8 +93,8 @@ glm::vec3 Renderer::refractedColour(Geometry::Intersection<Shape> *hit, World &w
 }
 
 glm::vec3 Renderer::lighting(Shape *shape,
-                             std::shared_ptr<PointLight> &light, glm::vec4 point,
-                             glm::vec4 eyev, glm::vec4 normalv, bool inShadow)
+                             std::shared_ptr<PointLight> &light, glm::vec4 &point,
+                             glm::vec4 &eyev, glm::vec4 &normalv, bool &inShadow)
 {
   glm::vec3 diffuse;
   glm::vec3 specular;
@@ -150,7 +150,7 @@ glm::vec3 Renderer::lighting(Shape *shape,
   return (ambient + diffuse + specular);
 }
 
-bool Renderer::isShadowed(glm::vec4 point, World &world)
+bool Renderer::isShadowed(glm::vec4 &point, World &world)
 {
   glm::vec4 v = world.lights.at(0)->position - point;
   float distance = glm::length(v);

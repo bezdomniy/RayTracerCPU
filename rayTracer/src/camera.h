@@ -17,7 +17,7 @@ private:
   virtual std::string type() override;
 
 public:
-  Camera(unsigned int id, glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize,
+  Camera(glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize,
          float vsize, float fov);
   ~Camera();
 

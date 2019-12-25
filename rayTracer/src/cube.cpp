@@ -1,7 +1,7 @@
 #include "cube.h"
 
-Cube::Cube(unsigned int id, glm::vec4 position)
-    : Shape(id, position)
+Cube::Cube()
+    : Shape()
 {
 }
 
@@ -30,8 +30,8 @@ std::vector<Geometry::Intersection<Shape>> Cube::intersectRay(Ray &ray)
 
 glm::vec4 Cube::normalAt(glm::vec4 point)
 {
-    glm::mat4 transformInverse(glm::affineInverse(this->transform));
-    glm::vec4 objectPoint = transformInverse * point;
+    // glm::mat4 transformInverse(glm::affineInverse(this->transform));
+    glm::vec4 objectPoint = this->inverseTransform * point;
     glm::vec4 objectNormal;
 
     float points[3] = {std::abs(objectPoint.x), std::abs(objectPoint.y), std::abs(objectPoint.z)};
@@ -45,7 +45,7 @@ glm::vec4 Cube::normalAt(glm::vec4 point)
     else
         objectNormal = glm::normalize(glm::vec4(0.f, 0.f, objectPoint.z, 0.f));
 
-    glm::vec4 worldNormal = glm::transpose(transformInverse) * objectNormal;
+    glm::vec4 worldNormal = glm::transpose(this->inverseTransform) * objectNormal;
     worldNormal.w = 0.f;
 
     return glm::normalize(worldNormal);

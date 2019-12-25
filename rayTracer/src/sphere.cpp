@@ -1,9 +1,8 @@
 #include "sphere.h"
 
-Sphere::Sphere(unsigned int id, glm::vec4 position, float radius)
-    : Shape(id, position)
+Sphere::Sphere()
+    : Shape()
 {
-  this->radius = radius;
 }
 
 Sphere::~Sphere() {}
@@ -20,7 +19,7 @@ std::vector<Geometry::Intersection<Shape>> Sphere::intersectRay(Ray &ray)
   float a = glm::dot(transformedRay.direction, transformedRay.direction);
   float b = 2 * glm::dot(transformedRay.direction, sphereToRay);
   float c =
-      glm::dot(sphereToRay, sphereToRay) - (this->radius * this->radius);
+      glm::dot(sphereToRay, sphereToRay) - 1;
   float discriminant = b * b - 4 * a * c;
 
   if (discriminant < 0)
@@ -37,10 +36,10 @@ std::vector<Geometry::Intersection<Shape>> Sphere::intersectRay(Ray &ray)
 
 glm::vec4 Sphere::normalAt(glm::vec4 point)
 {
-  glm::mat4 transformInverse(glm::affineInverse(this->transform));
-  glm::vec4 objectPoint = transformInverse * point;
+  // glm::mat4 transformInverse(glm::affineInverse(this->transform));
+  glm::vec4 objectPoint = this->inverseTransform * point;
   glm::vec4 objectNormal = objectPoint - glm::vec4(0.f, 0.f, 0.f, 1.f);
-  glm::vec4 worldNormal = glm::transpose(transformInverse) * objectNormal;
+  glm::vec4 worldNormal = glm::transpose(this->inverseTransform) * objectNormal;
   worldNormal.w = 0.f;
 
   return glm::normalize(worldNormal);

@@ -1,7 +1,7 @@
 #include "camera.h"
 
-Camera::Camera(unsigned int id, glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize,
-               float vsize, float fov) : Shape(id, position)
+Camera::Camera(glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize,
+               float vsize, float fov) : Shape()
 {
   this->position = position;
   this->centre = centre;

@@ -3,16 +3,24 @@
 Pattern::Pattern()
 {
     this->transform = glm::mat4(1.f);
+    this->inverseTransform = glm::mat4(1.f);
 }
 
 void Pattern::setTransform(glm::mat4 transform)
 {
     this->transform = transform;
+    // this->inverseTransform = glm::affineInverse(this->transform);
 }
 
 void Pattern::multiplyTransform(glm::mat4 &transform)
 {
     this->transform = transform * this->transform;
+    // this->inverseTransform = glm::affineInverse(this->transform);
+}
+
+void Pattern::calculateInverseTranform()
+{
+    this->inverseTransform = glm::affineInverse(this->transform);
 }
 
 Pattern::~Pattern()

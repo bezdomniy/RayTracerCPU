@@ -8,7 +8,7 @@
 class Plane : public Shape
 {
 public:
-    Plane(unsigned int id, glm::vec4 position);
+    Plane();
     ~Plane();
 
     virtual std::vector<Geometry::Intersection<Shape>> intersectRay(Ray &ray) override;

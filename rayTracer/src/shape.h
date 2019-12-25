@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_inverse.hpp>
 #include <vector>
+#include <unordered_map>
 
 #include "ray.h"
 #include "material.h"
@@ -13,7 +14,7 @@ class Shape
 private:
   /* data */
 public:
-  Shape(unsigned int id, glm::vec4 position);
+  Shape();
   virtual ~Shape();
 
   virtual std::vector<Geometry::Intersection<Shape>> intersectRay(Ray &ray) = 0;
@@ -21,11 +22,14 @@ public:
   virtual std::string type() = 0;
 
   glm::mat4 transform;
-  unsigned int id;
+  glm::mat4 inverseTransform;
 
   std::shared_ptr<Material> material;
   void setMaterial(std::shared_ptr<Material> &mat);
   glm::vec3 patternAt(glm::vec4 point);
+  void multiplyTransform(glm::mat4 &transform);
+  void calculateInverseTranform();
 
   Ray transformRay(Ray &ray);
+  void transformRayInPlace(Ray &ray);
 };

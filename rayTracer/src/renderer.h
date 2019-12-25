@@ -29,11 +29,11 @@ public:
   glm::vec3 colourAt(Ray &ray, World &world, short remaining);
   glm::vec3 reflectColour(Geometry::Intersection<Shape> *hit, World &world, short remaining);
   glm::vec3 lighting(Shape *shape,
-                     std::shared_ptr<PointLight> &light, glm::vec4 point,
-                     glm::vec4 eyev, glm::vec4 normalv, bool inShadow);
+                     std::shared_ptr<PointLight> &light, glm::vec4 &point,
+                     glm::vec4 &eyev, glm::vec4 &normalv, bool &inShadow);
   glm::vec3 shadeHit(Geometry::Intersection<Shape> *hit, World &world, short remaining);
   glm::vec3 refractedColour(Geometry::Intersection<Shape> *hit, World &world, short remaining);
-  bool isShadowed(glm::vec4 point, World &world);
+  bool isShadowed(glm::vec4 &point, World &world);
   Canvas canvas;
   void render(World &world);
 };

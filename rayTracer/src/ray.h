@@ -3,7 +3,8 @@
 #include <glm/glm.hpp>
 #include <ostream>
 
-class Ray {
+class Ray
+{
 public:
   Ray();
   Ray(glm::vec4, glm::vec4);
@@ -15,6 +16,8 @@ public:
   glm::vec4 direction;
 
   Ray transform(glm::mat4 &m);
+  Ray transform(glm::mat4 &m, glm::vec4 newOrigin);
+  void transformInPlace(glm::mat4 &m);
 
 private:
 };

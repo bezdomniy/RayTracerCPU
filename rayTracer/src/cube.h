@@ -9,7 +9,7 @@
 class Cube : public Shape
 {
 public:
-    Cube(unsigned int id, glm::vec4 position);
+    Cube();
     ~Cube();
 
     virtual std::vector<Geometry::Intersection<Shape>> intersectRay(Ray &ray) override;

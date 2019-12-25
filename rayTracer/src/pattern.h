@@ -1,6 +1,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_inverse.hpp>
 
 class Pattern
 {
@@ -13,8 +14,10 @@ public:
   virtual glm::vec3 patternAt(glm::vec4 point) = 0;
   void setTransform(glm::mat4 transform);
   void multiplyTransform(glm::mat4 &transform);
+  void calculateInverseTranform();
 
   glm::mat4 transform;
+  glm::mat4 inverseTransform;
 };
 
 class ColourPattern : public Pattern

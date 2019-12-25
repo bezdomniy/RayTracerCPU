@@ -1,7 +1,7 @@
 #include "plane.h"
 
-Plane::Plane(unsigned int id, glm::vec4 position)
-    : Shape(id, position)
+Plane::Plane()
+    : Shape()
 {
 }
 
@@ -24,10 +24,10 @@ std::vector<Geometry::Intersection<Shape>> Plane::intersectRay(Ray &ray)
 
 glm::vec4 Plane::normalAt(glm::vec4 point)
 {
-    glm::mat4 transformInverse(glm::affineInverse(this->transform));
+    // glm::mat4 transformInverse(glm::affineInverse(this->transform));
     // glm::vec4 objectPoint = transformInverse * point;
     glm::vec4 objectNormal(0.f, 1.f, 0.f, 0.f);
-    glm::vec4 worldNormal = glm::transpose(transformInverse) * objectNormal;
+    glm::vec4 worldNormal = glm::transpose(this->inverseTransform) * objectNormal;
     worldNormal.w = 0.f;
 
     return glm::normalize(worldNormal);

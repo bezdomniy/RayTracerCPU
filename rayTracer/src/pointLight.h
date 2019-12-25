@@ -10,10 +10,9 @@ private:
   virtual std::string type() override;
 
 public:
-  PointLight(unsigned int id, glm::vec4 position, glm::vec3 intensity);
+  PointLight(glm::vec4 position, glm::vec3 intensity);
   ~PointLight();
 
-  int id;
   glm::vec4 position;
   glm::vec3 intensity;
 };

@@ -106,20 +106,19 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
 
     if (shapeType == "sphere")
     {
-        ret = std::make_shared<Sphere>(1.f, glm::vec4(0.f, 0.f, 0.f, 1.f), 1.f);
+        ret = std::make_shared<Sphere>();
     }
     else if (shapeType == "plane")
     {
-        ret = std::make_shared<Plane>(1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
+        ret = std::make_shared<Plane>();
     }
     else if (shapeType == "cube")
     {
-        ret = std::make_shared<Cube>(1.f, glm::vec4(0.f, 0.f, 0.f, 1.f));
+        ret = std::make_shared<Cube>();
     }
     else if (shapeType == "camera")
     {
-        ret = std::make_shared<Camera>(0,
-                                       glm::vec4(*cameraDefinition.values["from"].vector, 1.f),
+        ret = std::make_shared<Camera>(glm::vec4(*cameraDefinition.values["from"].vector, 1.f),
                                        glm::vec4(*cameraDefinition.values["to"].vector, 1.f),
                                        glm::vec4(*cameraDefinition.values["up"].vector, 0.f),
                                        cameraDefinition.values["width"].scalar,
@@ -128,8 +127,7 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
     }
     else if (shapeType == "light")
     {
-        ret = std::make_shared<PointLight>(0,
-                                           glm::vec4(*lightDefinition.values["at"].vector, 1.f),
+        ret = std::make_shared<PointLight>(glm::vec4(*lightDefinition.values["at"].vector, 1.f),
                                            *lightDefinition.values["intensity"].vector);
     }
     else
@@ -191,27 +189,27 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr, Definition
         else if (value.first == "translate")
         {
             glm::mat4 translation = glm::translate(glm::mat4(1.f), *value.second.vector);
-            shapePtr->transform = translation * shapePtr->transform;
+            shapePtr->multiplyTransform(translation);
         }
         else if (value.first == "scale")
         {
             glm::mat4 scale = glm::scale(glm::mat4(1.f), *value.second.vector);
-            shapePtr->transform = scale * shapePtr->transform;
+            shapePtr->multiplyTransform(scale);
         }
         else if (value.first == "rotate-x")
         {
             glm::mat4 rotation = glm::rotate(glm::mat4(1.f), value.second.scalar, glm::vec3(1.f, 0.f, 0.f));
-            shapePtr->transform = rotation * shapePtr->transform;
+            shapePtr->multiplyTransform(rotation);
         }
         else if (value.first == "rotate-y")
         {
             glm::mat4 rotation = glm::rotate(glm::mat4(1.f), value.second.scalar, glm::vec3(0.f, 1.f, 0.f));
-            shapePtr->transform = rotation * shapePtr->transform;
+            shapePtr->multiplyTransform(rotation);
         }
         else if (value.first == "rotate-z")
         {
             glm::mat4 rotation = glm::rotate(glm::mat4(1.f), value.second.scalar, glm::vec3(0.f, 0.f, 1.f));
-            shapePtr->transform = rotation * shapePtr->transform;
+            shapePtr->multiplyTransform(rotation);
         }
         else
         {
@@ -219,7 +217,12 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr, Definition
         }
     }
     if (definition.pattern)
+    {
         shapePtr->material->setPattern(definition.pattern);
+        shapePtr->material->pattern->calculateInverseTranform();
+    }
+
+    shapePtr->calculateInverseTranform();
 }
 
 // TODO: add patterns
