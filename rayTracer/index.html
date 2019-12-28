@@ -1,0 +1,32 @@
+<html>
+
+<head>
+  <script src="build/RayTracer.wasm.js">
+  </script>
+  <script>
+    function offerFileAsDownload(filename, mime) {
+      mime = mime || "application/octet-stream";
+
+      let content = Module.FS.readFile(filename);
+      console.log(`Offering download of "${filename}", with ${content.length} bytes...`);
+
+      var a = document.createElement('a');
+      a.download = filename;
+      a.href = URL.createObjectURL(new Blob([content], { type: mime }));
+      a.style.display = 'none';
+
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(a.href);
+      }, 2000);
+    }
+  </script>
+
+</head>
+
+<body>
+</body>
+
+</html>
