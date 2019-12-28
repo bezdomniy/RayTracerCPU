@@ -6,11 +6,11 @@
 #include <memory>
 #include <vector>
 
-#if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
-#include <noise/noise.h>
-#elif __unix__
-#include <libnoise/noise.h>
-#endif
+// #if defined(WIN32) || defined(_WIN32) || defined(__WIN32__) || defined(__NT__)
+// #include <noise/noise.h>
+// #elif __unix__
+// #include <libnoise/noise.h>
+// #endif
 
 class StripedPattern : public ColourPattern
 {

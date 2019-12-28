@@ -2,3 +2,6 @@
 [submodule "rayTracer/yaml-cpp"]
 	path = rayTracer/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "rayTracer/glm"]
+	path = rayTracer/glm
+	url = https://github.com/g-truc/glm.git

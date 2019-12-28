@@ -92,17 +92,17 @@ PerturbedPattern::~PerturbedPattern() {}
 
 glm::vec3 PerturbedPattern::patternAt(glm::vec4 point)
 {
-  noise::module::Perlin perlinModule;
+  // noise::module::Perlin perlinModule;
 
   glm::mat4 patternTransform(glm::affineInverse(pattern->transform));
   glm::vec4 patternPoint = patternTransform * point;
 
-  double value = perlinModule.GetValue(
-      patternPoint.x * .5f, patternPoint.y * .5f, patternPoint.z * .5f);
+  // double value = perlinModule.GetValue(
+  //     patternPoint.x * .5f, patternPoint.y * .5f, patternPoint.z * .5f);
 
-  patternPoint.x += value;
-  patternPoint.y += value;
-  patternPoint.z += value;
+  // patternPoint.x += value;
+  // patternPoint.y += value;
+  // patternPoint.z += value;
 
   return this->pattern->patternAt(patternPoint);
 }
