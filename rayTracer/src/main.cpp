@@ -15,22 +15,18 @@
 #include <emscripten/val.h>
 #endif
 
-int main(int argc, char const *argv[])
-{
-    World world;
-    std::shared_ptr<Camera> camera = world.loadFromFile("./src/scene2.yaml");
-    // std::shared_ptr<Camera> camera = world.loadFromFile("scene2.yaml");
+int main(int argc, char const *argv[]) {
+  World world;
+  std::shared_ptr<Camera> camera = world.loadFromFile("./src/scene2.yaml");
+  //   std::shared_ptr<Camera> camera = world.loadFromFile("scene2.yaml");
 
-    Renderer renderer(camera);
-    renderer.render(world);
-    renderer.canvas.writeToPPM("./test.ppm", false);
+  Renderer renderer(camera);
+  renderer.render(world);
+  renderer.canvas.writeToPPM("./test.ppm", false);
 
-    #ifdef __EMSCRIPTEN__
-    emscripten::val::global("window").call<void>(
-        "offerFileAsDownload",
-        std::string("test.ppm"),
-        std::string("mime/type")
-  );
-    #endif
-    return 0;
+#ifdef __EMSCRIPTEN__
+  emscripten::val::global("window").call<void>(
+      "offerFileAsDownload", std::string("test.ppm"), std::string("mime/type"));
+#endif
+  return 0;
 }

@@ -1,52 +1,51 @@
 #pragma once
 
-#include <unordered_map>
-#include <map>
-#include <vector>
-#include <string>
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include "yaml-cpp/yaml.h"
+#include "camera.h"
+#include "cube.h"
+#include "material.h"
+#include "patterns.h"
+#include "plane.h"
+#include "pointLight.h"
 #include "shape.h"
 #include "sphere.h"
-#include "plane.h"
-#include "cube.h"
 #include "triangle.h"
-#include "patterns.h"
-#include "material.h"
-#include "camera.h"
-#include "pointLight.h"
+#include "yaml-cpp/yaml.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-class ObjectLoader
-{
+class ObjectLoader {
 private:
-    struct Value
-    {
-        bool isScalar;
-        float scalar;
-        std::unique_ptr<glm::vec3> vector;
-    };
+  struct Value {
+    bool isScalar;
+    float scalar;
+    std::unique_ptr<glm::vec3> vector;
+  };
 
-    struct Definition
-    {
-        bool empty = true;
-        std::shared_ptr<Definition> inheritFrom;
-        std::unordered_map<std::string, Value> values;
-        std::unique_ptr<Pattern> pattern;
-    };
+  struct Definition {
+    bool empty = true;
+    std::shared_ptr<Definition> inheritFrom;
+    std::unordered_map<std::string, Value> values;
+    std::vector<std::string> valueOrder;
+    std::unique_ptr<Pattern> pattern;
+  };
 
-    std::unordered_map<std::string, std::shared_ptr<Definition>> definitions;
+  std::unordered_map<std::string, std::shared_ptr<Definition>> definitions;
 
-    std::shared_ptr<Shape> addShape(const YAML::Node &shapeNode);
-    void addDefinition(const YAML::Node &definitionNode);
-    void assignDefinition(std::shared_ptr<Shape> &shapePtr, Definition &definition);
-    void parseMaterial(const YAML::Node &node, Definition &definition);
-    void parseTransform(const YAML::Node &node, Definition &definition);
-    void parsePattern(const YAML::Node &node, Definition &definition);
-    void parseArgs(const YAML::Node &node, std::vector<Value> &args);
+  std::shared_ptr<Shape> addShape(const YAML::Node &shapeNode);
+  void addDefinition(const YAML::Node &definitionNode);
+  void assignDefinition(std::shared_ptr<Shape> &shapePtr,
+                        Definition &definition);
+  void parseMaterial(const YAML::Node &node, Definition &definition);
+  void parseTransform(const YAML::Node &node, Definition &definition);
+  void parsePattern(const YAML::Node &node, Definition &definition);
+  void parseArgs(const YAML::Node &node, std::vector<Value> &args);
 
 public:
-    ObjectLoader();
-    ~ObjectLoader();
-    std::pair<std::shared_ptr<Camera>, std::vector<std::shared_ptr<Shape>>> loadYaml(const std::string &fileName);
+  ObjectLoader();
+  ~ObjectLoader();
+  std::pair<std::shared_ptr<Camera>, std::vector<std::shared_ptr<Shape>>>
+  loadYaml(const std::string &fileName);
 };
