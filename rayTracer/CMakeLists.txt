@@ -14,11 +14,11 @@ enable_testing()
 # find_library(LIBNOISE_LIBRARY NAMES noise PATHS /usr/lib/libnoise)
 
 
-# find_package(glm CONFIG REQUIRED)
+find_package(glm CONFIG REQUIRED)
 # find_package(yaml-cpp REQUIRED)
 
 add_subdirectory(yaml-cpp)
-add_subdirectory(glm)
+# add_subdirectory(glm)
 # find_package(yaml-cpp REQUIRED)
 
 
@@ -46,8 +46,8 @@ if(TO_NATIVE)
 else(TO_NATIVE)
 	message(STATUS "Setting compilation target to WASM")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
-	set_target_properties(RayTracer PROPERTIES LINK_FLAGS "--bind -s WASM=1 -s BINARYEN_METHOD='native-wasm' -s EXPORTED_FUNCTIONS='[_main]' --embed-file ${CMAKE_SOURCE_DIR}/build/scene2.yaml -s EXTRA_EXPORTED_RUNTIME_METHODS=FS")
-endif(JS_ONLY)
+	set_target_properties(RayTracer PROPERTIES LINK_FLAGS "-s WASM=1 -s BINARYEN_METHOD='native-wasm' -s EXPORTED_FUNCTIONS='[_main]' -s EXTRA_EXPORTED_RUNTIME_METHODS=FS")
+endif(TO_NATIVE)
 
 # target_include_directories(RayTracer PRIVATE ${LIBNOISE_INCLUDE_DIR})
 # target_link_libraries(RayTracer PRIVATE glm yaml-cpp ${LIBNOISE_LIBRARY})
