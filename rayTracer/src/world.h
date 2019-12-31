@@ -23,7 +23,7 @@ public:
   ~World();
 
   std::shared_ptr<Camera> loadFromFile(const std::string &fileName);
-
+  
   void addShape(std::shared_ptr<Shape> &shape_ptr);
   void addLight(std::shared_ptr<PointLight> &light);
 

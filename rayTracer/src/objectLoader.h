@@ -15,16 +15,20 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <experimental/filesystem>
 
-class ObjectLoader {
+class ObjectLoader
+{
 private:
-  struct Value {
+  struct Value
+  {
     bool isScalar;
     float scalar;
     std::unique_ptr<glm::vec3> vector;
   };
 
-  struct Definition {
+  struct Definition
+  {
     bool empty = true;
     std::shared_ptr<Definition> inheritFrom;
     std::unordered_map<std::string, Value> values;

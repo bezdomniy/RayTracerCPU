@@ -5,22 +5,38 @@ ObjectLoader::ObjectLoader(/* args */) {}
 ObjectLoader::~ObjectLoader() {}
 
 std::pair<std::shared_ptr<Camera>, std::vector<std::shared_ptr<Shape>>>
-ObjectLoader::loadYaml(const std::string &fileName) {
+ObjectLoader::loadYaml(const std::string &fileName)
+{
   std::vector<std::shared_ptr<Shape>> ret;
   std::shared_ptr<Camera> camera;
 
-  YAML::Node root = YAML::LoadFile(fileName);
-  for (YAML::const_iterator it = root.begin(); it != root.end(); ++it) {
+  YAML::Node root;
+
+  if (std::experimental::filesystem::exists(fileName))
+    root = YAML::LoadFile(fileName);
+  else
+    root = YAML::Load(fileName);
+
+  for (YAML::const_iterator it = root.begin(); it != root.end(); ++it)
+  {
     assert((*it).Type() == YAML::NodeType::Map);
-    if (it->begin()->first.as<std::string>() == "add") {
-      if (it->begin()->second.as<std::string>() == "camera") {
+    if (it->begin()->first.as<std::string>() == "add")
+    {
+      if (it->begin()->second.as<std::string>() == "camera")
+      {
         camera = std::dynamic_pointer_cast<Camera>(addShape(*it));
-      } else {
+      }
+      else
+      {
         ret.push_back(addShape(*it));
       }
-    } else if (it->begin()->first.as<std::string>() == "define") {
+    }
+    else if (it->begin()->first.as<std::string>() == "define")
+    {
       addDefinition(*it);
-    } else {
+    }
+    else
+    {
       throw std::invalid_argument("invalid operator in yaml file");
     }
   }
@@ -29,7 +45,8 @@ ObjectLoader::loadYaml(const std::string &fileName) {
                    std::vector<std::shared_ptr<Shape>>>(camera, ret);
 }
 
-std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode) {
+std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
+{
   std::string shapeType;
   Definition materialDefinition;
   Definition transformDefinition;
@@ -39,77 +56,112 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode) {
   std::vector<Value> args;
 
   for (YAML::const_iterator it = shapeNode.begin(); it != shapeNode.end();
-       ++it) {
+       ++it)
+  {
     std::string nextKey = it->first.as<std::string>();
 
-    if (nextKey == "add") {
+    if (nextKey == "add")
+    {
       shapeType = it->second.as<std::string>();
-    } else if (nextKey == "args") {
+    }
+    else if (nextKey == "args")
+    {
       parseArgs(it->second, args);
-    } else if (nextKey == "material") {
+    }
+    else if (nextKey == "material")
+    {
       parseMaterial(it->second, materialDefinition);
-    } else if (nextKey == "transform") {
+    }
+    else if (nextKey == "transform")
+    {
       parseTransform(it->second, transformDefinition);
-    } else if (nextKey == "width") {
+    }
+    else if (nextKey == "width")
+    {
       cameraDefinition.values["width"] = Value{true, it->second.as<float>()};
       cameraDefinition.valueOrder.push_back("width");
-    } else if (nextKey == "height") {
+    }
+    else if (nextKey == "height")
+    {
       cameraDefinition.values["height"] = Value{true, it->second.as<float>()};
       cameraDefinition.valueOrder.push_back("height");
-    } else if (nextKey == "field-of-view") {
+    }
+    else if (nextKey == "field-of-view")
+    {
       cameraDefinition.values["field-of-view"] =
           Value{true, it->second.as<float>()};
       cameraDefinition.valueOrder.push_back("field-of-view");
-    } else if (nextKey == "from") {
+    }
+    else if (nextKey == "from")
+    {
       cameraDefinition.values["from"] =
           Value{false, 0.f,
                 std::make_unique<glm::vec3>(it->second[0].as<float>(),
                                             it->second[1].as<float>(),
                                             it->second[2].as<float>())};
       cameraDefinition.valueOrder.push_back("from");
-    } else if (nextKey == "to") {
+    }
+    else if (nextKey == "to")
+    {
       cameraDefinition.values["to"] =
           Value{false, 0.f,
                 std::make_unique<glm::vec3>(it->second[0].as<float>(),
                                             it->second[1].as<float>(),
                                             it->second[2].as<float>())};
       cameraDefinition.valueOrder.push_back("to");
-    } else if (nextKey == "up") {
+    }
+    else if (nextKey == "up")
+    {
       cameraDefinition.values["up"] =
           Value{false, 0.f,
                 std::make_unique<glm::vec3>(it->second[0].as<float>(),
                                             it->second[1].as<float>(),
                                             it->second[2].as<float>())};
       cameraDefinition.valueOrder.push_back("up");
-    } else if (nextKey == "at") {
+    }
+    else if (nextKey == "at")
+    {
       lightDefinition.values["at"] =
           Value{false, 0.f,
                 std::make_unique<glm::vec3>(it->second[0].as<float>(),
                                             it->second[1].as<float>(),
                                             it->second[2].as<float>())};
       lightDefinition.valueOrder.push_back("at");
-    } else if (nextKey == "intensity") {
+    }
+    else if (nextKey == "intensity")
+    {
       lightDefinition.values["intensity"] =
           Value{false, 0.f,
                 std::make_unique<glm::vec3>(it->second[0].as<float>(),
                                             it->second[1].as<float>(),
                                             it->second[2].as<float>())};
       lightDefinition.valueOrder.push_back("intensity");
-    } else {
+    }
+    else
+    {
       throw std::invalid_argument("invalid operator in add statement");
     }
   }
 
-  if (shapeType == "sphere") {
+  if (shapeType == "sphere")
+  {
     ret = std::make_shared<Sphere>();
-  } else if (shapeType == "plane") {
+  }
+  else if (shapeType == "plane")
+  {
     ret = std::make_shared<Plane>();
-  } else if (shapeType == "cube") {
+  }
+  else if (shapeType == "cube")
+  {
     ret = std::make_shared<Cube>();
-  } else if (shapeType == "triangle") {
+  }
+  else if (shapeType == "triangle")
+  {
     ret = std::make_shared<Triangle>(
         Triangle(*args.at(0).vector, *args.at(1).vector, *args.at(2).vector));
-  } else if (shapeType == "camera") {
+  }
+  else if (shapeType == "camera")
+  {
     ret = std::make_shared<Camera>(
         glm::vec4(*cameraDefinition.values["from"].vector, 1.f),
         glm::vec4(*cameraDefinition.values["to"].vector, 1.f),
@@ -117,11 +169,15 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode) {
         cameraDefinition.values["width"].scalar,
         cameraDefinition.values["height"].scalar,
         cameraDefinition.values["field-of-view"].scalar);
-  } else if (shapeType == "light") {
+  }
+  else if (shapeType == "light")
+  {
     ret = std::make_shared<PointLight>(
         glm::vec4(*lightDefinition.values["at"].vector, 1.f),
         *lightDefinition.values["intensity"].vector);
-  } else {
+  }
+  else
+  {
     throw std::invalid_argument("this shape is not implemented");
   }
 
@@ -133,74 +189,112 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode) {
   return ret;
 }
 
-void ObjectLoader::parseArgs(const YAML::Node &node, std::vector<Value> &args) {
-  for (auto &item : node) {
-    if (item.IsSequence()) {
+void ObjectLoader::parseArgs(const YAML::Node &node, std::vector<Value> &args)
+{
+  for (auto &item : node)
+  {
+    if (item.IsSequence())
+    {
       args.push_back(Value{false, 0.f,
                            std::make_unique<glm::vec3>(item[0].as<float>(),
                                                        item[1].as<float>(),
                                                        item[2].as<float>())});
-    } else if (item.IsScalar()) {
+    }
+    else if (item.IsScalar())
+    {
       args.push_back(Value{true, item.as<float>()});
-    } else {
+    }
+    else
+    {
       throw std::invalid_argument("invalid arguement in shape definition");
     }
   }
 }
 
 void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
-                                    Definition &definition) {
+                                    Definition &definition)
+{
   if (!shapePtr->material)
     shapePtr->material = std::make_shared<Material>();
 
-  if (definition.inheritFrom) {
+  if (definition.inheritFrom)
+  {
     assignDefinition(shapePtr, *definition.inheritFrom);
   }
-  for (auto &value : definition.valueOrder) {
-    if (value == "color") {
+  for (auto &value : definition.valueOrder)
+  {
+    if (value == "color")
+    {
       shapePtr->material->colour = *definition.values[value].vector;
-    } else if (value == "diffuse") {
+    }
+    else if (value == "diffuse")
+    {
       shapePtr->material->diffuse = definition.values[value].scalar;
-    } else if (value == "ambient") {
+    }
+    else if (value == "ambient")
+    {
       shapePtr->material->ambient = definition.values[value].scalar;
-    } else if (value == "specular") {
+    }
+    else if (value == "specular")
+    {
       shapePtr->material->specular = definition.values[value].scalar;
-    } else if (value == "shininess") {
+    }
+    else if (value == "shininess")
+    {
       shapePtr->material->shininess = definition.values[value].scalar;
-    } else if (value == "reflective") {
+    }
+    else if (value == "reflective")
+    {
       shapePtr->material->reflective = definition.values[value].scalar;
-    } else if (value == "transparency") {
+    }
+    else if (value == "transparency")
+    {
       shapePtr->material->transparency = definition.values[value].scalar;
-    } else if (value == "refractive-index") {
+    }
+    else if (value == "refractive-index")
+    {
       shapePtr->material->refractiveIndex = definition.values[value].scalar;
-    } else if (value == "translate") {
+    }
+    else if (value == "translate")
+    {
       glm::mat4 translation =
           glm::translate(glm::mat4(1.f), *definition.values[value].vector);
       shapePtr->multiplyTransform(translation);
-    } else if (value == "scale") {
+    }
+    else if (value == "scale")
+    {
       glm::mat4 scale =
           glm::scale(glm::mat4(1.f), *definition.values[value].vector);
       shapePtr->multiplyTransform(scale);
-    } else if (value == "rotate-x") {
+    }
+    else if (value == "rotate-x")
+    {
       glm::mat4 rotation =
           glm::rotate(glm::mat4(1.f), definition.values[value].scalar,
                       glm::vec3(1.f, 0.f, 0.f));
       shapePtr->multiplyTransform(rotation);
-    } else if (value == "rotate-y") {
+    }
+    else if (value == "rotate-y")
+    {
       glm::mat4 rotation =
           glm::rotate(glm::mat4(1.f), definition.values[value].scalar,
                       glm::vec3(0.f, 1.f, 0.f));
       shapePtr->multiplyTransform(rotation);
-    } else if (value == "rotate-z") {
+    }
+    else if (value == "rotate-z")
+    {
       glm::mat4 rotation =
           glm::rotate(glm::mat4(1.f), definition.values[value].scalar,
                       glm::vec3(0.f, 0.f, 1.f));
       shapePtr->multiplyTransform(rotation);
-    } else {
+    }
+    else
+    {
       throw std::invalid_argument("invalid operator in value statement");
     }
   }
-  if (definition.pattern) {
+  if (definition.pattern)
+  {
     shapePtr->material->setPattern(definition.pattern);
     shapePtr->material->pattern->calculateInverseTranform();
   }
@@ -209,25 +303,39 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
 }
 
 // TODO: add patterns
-void ObjectLoader::addDefinition(const YAML::Node &definitionNode) {
+void ObjectLoader::addDefinition(const YAML::Node &definitionNode)
+{
   std::shared_ptr<Definition> newDefinition = std::make_shared<Definition>();
   std::string name;
   for (YAML::const_iterator it = definitionNode.begin();
-       it != definitionNode.end(); ++it) {
+       it != definitionNode.end(); ++it)
+  {
     std::string nextKey = it->first.as<std::string>();
-    if (nextKey == "define") {
+    if (nextKey == "define")
+    {
       name = it->second.as<std::string>();
-    } else if (nextKey == "extend") {
+    }
+    else if (nextKey == "extend")
+    {
       newDefinition->inheritFrom = definitions.at(it->second.as<std::string>());
-    } else if (nextKey == "value") {
-      if (it->second.IsMap()) {
+    }
+    else if (nextKey == "value")
+    {
+      if (it->second.IsMap())
+      {
         parseMaterial(it->second, *newDefinition);
-      } else if (it->second.IsSequence()) {
+      }
+      else if (it->second.IsSequence())
+      {
         parseTransform(it->second, *newDefinition);
-      } else {
+      }
+      else
+      {
         throw std::invalid_argument("value must be sequence or map");
       }
-    } else {
+    }
+    else
+    {
       throw std::invalid_argument("invalid operator in define statement");
     }
   }
@@ -236,52 +344,76 @@ void ObjectLoader::addDefinition(const YAML::Node &definitionNode) {
 }
 
 void ObjectLoader::parseMaterial(const YAML::Node &node,
-                                 Definition &definition) {
-  if (node.IsScalar()) {
+                                 Definition &definition)
+{
+  if (node.IsScalar())
+  {
     definition.inheritFrom = definitions.at(node.as<std::string>());
-  } else {
+  }
+  else
+  {
     for (YAML::const_iterator valueIt = node.begin(); valueIt != node.end();
-         ++valueIt) {
+         ++valueIt)
+    {
       std::string valueKey = valueIt->first.as<std::string>();
 
-      if (valueKey == "color") {
+      if (valueKey == "color")
+      {
         definition.values["color"] =
             Value{false, 0.f,
                   std::make_unique<glm::vec3>(valueIt->second[0].as<float>(),
                                               valueIt->second[1].as<float>(),
                                               valueIt->second[2].as<float>())};
         definition.valueOrder.push_back("color");
-      } else if (valueKey == "diffuse") {
+      }
+      else if (valueKey == "diffuse")
+      {
         float diffuse = valueIt->second.as<float>();
         definition.values["diffuse"] = Value{true, diffuse};
         definition.valueOrder.push_back("diffuse");
-      } else if (valueKey == "ambient") {
+      }
+      else if (valueKey == "ambient")
+      {
         float ambient = valueIt->second.as<float>();
         definition.values["ambient"] = Value{true, ambient};
         definition.valueOrder.push_back("ambient");
-      } else if (valueKey == "specular") {
+      }
+      else if (valueKey == "specular")
+      {
         float specular = valueIt->second.as<float>();
         definition.values["specular"] = Value{true, specular};
         definition.valueOrder.push_back("specular");
-      } else if (valueKey == "shininess") {
+      }
+      else if (valueKey == "shininess")
+      {
         float shininess = valueIt->second.as<float>();
         definition.values["shininess"] = Value{true, shininess};
         definition.valueOrder.push_back("shininess");
-      } else if (valueKey == "reflective") {
+      }
+      else if (valueKey == "reflective")
+      {
         float reflective = valueIt->second.as<float>();
         definition.values["reflective"] = Value{true, reflective};
         definition.valueOrder.push_back("reflective");
-      } else if (valueKey == "transparency") {
+      }
+      else if (valueKey == "transparency")
+      {
         float transparency = valueIt->second.as<float>();
         definition.values["transparency"] = Value{true, transparency};
         definition.valueOrder.push_back("transparency");
-      } else if (valueKey == "refractive-index") {
+      }
+      else if (valueKey == "refractive-index")
+      {
         float refractiveIndex = valueIt->second.as<float>();
         definition.values["refractive-index"] = Value{true, refractiveIndex};
         definition.valueOrder.push_back("refractive-index");
-      } else if (valueKey == "pattern") {
+      }
+      else if (valueKey == "pattern")
+      {
         parsePattern(valueIt->second, definition);
-      } else {
+      }
+      else
+      {
         throw std::invalid_argument("invalid operator in value statement");
       }
     }
@@ -290,37 +422,55 @@ void ObjectLoader::parseMaterial(const YAML::Node &node,
 }
 
 void ObjectLoader::parsePattern(const YAML::Node &node,
-                                Definition &definition) {
+                                Definition &definition)
+{
   std::string type;
   std::unique_ptr<Pattern> pattern;
   for (YAML::const_iterator valueIt = node.begin(); valueIt != node.end();
-       ++valueIt) {
+       ++valueIt)
+  {
     std::string valueKey = valueIt->first.as<std::string>();
 
-    if (valueKey == "type") {
+    if (valueKey == "type")
+    {
       type = valueKey;
-      if (valueIt->second.as<std::string>() == "stripes") {
+      if (valueIt->second.as<std::string>() == "stripes")
+      {
         pattern = std::make_unique<StripedPattern>(glm::vec3(1.f, 0.f, 0.f),
                                                    glm::vec3(0.f, 1.f, 0.f));
-      } else if (valueIt->second.as<std::string>() == "gradient") {
+      }
+      else if (valueIt->second.as<std::string>() == "gradient")
+      {
         pattern = std::make_unique<GradientPattern>(glm::vec3(1.f, 0.f, 0.f),
                                                     glm::vec3(0.f, 1.f, 0.f));
-      } else if (valueIt->second.as<std::string>() == "rings") {
+      }
+      else if (valueIt->second.as<std::string>() == "rings")
+      {
         pattern = std::make_unique<RingPattern>(glm::vec3(1.f, 0.f, 0.f),
                                                 glm::vec3(0.f, 1.f, 0.f));
-      } else if (valueIt->second.as<std::string>() == "checkers") {
+      }
+      else if (valueIt->second.as<std::string>() == "checkers")
+      {
         pattern = std::make_unique<CheckedPattern>(glm::vec3(1.f, 0.f, 0.f),
                                                    glm::vec3(0.f, 1.f, 0.f));
-      } else if (valueIt->second.as<std::string>() == "blended") {
+      }
+      else if (valueIt->second.as<std::string>() == "blended")
+      {
         // pattern = std::make_unique<BlendedPattern>(glm::vec3(1.f, 0.f, 0.f),
         // glm::vec3(0.f, 1.f, 0.f));
-      } else if (valueIt->second.as<std::string>() == "perturbed") {
+      }
+      else if (valueIt->second.as<std::string>() == "perturbed")
+      {
         // pattern = std::make_unique<PerturbedPattern>(glm::vec3(1.f, 0.f,
         // 0.f), glm::vec3(0.f, 1.f, 0.f));
-      } else {
+      }
+      else
+      {
         throw std::invalid_argument("invalid pattern type");
       }
-    } else if (valueKey == "colors") {
+    }
+    else if (valueKey == "colors")
+    {
       if (type == "blended")
         throw std::invalid_argument("invalid arguement for blended pattern");
       if (type == "perturbed")
@@ -339,38 +489,52 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
 
       colourPattern->setColour(colourA, 0);
       colourPattern->setColour(colourB, 1);
-    } else if (valueKey == "transform") {
-      for (auto &transformValue : valueIt->second) {
-        if (transformValue[0].as<std::string>() == "translate") {
+    }
+    else if (valueKey == "transform")
+    {
+      for (auto &transformValue : valueIt->second)
+      {
+        if (transformValue[0].as<std::string>() == "translate")
+        {
           glm::vec3 vector(transformValue[1].as<float>(),
                            transformValue[2].as<float>(),
                            transformValue[3].as<float>());
           glm::mat4 translation = glm::translate(glm::mat4(1.f), vector);
           pattern->multiplyTransform(translation);
-        } else if (transformValue[0].as<std::string>() == "scale") {
+        }
+        else if (transformValue[0].as<std::string>() == "scale")
+        {
           glm::vec3 vector(transformValue[1].as<float>(),
                            transformValue[2].as<float>(),
                            transformValue[3].as<float>());
           glm::mat4 scale = glm::scale(glm::mat4(1.f), vector);
           pattern->multiplyTransform(scale);
-        } else if (transformValue[0].as<std::string>() == "rotate-x") {
+        }
+        else if (transformValue[0].as<std::string>() == "rotate-x")
+        {
           glm::mat4 rotation =
               glm::rotate(glm::mat4(1.f), transformValue[1].as<float>(),
                           glm::vec3(1.f, 0.f, 0.f));
           pattern->multiplyTransform(rotation);
-        } else if (transformValue[0].as<std::string>() == "rotate-y") {
+        }
+        else if (transformValue[0].as<std::string>() == "rotate-y")
+        {
           glm::mat4 rotation =
               glm::rotate(glm::mat4(1.f), transformValue[1].as<float>(),
                           glm::vec3(0.f, 1.f, 0.f));
           pattern->multiplyTransform(rotation);
-        } else if (transformValue[0].as<std::string>() == "rotate-z") {
+        }
+        else if (transformValue[0].as<std::string>() == "rotate-z")
+        {
           glm::mat4 rotation =
               glm::rotate(glm::mat4(1.f), transformValue[1].as<float>(),
                           glm::vec3(0.f, 0.f, 1.f));
           pattern->multiplyTransform(rotation);
         }
       }
-    } else {
+    }
+    else
+    {
       throw std::invalid_argument("invalid key in pattern definition");
     }
   }
@@ -378,19 +542,30 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
 }
 
 void ObjectLoader::parseTransform(const YAML::Node &node,
-                                  Definition &definition) {
-  if (node.IsScalar()) {
+                                  Definition &definition)
+{
+  if (node.IsScalar())
+  {
     definition.inheritFrom = definitions.at(node.as<std::string>());
-  } else if (node.IsSequence()) {
-    for (auto &item : node) {
-      if (item.IsScalar()) {
+  }
+  else if (node.IsSequence())
+  {
+    for (auto &item : node)
+    {
+      if (item.IsScalar())
+      {
         definition.inheritFrom = definitions.at(item.as<std::string>());
-      } else {
-        if (item[0].as<std::string>().substr(0, 6) == "rotate") {
+      }
+      else
+      {
+        if (item[0].as<std::string>().substr(0, 6) == "rotate")
+        {
           definition.values[item[0].as<std::string>()] =
               Value{true, item[1].as<float>()};
           definition.valueOrder.push_back(item[0].as<std::string>());
-        } else {
+        }
+        else
+        {
           definition.values[item[0].as<std::string>()] =
               Value{false, 0.f,
                     std::make_unique<glm::vec3>(item[1].as<float>(),
@@ -400,7 +575,9 @@ void ObjectLoader::parseTransform(const YAML::Node &node,
         }
       }
     }
-  } else {
+  }
+  else
+  {
     throw std::invalid_argument(
         "value as sequence must contain either extension name or sequence");
   }
