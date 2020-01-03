@@ -93,6 +93,6 @@ void Canvas::writeToPPM(const std::string &fileName, bool invertY = false) {
       }
     }
   }
-
+  out << "\n";
   out.close();
 }

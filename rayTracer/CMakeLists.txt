@@ -2,7 +2,15 @@ cmake_minimum_required(VERSION 3.10)
 project(RayTracer VERSION 0.1.0)
 set (CMAKE_CXX_STANDARD 17)
 
-option(TO_NATIVE "Compiles to native (Not WASM)" ON)
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+
+set(TO_NATIVE OFF)
 
 include(CTest)
 enable_testing()
@@ -14,11 +22,11 @@ enable_testing()
 # find_library(LIBNOISE_LIBRARY NAMES noise PATHS /usr/lib/libnoise)
 
 
-find_package(glm CONFIG REQUIRED)
+# find_package(glm CONFIG REQUIRED)
 # find_package(yaml-cpp REQUIRED)
 
 add_subdirectory(yaml-cpp)
-# add_subdirectory(glm)
+add_subdirectory(glm)
 # find_package(yaml-cpp REQUIRED)
 
 
@@ -39,15 +47,15 @@ file(GLOB SOURCES
 
 add_executable(RayTracer ${SOURCES})
 
-if(TO_NATIVE)
+if(${TO_NATIVE})
 	message(STATUS "Setting compilation target to native binary")
 	# set(CMAKE_EXECUTABLE_SUFFIX ".js")
 	# set_target_properties(RayTracer PROPERTIES LINK_FLAGS "-s EXPORTED_FUNCTIONS='[_main]'")
-else(TO_NATIVE)
+else()
 	message(STATUS "Setting compilation target to WASM")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
-	set_target_properties(RayTracer PROPERTIES LINK_FLAGS "-s WASM=1 -s BINARYEN_METHOD='native-wasm' -s EXPORTED_FUNCTIONS='[_main]' -s EXTRA_EXPORTED_RUNTIME_METHODS=FS")
-endif(TO_NATIVE)
+	set_target_properties(RayTracer PROPERTIES LINK_FLAGS "--bind -s WASM=1 -s BINARYEN_METHOD='native-wasm' -s EXTRA_EXPORTED_RUNTIME_METHODS=FS")
+endif()
 
 # target_include_directories(RayTracer PRIVATE ${LIBNOISE_INCLUDE_DIR})
 # target_link_libraries(RayTracer PRIVATE glm yaml-cpp ${LIBNOISE_LIBRARY})
