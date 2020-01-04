@@ -1,42 +1,34 @@
 #include "patterns.h"
 
 StripedPattern::StripedPattern(glm::vec3 colourA, glm::vec3 colourB)
-    : ColourPattern(colourA, colourB)
-{
-}
+    : ColourPattern(colourA, colourB) {}
 
 StripedPattern::~StripedPattern() {}
 
-glm::vec3 StripedPattern::patternAt(glm::vec4 point)
-{
+glm::vec3 StripedPattern::patternAt(glm::vec4 point) {
   if ((int)(std::floor(point.x)) % 2 == 0)
     return this->colourA;
   return this->colourB;
 }
 
 GradientPattern::GradientPattern(glm::vec3 colourA, glm::vec3 colourB)
-    : ColourPattern(colourA, colourB)
-{
-}
+    : ColourPattern(colourA, colourB) {}
 
 GradientPattern::~GradientPattern() {}
 
-glm::vec3 GradientPattern::patternAt(glm::vec4 point)
-{
+glm::vec3 GradientPattern::patternAt(glm::vec4 point) {
   glm::vec3 distance = this->colourB - this->colourA;
   float fraction = point.x - std::floor(point.x);
 
   return this->colourA + distance * fraction;
 }
 
-RingPattern::RingPattern(glm::vec3 colourA, glm::vec3 colourB) : ColourPattern(colourA, colourB)
-{
-}
+RingPattern::RingPattern(glm::vec3 colourA, glm::vec3 colourB)
+    : ColourPattern(colourA, colourB) {}
 
 RingPattern::~RingPattern() {}
 
-glm::vec3 RingPattern::patternAt(glm::vec4 point)
-{
+glm::vec3 RingPattern::patternAt(glm::vec4 point) {
   if ((int)std::floor(std::sqrt(point.x * point.x + point.z * point.z)) % 2 ==
       0)
     return this->colourA;
@@ -44,14 +36,11 @@ glm::vec3 RingPattern::patternAt(glm::vec4 point)
 }
 
 CheckedPattern::CheckedPattern(glm::vec3 colourA, glm::vec3 colourB)
-    : ColourPattern(colourA, colourB)
-{
-}
+    : ColourPattern(colourA, colourB) {}
 
 CheckedPattern::~CheckedPattern() {}
 
-glm::vec3 CheckedPattern::patternAt(glm::vec4 point)
-{
+glm::vec3 CheckedPattern::patternAt(glm::vec4 point) {
   if (((int)(std::floor(point.x) + std::floor(point.y) + std::floor(point.z))) %
           2 ==
       0)
@@ -59,18 +48,16 @@ glm::vec3 CheckedPattern::patternAt(glm::vec4 point)
   return this->colourB;
 }
 
-BlendedPattern::BlendedPattern(std::shared_ptr<Pattern> &patternA,
-                               std::shared_ptr<Pattern> &patternB)
-    : Pattern()
-{
-  this->patternA = patternA;
-  this->patternB = patternB;
+BlendedPattern::BlendedPattern(std::unique_ptr<Pattern> patternA,
+                               std::unique_ptr<Pattern> patternB)
+    : Pattern() {
+  this->patternA = std::move(patternA);
+  this->patternB = std::move(patternB);
 }
 
 BlendedPattern::~BlendedPattern() {}
 
-glm::vec3 BlendedPattern::patternAt(glm::vec4 point)
-{
+glm::vec3 BlendedPattern::patternAt(glm::vec4 point) {
   glm::mat4 patternTransformA(glm::affineInverse(patternA->transform));
   glm::vec4 patternPointA = patternTransformA * point;
 
@@ -82,27 +69,28 @@ glm::vec3 BlendedPattern::patternAt(glm::vec4 point)
          0.5f;
 }
 
-PerturbedPattern::PerturbedPattern(std::shared_ptr<Pattern> &pattern)
-    : Pattern()
-{
-  this->pattern = pattern;
+PerturbedPattern::PerturbedPattern(std::unique_ptr<Pattern> pattern,
+                                   float perturbedCoeff)
+    : Pattern() {
+  this->pattern = std::move(pattern);
+  this->perturbedCoeff = perturbedCoeff;
 }
 
 PerturbedPattern::~PerturbedPattern() {}
 
-glm::vec3 PerturbedPattern::patternAt(glm::vec4 point)
-{
-  // noise::module::Perlin perlinModule;
+glm::vec3 PerturbedPattern::patternAt(glm::vec4 point) {
+  noise::module::Perlin perlinModule;
 
   glm::mat4 patternTransform(glm::affineInverse(pattern->transform));
   glm::vec4 patternPoint = patternTransform * point;
 
-  // double value = perlinModule.GetValue(
-  //     patternPoint.x * .5f, patternPoint.y * .5f, patternPoint.z * .5f);
+  double value = perlinModule.GetValue(patternPoint.x * perturbedCoeff,
+                                       patternPoint.y * perturbedCoeff,
+                                       patternPoint.z * perturbedCoeff);
 
-  // patternPoint.x += value;
-  // patternPoint.y += value;
-  // patternPoint.z += value;
+  patternPoint.x += value;
+  patternPoint.y += value;
+  patternPoint.z += value;
 
   return this->pattern->patternAt(patternPoint);
 }

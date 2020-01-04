@@ -303,6 +303,7 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
                                 Definition &definition) {
   std::string type;
   std::unique_ptr<Pattern> pattern;
+  float perturbedCoeff;
   for (YAML::const_iterator valueIt = node.begin(); valueIt != node.end();
        ++valueIt) {
     std::string valueKey = valueIt->first.as<std::string>();
@@ -330,6 +331,8 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
       } else {
         throw std::invalid_argument("invalid pattern type");
       }
+    } else if (valueKey == "perturbed") {
+      perturbedCoeff = valueIt->second.as<float>();
     } else if (valueKey == "colors") {
       if (type == "blended")
         throw std::invalid_argument("invalid arguement for blended pattern");
@@ -383,6 +386,10 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
     } else {
       throw std::invalid_argument("invalid key in pattern definition");
     }
+  }
+  if (perturbedCoeff) {
+    pattern =
+        std::make_unique<PerturbedPattern>(std::move(pattern), perturbedCoeff);
   }
   definition.pattern = std::move(pattern);
 }
