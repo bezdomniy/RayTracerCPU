@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-set(TO_NATIVE OFF)
+set(TO_NATIVE ON)
 
 include(CTest)
 enable_testing()
@@ -37,8 +37,8 @@ add_subdirectory(glm)
 file(GLOB SOURCES
     src/*.h
     src/*.cpp
-    src/archive/*.h
-    src/archive/*.cpp
+    # src/archive/*.h
+    # src/archive/*.cpp
 )
 
 # message(${LIBNOISE_INCLUDE_DIR})
@@ -50,7 +50,8 @@ add_executable(RayTracer ${SOURCES})
 if(${TO_NATIVE})
 	message(STATUS "Setting compilation target to native binary")
 	# set(CMAKE_EXECUTABLE_SUFFIX ".js")
-	# set_target_properties(RayTracer PROPERTIES LINK_FLAGS "-s EXPORTED_FUNCTIONS='[_main]'")
+	# set_target_properties(RayTracer PROPERTIES LINK_FLAGS -lc++fs)
+	# target_link_libraries(RayTracer PRIVATE "stdc++fs")
 else()
 	message(STATUS "Setting compilation target to WASM")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")

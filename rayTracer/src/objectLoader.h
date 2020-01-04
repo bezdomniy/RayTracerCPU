@@ -2,6 +2,7 @@
 
 #include "camera.h"
 #include "cube.h"
+#include "fstream"
 #include "material.h"
 #include "patterns.h"
 #include "plane.h"
@@ -10,25 +11,22 @@
 #include "sphere.h"
 #include "triangle.h"
 #include "yaml-cpp/yaml.h"
+// #include <filesystem>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
 #include <unordered_map>
 #include <vector>
-#include <experimental/filesystem>
 
-class ObjectLoader
-{
+class ObjectLoader {
 private:
-  struct Value
-  {
+  struct Value {
     bool isScalar;
     float scalar;
     std::unique_ptr<glm::vec3> vector;
   };
 
-  struct Definition
-  {
+  struct Definition {
     bool empty = true;
     std::shared_ptr<Definition> inheritFrom;
     std::unordered_map<std::string, Value> values;
