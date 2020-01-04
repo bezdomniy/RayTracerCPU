@@ -304,6 +304,7 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
   std::string type;
   std::unique_ptr<Pattern> pattern;
   float perturbedCoeff;
+  bool blendedPattern = false;
   for (YAML::const_iterator valueIt = node.begin(); valueIt != node.end();
        ++valueIt) {
     std::string valueKey = valueIt->first.as<std::string>();
@@ -323,11 +324,8 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
         pattern = std::make_unique<CheckedPattern>(glm::vec3(1.f, 0.f, 0.f),
                                                    glm::vec3(0.f, 1.f, 0.f));
       } else if (valueIt->second.as<std::string>() == "blended") {
-        // pattern = std::make_unique<BlendedPattern>(glm::vec3(1.f, 0.f,
-        // 0.f), glm::vec3(0.f, 1.f, 0.f));
-      } else if (valueIt->second.as<std::string>() == "perturbed") {
-        // pattern = std::make_unique<PerturbedPattern>(glm::vec3(1.f, 0.f,
-        // 0.f), glm::vec3(0.f, 1.f, 0.f));
+        blendedPattern = true;
+        break;
       } else {
         throw std::invalid_argument("invalid pattern type");
       }
@@ -338,8 +336,7 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
         throw std::invalid_argument("invalid arguement for blended pattern");
       if (type == "perturbed")
         throw std::invalid_argument("invalid arguement for perturbed pattern");
-      // std::unique_ptr<ColourPattern> colourPattern =
-      // std::dynamic_pointer_cast<ColourPattern>(pattern);
+
       ColourPattern *colourPattern =
           dynamic_cast<ColourPattern *>(pattern.get());
 
@@ -387,6 +384,25 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
       throw std::invalid_argument("invalid key in pattern definition");
     }
   }
+
+  if (blendedPattern) {
+
+    try {
+      perturbedCoeff = node["perturbed"].as<float>();
+    } catch (YAML::InvalidNode) {
+    }
+
+    Definition patternADefinition;
+    Definition patternBDefinition;
+
+    parsePattern(node["patterns"][0], patternADefinition);
+    parsePattern(node["patterns"][1], patternBDefinition);
+
+    pattern =
+        std::make_unique<BlendedPattern>(std::move(patternADefinition.pattern),
+                                         std::move(patternBDefinition.pattern));
+  }
+
   if (perturbedCoeff) {
     pattern =
         std::make_unique<PerturbedPattern>(std::move(pattern), perturbedCoeff);
