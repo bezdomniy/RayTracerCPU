@@ -5,6 +5,3 @@
 [submodule "rayTracer/glm"]
 	path = rayTracer/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "rayTracer/libnoise"]
-	path = rayTracer/libnoise
-	url = https://github.com/eXpl0it3r/libnoise.git
