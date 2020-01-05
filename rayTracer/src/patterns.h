@@ -55,15 +55,16 @@ class BlendedPattern : public Pattern {
 private:
   /* data */
 public:
-  BlendedPattern(std::unique_ptr<Pattern> patternA,
-                 std::unique_ptr<Pattern> patternB);
+  BlendedPattern(std::shared_ptr<Pattern> &patternA,
+                 std::shared_ptr<Pattern> &patternB);
+  BlendedPattern(const BlendedPattern &blendedPattern);
   ~BlendedPattern();
 
   // void addPattern(std::shared_ptr<Pattern>& pattern);
   virtual glm::vec3 patternAt(glm::vec4 point) override;
 
-  std::unique_ptr<Pattern> patternA;
-  std::unique_ptr<Pattern> patternB;
+  std::shared_ptr<Pattern> patternA;
+  std::shared_ptr<Pattern> patternB;
 };
 
 class PerturbedPattern : public Pattern {
@@ -72,10 +73,11 @@ private:
   float perturbedCoeff;
 
 public:
-  PerturbedPattern(std::unique_ptr<Pattern> pattern, float perturbedCoeff);
+  PerturbedPattern(std::shared_ptr<Pattern> &pattern, float perturbedCoeff);
+  PerturbedPattern(const PerturbedPattern &perturbedPattern);
   ~PerturbedPattern();
 
   virtual glm::vec3 patternAt(glm::vec4 point) override;
 
-  std::unique_ptr<Pattern> pattern;
+  std::shared_ptr<Pattern> pattern;
 };

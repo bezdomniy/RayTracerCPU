@@ -1,7 +1,6 @@
 #include "material.h"
 
-Material::Material()
-{
+Material::Material() {
   this->colour = glm::vec3(0.f);
   this->ambient = 0.1f;
   this->diffuse = 0.9f;
@@ -14,8 +13,7 @@ Material::Material()
 
 // TODO make 2 material constructors, 1 with colour, the other with pattern
 Material::Material(glm::vec3 colour, float ambient, float diffuse,
-                   float specular, float shininess)
-{
+                   float specular, float shininess) {
   this->colour = colour;
   this->ambient = ambient;
   this->diffuse = diffuse;
@@ -28,7 +26,7 @@ Material::Material(glm::vec3 colour, float ambient, float diffuse,
 
 Material::~Material() {}
 
-void Material::setPattern(std::unique_ptr<Pattern> &pattern)
-{
-  this->pattern = std::move(pattern);
+void Material::setPattern(std::shared_ptr<Pattern> &pattern) {
+  // this->pattern = std::move(pattern);
+  this->pattern = pattern;
 }

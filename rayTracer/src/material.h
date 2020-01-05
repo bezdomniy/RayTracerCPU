@@ -1,11 +1,10 @@
 #pragma once
 
+#include "patterns.h"
 #include <glm/glm.hpp>
 #include <memory>
-#include "pattern.h"
 
-class Material
-{
+class Material {
 private:
   /* data */
 public:
@@ -24,6 +23,6 @@ public:
   float transparency;
   float refractiveIndex;
 
-  std::unique_ptr<Pattern> pattern;
-  void setPattern(std::unique_ptr<Pattern> &pattern);
+  std::shared_ptr<Pattern> pattern;
+  void setPattern(std::shared_ptr<Pattern> &pattern);
 };

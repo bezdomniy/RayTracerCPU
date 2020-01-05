@@ -31,7 +31,7 @@ private:
     std::shared_ptr<Definition> inheritFrom;
     std::unordered_map<std::string, Value> values;
     std::vector<std::string> valueOrder;
-    std::unique_ptr<Pattern> pattern;
+    std::shared_ptr<Pattern> pattern;
   };
 
   std::unordered_map<std::string, std::shared_ptr<Definition>> definitions;

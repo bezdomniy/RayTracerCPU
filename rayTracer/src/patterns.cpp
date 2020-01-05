@@ -48,12 +48,19 @@ glm::vec3 CheckedPattern::patternAt(glm::vec4 point) {
   return this->colourB;
 }
 
-BlendedPattern::BlendedPattern(std::unique_ptr<Pattern> patternA,
-                               std::unique_ptr<Pattern> patternB)
+BlendedPattern::BlendedPattern(std::shared_ptr<Pattern> &patternA,
+                               std::shared_ptr<Pattern> &patternB)
     : Pattern() {
-  this->patternA = std::move(patternA);
-  this->patternB = std::move(patternB);
+  this->patternA = patternA;
+  this->patternB = patternB;
 }
+
+// BlendedPattern::BlendedPattern(const BlendedPattern &blendedPattern)
+//     : Pattern() {
+//   this->patternA =
+//   std::make_shared<BlendedPattern>(*blendedPattern.patternA); this->patternB
+//   = std::make_shared<BlendedPattern>(*blendedPattern.patternB);
+// }
 
 BlendedPattern::~BlendedPattern() {}
 
@@ -69,11 +76,17 @@ glm::vec3 BlendedPattern::patternAt(glm::vec4 point) {
          0.5f;
 }
 
-PerturbedPattern::PerturbedPattern(std::unique_ptr<Pattern> pattern,
+PerturbedPattern::PerturbedPattern(std::shared_ptr<Pattern> &pattern,
                                    float perturbedCoeff)
     : Pattern() {
-  this->pattern = std::move(pattern);
+  this->pattern = pattern;
   this->perturbedCoeff = perturbedCoeff;
+}
+
+PerturbedPattern::PerturbedPattern(const PerturbedPattern &perturbedPattern)
+    : Pattern() {
+  this->pattern = perturbedPattern.pattern;
+  this->perturbedCoeff = perturbedPattern.perturbedCoeff;
 }
 
 PerturbedPattern::~PerturbedPattern() {}

@@ -23,7 +23,7 @@ EMSCRIPTEN_BINDINGS(Module) { emscripten::function("runRayTracer", &run); }
 int main(int argc, char const *argv[]) { return 0; }
 #else
 int main(int argc, char const *argv[]) {
-  run("build/scene2.yaml");
+  run("build/reflectionScene.yaml");
   return 0;
 }
 #endif

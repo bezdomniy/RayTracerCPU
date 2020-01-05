@@ -302,7 +302,7 @@ void ObjectLoader::parseMaterial(const YAML::Node &node,
 void ObjectLoader::parsePattern(const YAML::Node &node,
                                 Definition &definition) {
   std::string type;
-  std::unique_ptr<Pattern> pattern;
+  std::shared_ptr<Pattern> pattern;
   float perturbedCoeff;
   bool blendedPattern = false;
   for (YAML::const_iterator valueIt = node.begin(); valueIt != node.end();
@@ -398,14 +398,12 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
     parsePattern(node["patterns"][0], patternADefinition);
     parsePattern(node["patterns"][1], patternBDefinition);
 
-    pattern =
-        std::make_unique<BlendedPattern>(std::move(patternADefinition.pattern),
-                                         std::move(patternBDefinition.pattern));
+    pattern = std::make_shared<BlendedPattern>(patternADefinition.pattern,
+                                               patternBDefinition.pattern);
   }
 
   if (perturbedCoeff) {
-    pattern =
-        std::make_unique<PerturbedPattern>(std::move(pattern), perturbedCoeff);
+    pattern = std::make_shared<PerturbedPattern>(pattern, perturbedCoeff);
   }
   definition.pattern = std::move(pattern);
 }
