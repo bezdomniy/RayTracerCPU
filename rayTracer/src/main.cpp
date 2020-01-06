@@ -28,7 +28,7 @@ int main(int argc, char const *argv[]) { return 0; }
 #else
 int main(int argc, char const *argv[])
 {
-  run("build/scene2.yaml");
+  run("scenes/hippy.yaml");
   return 0;
 }
 #endif

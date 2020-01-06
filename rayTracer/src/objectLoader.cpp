@@ -121,7 +121,7 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode) {
       ret = std::make_shared<Cylinder>();
     else
       ret = std::make_shared<Cylinder>(
-          Cylinder(args.at(0).scalar, args.at(1).scalar));
+          Cylinder(args.at(0).scalar, args.at(1).scalar, std::abs(args.at(2).scalar) > std::numeric_limits<float>::epsilon()));
   } else if (shapeType == "triangle") {
     ret = std::make_shared<Triangle>(
         Triangle(*args.at(0).vector, *args.at(1).vector, *args.at(2).vector));

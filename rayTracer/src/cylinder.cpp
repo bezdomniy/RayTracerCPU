@@ -3,11 +3,13 @@
 Cylinder::Cylinder() : Shape() {
   this->minimum = -std::numeric_limits<float>::infinity();
   this->maximum = std::numeric_limits<float>::infinity();
+  this->capped = false;
 }
 
-Cylinder::Cylinder(float minimum, float maximum) : Shape() {
+Cylinder::Cylinder(float minimum, float maximum, bool capped) : Shape() {
   this->minimum = minimum;
   this->maximum = maximum;
+  this->capped = capped;
 }
 
 Cylinder::~Cylinder() {}
@@ -45,12 +47,28 @@ std::vector<Geometry::Intersection<Shape>> Cylinder::intersectRay(Ray &ray) {
   if (this->minimum < y2 and y2 < this->maximum)
     ret.push_back(Geometry::Intersection<Shape>{t2, this});
 
+  std::vector<Geometry::Intersection<Shape>> capIntersections =
+      intersectCaps(transformedRay);
+
+  ret.insert(ret.end(), std::make_move_iterator(capIntersections.begin()),
+             std::make_move_iterator(capIntersections.end()));
+
   return ret;
 }
 
 glm::vec4 Cylinder::normalAt(glm::vec4 point) {
   glm::vec4 objectPoint = this->inverseTransform * point;
-  glm::vec4 objectNormal = glm::vec4(objectPoint.x, 0.f, objectPoint.z, 0.f);
+
+  float dist = std::pow(objectPoint.x, 2) + std::pow(objectPoint.z, 2);
+  glm::vec4 objectNormal;
+
+  if (dist < 1 && objectPoint.y >= (this->maximum - Geometry::EPSILON))
+    objectNormal = glm::vec4(0.f, 1.f, 0.f, 0.f);
+  else if (dist < 1 && objectPoint.y <= (this->minimum + Geometry::EPSILON))
+    objectNormal = glm::vec4(0.f, -1.f, 0.f, 0.f);
+  else
+    objectNormal = glm::vec4(objectPoint.x, 0.f, objectPoint.z, 0.f);
+
   glm::vec4 worldNormal = glm::transpose(this->inverseTransform) * objectNormal;
   worldNormal.w = 0.f;
 
@@ -58,3 +76,26 @@ glm::vec4 Cylinder::normalAt(glm::vec4 point) {
 }
 
 std::string Cylinder::type() { return "Cylinder"; }
+
+bool Cylinder::checkCap(Ray &ray, float t) {
+  float x = ray.origin.x + t * ray.direction.x;
+  float z = ray.origin.z + t * ray.direction.z;
+
+  return (std::pow(x, 2) + std::pow(z, 2)) <= 1;
+}
+
+std::vector<Geometry::Intersection<Shape>> Cylinder::intersectCaps(Ray &ray) {
+  std::vector<Geometry::Intersection<Shape>> ret;
+  if (!this->capped || std::abs(ray.direction.y) < Geometry::EPSILON)
+    return ret;
+
+  float t1 = (this->minimum - ray.origin.y) / ray.direction.y;
+  if (checkCap(ray, t1))
+    ret.push_back(Geometry::Intersection<Shape>{t1, this});
+
+  float t2 = (this->maximum - ray.origin.y) / ray.direction.y;
+  if (checkCap(ray, t2))
+    ret.push_back(Geometry::Intersection<Shape>{t2, this});
+
+  return ret;
+}

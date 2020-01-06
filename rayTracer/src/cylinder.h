@@ -8,7 +8,7 @@
 class Cylinder : public Shape {
 public:
   Cylinder();
-  Cylinder(float minimum, float maximum);
+  Cylinder(float minimum, float maximum, bool capped);
   ~Cylinder();
 
   virtual std::vector<Geometry::Intersection<Shape>>
@@ -18,6 +18,10 @@ public:
 
   float minimum;
   float maximum;
+  bool capped;
 
 private:
+  bool checkCap(Ray &ray, float t);
+
+  std::vector<Geometry::Intersection<Shape>> intersectCaps(Ray &ray);
 };

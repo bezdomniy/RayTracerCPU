@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-set(TO_NATIVE OFF)
+set(TO_NATIVE ON)
 
 # include(CTest)
 # enable_testing()
@@ -26,7 +26,7 @@ file(GLOB SOURCES
 	include/*.cpp
 )
 
-message("${SOURCES}")
+# message("${SOURCES}")
 # add_subdirectory(libnoise)
 # find_package(LibNoise)
 add_subdirectory(yaml-cpp)
