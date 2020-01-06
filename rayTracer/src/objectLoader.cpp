@@ -116,6 +116,12 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode) {
     ret = std::make_shared<Plane>();
   } else if (shapeType == "cube") {
     ret = std::make_shared<Cube>();
+  } else if (shapeType == "cylinder") {
+    if (args.empty())
+      ret = std::make_shared<Cylinder>();
+    else
+      ret = std::make_shared<Cylinder>(
+          Cylinder(args.at(0).scalar, args.at(1).scalar));
   } else if (shapeType == "triangle") {
     ret = std::make_shared<Triangle>(
         Triangle(*args.at(0).vector, *args.at(1).vector, *args.at(2).vector));
@@ -386,11 +392,8 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
   }
 
   if (blendedPattern) {
-
-    try {
+    if (node["perturbed"])
       perturbedCoeff = node["perturbed"].as<float>();
-    } catch (YAML::InvalidNode) {
-    }
 
     Definition patternADefinition;
     Definition patternBDefinition;

@@ -9,7 +9,8 @@
 #include <emscripten/val.h>
 #endif
 
-void run(const std::string &sceneDesc) {
+void run(const std::string &sceneDesc)
+{
   World world;
   std::shared_ptr<Camera> camera = world.loadFromFile(sceneDesc);
 
@@ -19,11 +20,15 @@ void run(const std::string &sceneDesc) {
 }
 
 #ifdef __EMSCRIPTEN__
-EMSCRIPTEN_BINDINGS(Module) { emscripten::function("runRayTracer", &run); }
+EMSCRIPTEN_BINDINGS(Module)
+{
+  emscripten::function("runRayTracer", &run);
+}
 int main(int argc, char const *argv[]) { return 0; }
 #else
-int main(int argc, char const *argv[]) {
-  run("build/reflectionScene.yaml");
+int main(int argc, char const *argv[])
+{
+  run("build/scene2.yaml");
   return 0;
 }
 #endif

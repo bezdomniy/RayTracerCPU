@@ -55,12 +55,11 @@ BlendedPattern::BlendedPattern(std::shared_ptr<Pattern> &patternA,
   this->patternB = patternB;
 }
 
-// BlendedPattern::BlendedPattern(const BlendedPattern &blendedPattern)
-//     : Pattern() {
-//   this->patternA =
-//   std::make_shared<BlendedPattern>(*blendedPattern.patternA); this->patternB
-//   = std::make_shared<BlendedPattern>(*blendedPattern.patternB);
-// }
+BlendedPattern::BlendedPattern(const BlendedPattern &blendedPattern)
+    : Pattern() {
+  this->patternA = blendedPattern.patternA;
+  this->patternB = blendedPattern.patternB;
+}
 
 BlendedPattern::~BlendedPattern() {}
 
@@ -92,14 +91,12 @@ PerturbedPattern::PerturbedPattern(const PerturbedPattern &perturbedPattern)
 PerturbedPattern::~PerturbedPattern() {}
 
 glm::vec3 PerturbedPattern::patternAt(glm::vec4 point) {
-  noise::module::Perlin perlinModule;
-
   glm::mat4 patternTransform(glm::affineInverse(pattern->transform));
   glm::vec4 patternPoint = patternTransform * point;
 
-  double value = perlinModule.GetValue(patternPoint.x * perturbedCoeff,
-                                       patternPoint.y * perturbedCoeff,
-                                       patternPoint.z * perturbedCoeff);
+  float value = SimplexNoise::noise(patternPoint.x * perturbedCoeff,
+                                    patternPoint.y * perturbedCoeff,
+                                    patternPoint.z * perturbedCoeff);
 
   patternPoint.x += value;
   patternPoint.y += value;

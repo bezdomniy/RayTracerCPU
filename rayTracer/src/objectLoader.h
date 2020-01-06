@@ -2,9 +2,10 @@
 
 #include "camera.h"
 #include "cube.h"
+#include "cylinder.h"
 #include "fstream"
 #include "material.h"
-#include "patterns.h"
+#include "pattern.h"
 #include "plane.h"
 #include "pointLight.h"
 #include "shape.h"
