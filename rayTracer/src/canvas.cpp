@@ -2,7 +2,8 @@
 
 Canvas::Canvas() {}
 
-Canvas::Canvas(unsigned int w, unsigned int h) {
+Canvas::Canvas(unsigned int w, unsigned int h)
+{
   width = w;
   height = h;
   pixels.resize(width * height);
@@ -11,38 +12,56 @@ Canvas::Canvas(unsigned int w, unsigned int h) {
 
 Canvas::~Canvas() {}
 
-void Canvas::writePixel(unsigned int x, unsigned int y, glm::vec3 colour) {
+void Canvas::writePixel(unsigned int x, unsigned int y, glm::vec3 colour)
+{
   if (height >= width)
     pixels[y * width + x] = colour;
   else
     pixels[x * height + y] = colour;
 }
 
-glm::vec3 Canvas::getPixel(unsigned int x, unsigned int y) {
+glm::vec3 Canvas::getPixel(unsigned int x, unsigned int y)
+{
   if (height >= width)
     return pixels[y * width + x];
   return pixels[x * height + y];
 }
 
-void Canvas::clear(glm::vec3 colour) {
-  for (int i = 0; i < width * height; i++) {
+void Canvas::clear(glm::vec3 colour)
+{
+  for (int i = 0; i < width * height; i++)
+  {
     pixels[i] = colour;
   }
 }
 
-void Canvas::_writeRgbString(float f, bool &newLine, int &charsInLine,
-                             std::ofstream *streamPtr) {
-  std::string c;
-  if (f < 0.f) {
-    c = "0";
-  } else if (f > 1.f) {
-    c = "255";
-  } else {
-    c = std::to_string(int(f * 255));
+uint8_t Canvas::rbgFloatToInt(float f)
+{
+  uint8_t c;
+  if (f < 0.f)
+  {
+    c = (uint8_t)0;
+  }
+  else if (f > 1.f)
+  {
+    c = (uint8_t)255;
+  }
+  else
+  {
+    c = (uint8_t)(f * 255);
   }
 
+  return c;
+}
+
+void Canvas::_writeRgbString(float f, bool &newLine, int &charsInLine,
+                             std::ofstream *streamPtr)
+{
+  std::string c = std::to_string(rbgFloatToInt(f));
+
   charsInLine += c.length() + 1;
-  if (charsInLine >= 70) {
+  if (charsInLine >= 70)
+  {
     *(streamPtr) << "\n";
     charsInLine = 0;
     newLine = true;
@@ -54,10 +73,12 @@ void Canvas::_writeRgbString(float f, bool &newLine, int &charsInLine,
   newLine = false;
 }
 
-void Canvas::writeToPPM(const std::string &fileName, bool invertY = false) {
+void Canvas::writeToPPM(const std::string &fileName, bool invertY = false)
+{
   std::ofstream out(fileName);
 
-  if (out.fail()) {
+  if (out.fail())
+  {
     throw std::runtime_error("Failed to open file.");
     return;
   }
@@ -68,25 +89,32 @@ void Canvas::writeToPPM(const std::string &fileName, bool invertY = false) {
   int charsInCurrentLine = 0;
   bool newLine = true;
 
-  if (invertY) {
-    for (int i = height - 1; i >= 0; i--) {
+  if (invertY)
+  {
+    for (int i = height - 1; i >= 0; i--)
+    {
       out << "\n";
       charsInCurrentLine = 0;
       newLine = true;
 
-      for (int j = 0; j < width; j++) {
+      for (int j = 0; j < width; j++)
+      {
         _writeRgbString(getPixel(j, i).x, newLine, charsInCurrentLine, &out);
         _writeRgbString(getPixel(j, i).y, newLine, charsInCurrentLine, &out);
         _writeRgbString(getPixel(j, i).z, newLine, charsInCurrentLine, &out);
       }
     }
-  } else {
-    for (int i = 0; i < height; i++) {
+  }
+  else
+  {
+    for (int i = 0; i < height; i++)
+    {
       out << "\n";
       charsInCurrentLine = 0;
       newLine = true;
 
-      for (int j = 0; j < width; j++) {
+      for (int j = 0; j < width; j++)
+      {
         _writeRgbString(getPixel(j, i).x, newLine, charsInCurrentLine, &out);
         _writeRgbString(getPixel(j, i).y, newLine, charsInCurrentLine, &out);
         _writeRgbString(getPixel(j, i).z, newLine, charsInCurrentLine, &out);
@@ -95,4 +123,48 @@ void Canvas::writeToPPM(const std::string &fileName, bool invertY = false) {
   }
   out << "\n";
   out.close();
+}
+
+std::pair<uint8_t *, size_t> Canvas::writeToRGBA(bool invertY)
+{
+  std::pair<uint8_t *, size_t> ret;
+  size_t size = (this->width * this->height * 4) * sizeof(uint8_t);
+  uint8_t *bytes = new uint8_t[size];
+  unsigned int bytesIndex = 0;
+
+  if (invertY)
+  {
+    for (int i = height - 1; i >= 0; i--)
+    {
+      for (int j = 0; j < width; j++)
+      {
+        bytes[bytesIndex] = rbgFloatToInt(getPixel(j, i).x);
+        bytes[bytesIndex + 1] = rbgFloatToInt(getPixel(j, i).y);
+        bytes[bytesIndex + 2] = rbgFloatToInt(getPixel(j, i).z);
+        bytes[bytesIndex + 3] = 1;
+
+        bytesIndex += 4;
+      }
+    }
+  }
+  else
+  {
+    for (int i = 0; i < height; i++)
+    {
+      for (int j = 0; j < width; j++)
+      {
+        bytes[bytesIndex] = rbgFloatToInt(getPixel(j, i).x);
+        bytes[bytesIndex + 1] = rbgFloatToInt(getPixel(j, i).y);
+        bytes[bytesIndex + 2] = rbgFloatToInt(getPixel(j, i).z);
+        bytes[bytesIndex + 3] = 1;
+
+        bytesIndex += 4;
+      }
+    }
+  }
+
+  ret.first = bytes;
+  ret.second = size;
+
+  return ret;
 }

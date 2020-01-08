@@ -36,10 +36,15 @@ void Camera::setPixelSize()
   this->pixelSize = (this->halfWidth * 2) / this->hsize;
 }
 
-Ray Camera::rayForPixel(float px, float py)
+Ray Camera::rayForPixel(float px, float py, int currentRayNumber, int sqrtRaysPerPixel, float halfSubPixelSize)
 {
-  float xOffset = (px + 0.5f) * this->pixelSize;
-  float yOffset = (py + 0.5f) * this->pixelSize;
+  int subPixelRowNumber = currentRayNumber / sqrtRaysPerPixel;
+  int subPixelColNumber = currentRayNumber % sqrtRaysPerPixel;
+  float subPixelxOffset = halfSubPixelSize * subPixelColNumber;
+  float subPixelyOffset = halfSubPixelSize * subPixelRowNumber;
+  
+  float xOffset =  (px + subPixelxOffset) * this->pixelSize;
+  float yOffset =  (py + subPixelyOffset) * this->pixelSize;
 
   float worldX = this->halfWidth - xOffset;
   float worldY = this->halfHeight - yOffset;

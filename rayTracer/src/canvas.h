@@ -5,12 +5,13 @@
 #include <string>
 #include <vector>
 
-
-class Canvas {
+class Canvas
+{
 private:
   std::vector<glm::vec3> pixels;
   void _writeRgbString(float f, bool &newLine, int &charsInLine,
                        std::ofstream *streamPtr);
+  uint8_t rbgFloatToInt(float f);
 
 public:
   Canvas();
@@ -26,4 +27,5 @@ public:
   void clear(glm::vec3);
 
   void writeToPPM(const std::string &, bool invertY);
+  std::pair<uint8_t *, size_t> writeToRGBA(bool invertY);
 };

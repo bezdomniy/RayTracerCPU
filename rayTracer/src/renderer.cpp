@@ -12,16 +12,31 @@ Renderer::~Renderer() {}
 
 void Renderer::render(World &world)
 {
+  int sqrtRaysPerPixel = std::sqrt(RAYS_PER_PIXEL);
+  float halfSubPixelSize = 1.f / (float)sqrtRaysPerPixel / 2.f;
+  
+  std::vector<std::pair<int,int>> pixels;
+  pixels.reserve(this->canvas.height * this->canvas.width);
 
-  // this->world = std::make_shared<World>(world);
   for (int y = 0; y < this->canvas.height; y++)
   {
-    for (int x = 0; x < this->canvas.width; x++)
-    {
-      Ray cast = this->camera->rayForPixel(x, y);
-      glm::vec3 cShape = colourAt(cast, world, RAY_BOUNCE_LIMIT);
-      this->canvas.writePixel(x, y, cShape);
+    for (int x = 0; x < this->canvas.width; x++) {
+      pixels.push_back(std::make_pair(x,y));
     }
+  }
+
+  std::random_shuffle ( pixels.begin(), pixels.end() );  // in place no extra array
+  for (std::vector<std::pair<int,int>>::iterator it=pixels.begin(); it!=pixels.end(); ++it) {
+    glm::vec3 cShape(0.f,0.f,0.f);
+    for (int i = 0; i < RAYS_PER_PIXEL; i++)
+    {
+      Ray cast = this->camera->rayForPixel(it->first, it->second, i, sqrtRaysPerPixel, halfSubPixelSize);
+      cShape += colourAt(cast, world, RAY_BOUNCE_LIMIT);
+    }
+
+    cShape *= 1.f / (float)RAYS_PER_PIXEL;
+
+    this->canvas.writePixel(it->first, it->second, cShape);
   }
 }
 
