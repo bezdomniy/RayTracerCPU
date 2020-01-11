@@ -10,10 +10,13 @@ Camera::Camera(glm::vec4 position, glm::vec4 centre, glm::vec4 up, int hsize,
   this->vsize = vsize;
   this->fov = fov;
 
+  updateTransform();
+  setPixelSize();
+}
+
+void Camera::updateTransform() {
   this->transform = glm::lookAt(glm::vec3(position),
                                 glm::vec3(this->centre), glm::vec3(this->up));
-  // std::cout << glm::to_string(transform) << std::endl;
-  setPixelSize();
 }
 
 Camera::~Camera() {}

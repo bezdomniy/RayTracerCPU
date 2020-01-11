@@ -33,10 +33,12 @@ EMSCRIPTEN_BINDINGS(Module)
       .function("init", &EmscriptenRunner::init)
       .function("renderToRGBA", &EmscriptenRunner::renderToRGBA)
       .function("done", &EmscriptenRunner::done)
+      .function("moveLeft", &EmscriptenRunner::moveLeft)
+      .function("moveRight", &EmscriptenRunner::moveRight)
       .function("getHeight", &EmscriptenRunner::getHeight)
       .function("getWidth", &EmscriptenRunner::getWidth);
 }
-int main(int argc, char const *argv[]) { return 0; }
+// int main(int argc, char const *argv[]) { return 0; }
 #else
 int main(int argc, char const *argv[])
 {

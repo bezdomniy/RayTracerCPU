@@ -22,6 +22,7 @@ public:
   ~Camera();
 
   Ray rayForPixel(float px, float py, int currentRayNumber, int sqrtRaysPerPixel, float halfSubPixelSize);
+  void updateTransform();
 
   glm::vec4 position;
   glm::vec4 centre;

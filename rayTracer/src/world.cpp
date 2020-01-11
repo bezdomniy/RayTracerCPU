@@ -33,6 +33,9 @@ std::vector<Geometry::Intersection<Shape>> World::intersectRay(Ray &ray)
 
 std::shared_ptr<Camera> World::loadFromFile(const std::string &fileName)
 {
+  this->shapes.clear();
+  this->lights.clear();
+  
   if (!objectLoader)
     objectLoader = std::make_unique<ObjectLoader>();
 
