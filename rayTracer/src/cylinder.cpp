@@ -50,8 +50,9 @@ std::vector<Geometry::Intersection<Shape>> Cylinder::intersectRay(Ray &ray) {
   std::vector<Geometry::Intersection<Shape>> capIntersections =
       intersectCaps(transformedRay);
 
-  ret.insert(ret.end(), std::make_move_iterator(capIntersections.begin()),
-             std::make_move_iterator(capIntersections.end()));
+  if (!capIntersections.empty())
+    ret.insert(ret.end(), std::make_move_iterator(capIntersections.begin()),
+               std::make_move_iterator(capIntersections.end()));
 
   return ret;
 }
