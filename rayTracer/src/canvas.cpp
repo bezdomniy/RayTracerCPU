@@ -125,11 +125,12 @@ void Canvas::writeToPPM(const std::string &fileName, bool invertY = false)
   out.close();
 }
 
-std::pair<uint8_t *, size_t> Canvas::writeToRGBA(bool invertY)
+std::pair<std::vector<uint8_t>, size_t> Canvas::writeToRGBA(bool invertY)
 {
-  std::pair<uint8_t *, size_t> ret;
+  std::pair<std::vector<uint8_t>, size_t> ret;
   size_t size = (this->width * this->height * 4) * sizeof(uint8_t);
-  uint8_t *bytes = new uint8_t[size];
+
+  std::vector<uint8_t> bytes(size, 0);
   unsigned int bytesIndex = 0;
 
   if (invertY)

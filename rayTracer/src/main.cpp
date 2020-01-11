@@ -2,12 +2,16 @@
 #include "renderer.h"
 #include "world.h"
 #include <glm/gtc/matrix_transform.hpp>
+
 #include <iostream>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #include <emscripten/bind.h>
 #include <emscripten/val.h>
+
+#include "emscriptenRunner.h"
+using namespace emscripten;
 #endif
 
 void renderToPPM(const std::string &sceneDesc)
@@ -22,25 +26,15 @@ void renderToPPM(const std::string &sceneDesc)
 
 #ifdef __EMSCRIPTEN__
 
-emscripten::val renderToRGBA(const std::string &sceneDesc)
-{
-  World world;
-  std::shared_ptr<Camera> camera = world.loadFromFile(sceneDesc);
-
-  Renderer renderer(camera);
-  renderer.render(world);
-  uint8_t *byteBuffer;
-  size_t bufferLength;
-
-  std::tie(byteBuffer,bufferLength) = renderer.canvas.writeToRGBA(false);
-
-  return emscripten::val(emscripten::typed_memory_view(bufferLength, byteBuffer));
-}
-
 EMSCRIPTEN_BINDINGS(Module)
 {
-  emscripten::function("runRayTracerPPM", &renderToPPM);
-  emscripten::function("runRayTracerRGBA", &renderToRGBA, emscripten::allow_raw_pointers());
+  class_<EmscriptenRunner>("EmscriptenRunner")
+      .constructor()
+      .function("init", &EmscriptenRunner::init)
+      .function("renderToRGBA", &EmscriptenRunner::renderToRGBA)
+      .function("done", &EmscriptenRunner::done)
+      .function("getHeight", &EmscriptenRunner::getHeight)
+      .function("getWidth", &EmscriptenRunner::getWidth);
 }
 int main(int argc, char const *argv[]) { return 0; }
 #else

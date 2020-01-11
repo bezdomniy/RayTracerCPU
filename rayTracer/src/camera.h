@@ -17,8 +17,8 @@ private:
   virtual std::string type() override;
 
 public:
-  Camera(glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize,
-         float vsize, float fov);
+  Camera(glm::vec4 position, glm::vec4 centre, glm::vec4 up, int hsize,
+         int vsize, float fov);
   ~Camera();
 
   Ray rayForPixel(float px, float py, int currentRayNumber, int sqrtRaysPerPixel, float halfSubPixelSize);
@@ -27,8 +27,8 @@ public:
   glm::vec4 centre;
   glm::vec4 up;
 
-  float hsize;
-  float vsize;
+  int hsize;
+  int vsize;
   float halfWidth;
   float halfHeight;
   float fov;

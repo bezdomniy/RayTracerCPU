@@ -1,7 +1,7 @@
 #include "camera.h"
 
-Camera::Camera(glm::vec4 position, glm::vec4 centre, glm::vec4 up, float hsize,
-               float vsize, float fov) : Shape()
+Camera::Camera(glm::vec4 position, glm::vec4 centre, glm::vec4 up, int hsize,
+               int vsize, float fov) : Shape()
 {
   this->position = position;
   this->centre = centre;
@@ -21,7 +21,7 @@ Camera::~Camera() {}
 void Camera::setPixelSize()
 {
   float halfView = glm::tan(this->fov / 2);
-  float aspect = this->hsize / this->vsize;
+  float aspect = (float)this->hsize / (float)this->vsize;
 
   if (aspect >= 1)
   {
@@ -33,7 +33,7 @@ void Camera::setPixelSize()
     this->halfWidth = halfView * aspect;
     this->halfHeight = halfView;
   }
-  this->pixelSize = (this->halfWidth * 2) / this->hsize;
+  this->pixelSize = (this->halfWidth * 2.f) / (float)this->hsize;
 }
 
 Ray Camera::rayForPixel(float px, float py, int currentRayNumber, int sqrtRaysPerPixel, float halfSubPixelSize)
@@ -42,9 +42,9 @@ Ray Camera::rayForPixel(float px, float py, int currentRayNumber, int sqrtRaysPe
   int subPixelColNumber = currentRayNumber % sqrtRaysPerPixel;
   float subPixelxOffset = halfSubPixelSize * subPixelColNumber;
   float subPixelyOffset = halfSubPixelSize * subPixelRowNumber;
-  
-  float xOffset =  (px + subPixelxOffset) * this->pixelSize;
-  float yOffset =  (py + subPixelyOffset) * this->pixelSize;
+
+  float xOffset = (px + subPixelxOffset) * this->pixelSize;
+  float yOffset = (py + subPixelyOffset) * this->pixelSize;
 
   float worldX = this->halfWidth - xOffset;
   float worldY = this->halfHeight - yOffset;

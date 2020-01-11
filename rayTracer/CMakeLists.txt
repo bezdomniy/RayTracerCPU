@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-set(TO_NATIVE ON)
+set(TO_NATIVE OFF)
 
 # include(CTest)
 # enable_testing()

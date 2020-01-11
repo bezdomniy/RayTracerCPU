@@ -27,5 +27,5 @@ public:
   void clear(glm::vec3);
 
   void writeToPPM(const std::string &, bool invertY);
-  std::pair<uint8_t *, size_t> writeToRGBA(bool invertY);
+  std::pair<std::vector<uint8_t>, size_t> writeToRGBA(bool invertY);
 };

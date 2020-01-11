@@ -14,18 +14,21 @@
 #include <glm/gtc/quaternion.hpp>
 #include <iostream>
 #include <memory>
+#include <algorithm>
+#include <random>
 
 class Renderer
 {
 private:
   std::shared_ptr<Camera> camera;
-  static const int RAY_BOUNCE_LIMIT = 4;
-  static const int RAYS_PER_PIXEL = 1;
 
 public:
   Renderer();
   Renderer(std::shared_ptr<Camera> &c);
   ~Renderer();
+
+  static const int RAY_BOUNCE_LIMIT = 4;
+  static const int RAYS_PER_PIXEL = 1;
 
   glm::vec3 colourAt(Ray &ray, World &world, short remaining);
   glm::vec3 reflectColour(Geometry::Intersection<Shape> *hit, World &world, short remaining);
@@ -37,4 +40,5 @@ public:
   bool isShadowed(glm::vec4 &point, World &world);
   Canvas canvas;
   void render(World &world);
+  void renderPixel(World &world, std::pair<int, int> &pixel, int sqrtRaysPerPixel, float halfSubPixelSize);
 };

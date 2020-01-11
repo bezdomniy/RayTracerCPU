@@ -19,15 +19,18 @@
 #include <unordered_map>
 #include <vector>
 
-class ObjectLoader {
+class ObjectLoader
+{
 private:
-  struct Value {
+  struct Value
+  {
     bool isScalar;
     float scalar;
     std::unique_ptr<glm::vec3> vector;
   };
 
-  struct Definition {
+  struct Definition
+  {
     bool empty = true;
     std::shared_ptr<Definition> inheritFrom;
     std::unordered_map<std::string, Value> values;
@@ -51,4 +54,5 @@ public:
   ~ObjectLoader();
   std::pair<std::shared_ptr<Camera>, std::vector<std::shared_ptr<Shape>>>
   loadYaml(const std::string &fileName);
+  std::pair<int, int> getCanvasSize(const std::string &fileName);
 };
