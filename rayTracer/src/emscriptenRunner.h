@@ -20,7 +20,7 @@
 class EmscriptenRunner
 {
 private:
-    static const int PIXELS_PER_BATCH = 20000;
+    static const int PIXELS_PER_BATCH = 40000;
     World world;
     std::shared_ptr<Camera> camera;
     Renderer renderer;
