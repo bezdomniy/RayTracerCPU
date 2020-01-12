@@ -31,6 +31,7 @@ file(GLOB SOURCES
 # find_package(LibNoise)
 add_subdirectory(yaml-cpp)
 add_subdirectory(glm)
+add_subdirectory(cpp-taskflow)
 
 add_executable(RayTracer ${SOURCES})
 
@@ -48,7 +49,7 @@ endif()
 # target_include_directories(RayTracer PRIVATE ${LIBNOISE_INCLUDE_DIR})
 # target_link_libraries(RayTracer PRIVATE glm yaml-cpp ${LIBNOISE_LIBRARY})
 
-target_include_directories(RayTracer PRIVATE )
+target_include_directories(RayTracer PRIVATE cpp-taskflow)
 target_link_libraries(RayTracer PRIVATE glm yaml-cpp )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
