@@ -105,11 +105,8 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode) {
                                             it->second[1].as<float>(),
                                             it->second[2].as<float>())};
       lightDefinition.valueOrder.push_back("intensity");
-    } else if (nextKey == "shadow") {
-      // TODO add functionality for shadowless shape
     } else {
-      throw std::invalid_argument("invalid operator in add statement: " +
-                                  nextKey);
+      throw std::invalid_argument("invalid operator in add statement");
     }
   }
 

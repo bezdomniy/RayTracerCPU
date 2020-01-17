@@ -18,6 +18,7 @@
 #include <random>
 
 #include <taskflow/taskflow.hpp>
+#include <thread>
 
 class Renderer {
 private:
@@ -28,7 +29,7 @@ public:
   Renderer(std::shared_ptr<Camera> &c);
   ~Renderer();
 
-  static const int RAY_BOUNCE_LIMIT = 3;
+  static const int RAY_BOUNCE_LIMIT = 4;
   static const int RAYS_PER_PIXEL = 1;
   Canvas canvas;
 

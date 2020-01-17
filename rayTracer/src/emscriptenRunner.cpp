@@ -64,6 +64,16 @@ void EmscriptenRunner::moveCamera(float posChange) {
   this->camera->updateTransform();
 }
 
+void EmscriptenRunner::render_() {
+  for (int i = 0; i < PIXELS_PER_BATCH; i++) {
+    if (!done()) {
+      this->this.renderPixel(this->world, this->pixelsToRender.back(),
+                             this->sqrtRaysPerPixel, this->halfSubPixelSize);
+      this->pixelsToRender.pop_back();
+    }
+  }
+}
+
 emscripten::val EmscriptenRunner::renderToRGBA() {
   std::vector<uint8_t> byteBuffer;
   size_t bufferLength;
@@ -76,6 +86,21 @@ emscripten::val EmscriptenRunner::renderToRGBA() {
       this->pixelsToRender.pop_back();
     }
   }
+
+  // TODO parallelise this using taskflow - try just indexing instead of popping
+
+  // tf::Executor executor(std::thread::hardware_concurrency());
+  // tf::Taskflow taskflow;
+
+  // for (int i = 0; i < PIXELS_PER_BATCH; i++) {
+  //   taskflow.emplace([this]() { this.render_(); });
+  // }
+
+  // taskflow.parallel_for(this->pixelsToRender.begin(),
+  //                       this->pixelsToRender.end(),
+  //                       [this](auto &pixel) { this.render_(); });
+  executor.run(taskflow);
+  executor.wait_for_all();
 
   std::tie(byteBuffer, bufferLength) = this->renderer.canvas.writeToRGBA(false);
 

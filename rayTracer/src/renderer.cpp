@@ -27,7 +27,7 @@ void Renderer::render(World &world) {
 
   std::shuffle(pixels.begin(), pixels.end(), g);
 
-  tf::Executor executor;
+  tf::Executor executor(std::thread::hardware_concurrency());
   tf::Taskflow taskflow;
 
   taskflow.parallel_for(
@@ -35,7 +35,8 @@ void Renderer::render(World &world) {
       [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &pixel) {
         renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
       });
-
+  executor.run(taskflow);
+  executor.wait_for_all();
   // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
   //      it != pixels.end(); ++it) {
   //   renderPixel(world, *it, sqrtRaysPerPixel, halfSubPixelSize);
