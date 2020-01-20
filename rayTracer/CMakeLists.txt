@@ -29,10 +29,16 @@ add_executable(RayTracer ${SOURCES})
 
 if(${TO_NATIVE})
 	message(STATUS "Setting compilation target to native binary")
+
+	set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+	set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+	set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+
 	set(TBB_DIR /home/ilia/dev/tools/tbb/cmake)
 	find_package(TBB REQUIRED tbb)
 	add_subdirectory(parallelstl)
 
+	target_include_directories(RayTracer PRIVATE ${CMAKE_SOURCE_DIR}/glfw/include)
 	target_link_libraries(RayTracer PRIVATE "tbb")
 	target_link_libraries(RayTracer PRIVATE glm yaml-cpp ParallelSTL $<$<CXX_COMPILER_ID:Clang>:rt>)
 else()
@@ -42,6 +48,7 @@ else()
 	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "--bind -s WASM=1 -s BINARYEN_METHOD='native-wasm' -s EXTRA_EXPORTED_RUNTIME_METHODS=FS -s ALLOW_MEMORY_GROWTH=1")
 	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_DEBUG "--bind -s WASM=1 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s EXTRA_EXPORTED_RUNTIME_METHODS=FS -s ALLOW_MEMORY_GROWTH=1")
 	target_link_libraries(RayTracer PRIVATE glm yaml-cpp)
+	
 endif()
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

@@ -2,6 +2,8 @@
 #include "renderer.h"
 #include "world.h"
 #include <glm/gtc/matrix_transform.hpp>
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 
 #include <iostream>
 
@@ -38,9 +40,15 @@ EMSCRIPTEN_BINDINGS(Module)
       .function("getWidth", &EmscriptenRunner::getWidth);
 }
 #else
+
 int main(int argc, char const *argv[])
 {
-  renderToPPM("scenes/reflectionScene.yaml");
+  // renderToPPM("scenes/reflectionScene.yaml");
+  if (glfwVulkanSupported())
+  {
+    std::cout << "Vulkan is available, at least for compute\n";
+  }
+
   return 0;
 }
 #endif
