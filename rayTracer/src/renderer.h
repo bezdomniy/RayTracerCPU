@@ -26,8 +26,7 @@
 #include <memory>
 #include <random>
 
-class Renderer
-{
+class Renderer {
 private:
   std::shared_ptr<Camera> camera;
 

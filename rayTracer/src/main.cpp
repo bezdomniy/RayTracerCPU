@@ -48,6 +48,10 @@ int main(int argc, char const *argv[])
   {
     std::cout << "Vulkan is available, at least for compute\n";
   }
+  else
+  {
+    std::cout << "Vulkan is not available, at least for compute\n";
+  }
 
   return 0;
 }

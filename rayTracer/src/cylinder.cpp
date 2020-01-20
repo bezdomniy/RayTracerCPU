@@ -40,11 +40,11 @@ std::vector<Geometry::Intersection<Shape>> Cylinder::intersectRay(Ray &ray) {
   float t2 = (-b + std::sqrt(discriminant)) / (2 * a);
 
   float y1 = transformedRay.origin.y + t1 * transformedRay.direction.y;
-  if (this->minimum < y1 and y1 < this->maximum)
+  if (this->minimum < y1 && y1 < this->maximum)
     ret.push_back(Geometry::Intersection<Shape>{t1, this});
 
   float y2 = transformedRay.origin.y + t2 * transformedRay.direction.y;
-  if (this->minimum < y2 and y2 < this->maximum)
+  if (this->minimum < y2 && y2 < this->maximum)
     ret.push_back(Geometry::Intersection<Shape>{t2, this});
 
   std::vector<Geometry::Intersection<Shape>> capIntersections =

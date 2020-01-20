@@ -29,7 +29,6 @@ void Renderer::render(World &world) {
 
   std::for_each(
       pstl::execution::par_unseq, pixels.begin(), pixels.end(),
-      // [&](double d) {
       [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &&pixel) {
         renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
       });
