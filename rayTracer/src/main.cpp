@@ -2,8 +2,8 @@
 #include "renderer.h"
 #include "world.h"
 #include <glm/gtc/matrix_transform.hpp>
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
+
+#include "VulkanInitialiser.h"
 
 #include <iostream>
 
@@ -43,15 +43,13 @@ EMSCRIPTEN_BINDINGS(Module)
 
 int main(int argc, char const *argv[])
 {
-  // renderToPPM("scenes/reflectionScene.yaml");
-  if (glfwVulkanSupported())
-  {
-    std::cout << "Vulkan is available, at least for compute\n";
-  }
-  else
-  {
-    std::cout << "Vulkan is not available, at least for compute\n";
-  }
+   //renderToPPM("../../../scenes/reflectionScene.yaml");
+
+   VulkanApp vulkanApp;
+   vulkanApp.initWindow();
+   vulkanApp.initVulkan();
+
+
 
   return 0;
 }

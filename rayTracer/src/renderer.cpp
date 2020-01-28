@@ -33,10 +33,10 @@ void Renderer::render(World &world) {
         renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
       });
 
-  // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
-  //      it != pixels.end(); ++it) {
-  //   renderPixel(world, *it, sqrtRaysPerPixel, halfSubPixelSize);
-  // }
+   //for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
+   //     it != pixels.end(); ++it) {
+   //  renderPixel(world, *it, sqrtRaysPerPixel, halfSubPixelSize);
+   //}
 }
 
 void Renderer::renderPixel(World &world, std::pair<int, int> &pixel,

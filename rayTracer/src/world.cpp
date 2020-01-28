@@ -17,6 +17,7 @@ void World::addShape(std::shared_ptr<Shape> &shape_ptr)
 std::vector<Geometry::Intersection<Shape>> World::intersectRay(Ray &ray)
 {
   std::vector<Geometry::Intersection<Shape>> ret;
+  //ret.reserve(this->shapes.size() * 3 * sizeof(Geometry::Intersection<Shape>));
 
   for (auto &shape : this->shapes)
   {

@@ -13,6 +13,8 @@ endif()
 
 set(TO_NATIVE ON)
 
+#SET(CMAKE_TOOLCHAIN_FILE "C:/dev/tools/vcpkg/scripts/buildsystems/vcpkg.cmake")
+
 
 file(GLOB SOURCES
     src/*.h
@@ -21,8 +23,8 @@ file(GLOB SOURCES
 	include/*.cpp
 )
 
-add_subdirectory(yaml-cpp)
-add_subdirectory(glm)
+#add_subdirectory(yaml-cpp)
+#add_subdirectory(glm)
 
 add_executable(RayTracer ${SOURCES})
 
@@ -36,13 +38,20 @@ if(${TO_NATIVE})
 
 	# set(TBB_DIR /home/ilia/dev/tools/tbb/cmake)
 	set(TBB_DIR C:\\dev\\tools\\tbb\\cmake)
-	find_package(TBB REQUIRED tbb)
-	add_subdirectory(parallelstl)
-	add_subdirectory(glfw)
+	find_package(TBB CONFIG REQUIRED)
+	find_package(ParallelSTL CONFIG REQUIRED)
+	find_package(glfw3 CONFIG REQUIRED)
+	find_package(yaml-cpp CONFIG REQUIRED)
+	find_package(glm CONFIG REQUIRED)
+	find_package(Vulkan REQUIRED)
+	#add_subdirectory(parallelstl)
+	#add_subdirectory(glfw)
 
-	target_include_directories(RayTracer PRIVATE ${CMAKE_SOURCE_DIR}/glfw/include C:\\VulkanSDK\\1.1.130.0\\Include)
-	# target_link_libraries(RayTracer PRIVATE "tbb" $<$<CXX_COMPILER_ID:Clang>:rt>)
-	target_link_libraries(RayTracer PRIVATE glm yaml-cpp ParallelSTL glfw)
+	#target_include_directories(RayTracer PRIVATE ${CMAKE_SOURCE_DIR}/glfw/include C:\\VulkanSDK\\1.1.130.0\\Include)
+	target_compile_definitions(RayTracer PRIVATE VK_USE_PLATFORM_WIN32_KHR)
+	target_include_directories(RayTracer PRIVATE Vulkan::Vulkan)
+	#target_link_libraries(RayTracer PRIVATE $<$<CXX_COMPILER_ID:Clang>:rt>)
+	target_link_libraries(RayTracer PRIVATE glm yaml-cpp pstl::ParallelSTL  TBB::tbb Vulkan::Vulkan glfw)
 else()
 	message(STATUS "Setting compilation target to WASM")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")

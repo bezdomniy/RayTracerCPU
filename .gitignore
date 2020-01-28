@@ -41,3 +41,9 @@
 3D_render/build
 3D_render/out
 target/
+/rayTracer/.vs
+/rayTracer/out5000.ppm
+/rayTracer/out4.ppm
+/rayTracer/out16.ppm
+/rayTracer/out100.ppm
+/rayTracer/out1.ppm
