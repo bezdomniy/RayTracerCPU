@@ -3,6 +3,8 @@
 #include "world.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "VulkanInitialiser.h"
+
 #include <iostream>
 
 #ifdef __EMSCRIPTEN__
@@ -14,7 +16,8 @@
 using namespace emscripten;
 #endif
 
-void renderToPPM(const std::string &sceneDesc) {
+void renderToPPM(const std::string &sceneDesc)
+{
   World world;
   std::shared_ptr<Camera> camera = world.loadFromFile(sceneDesc);
 
@@ -24,7 +27,8 @@ void renderToPPM(const std::string &sceneDesc) {
 }
 
 #ifdef __EMSCRIPTEN__
-EMSCRIPTEN_BINDINGS(Module) {
+EMSCRIPTEN_BINDINGS(Module)
+{
   class_<EmscriptenRunner>("EmscriptenRunner")
       .constructor()
       .function("init", &EmscriptenRunner::init)
@@ -36,8 +40,17 @@ EMSCRIPTEN_BINDINGS(Module) {
       .function("getWidth", &EmscriptenRunner::getWidth);
 }
 #else
-int main(int argc, char const *argv[]) {
-  renderToPPM("scenes/reflectionScene.yaml");
+
+int main(int argc, char const *argv[])
+{
+   renderToPPM("../../../scenes/reflectionScene.yaml");
+
+   //VulkanApp vulkanApp;
+   //vulkanApp.initWindow();
+   //vulkanApp.initVulkan();
+
+
+
   return 0;
 }
 #endif

@@ -11,8 +11,7 @@ public:
   Cylinder(float minimum, float maximum, bool capped);
   ~Cylinder();
 
-  virtual std::vector<Geometry::Intersection<Shape>>
-  intersectRay(Ray &ray) override;
+  virtual void intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) override;
   virtual glm::vec4 normalAt(glm::vec4 point) override;
   virtual std::string type() override;
 
@@ -23,5 +22,5 @@ public:
 private:
   bool checkCap(Ray &ray, float t);
 
-  std::vector<Geometry::Intersection<Shape>> intersectCaps(Ray &ray);
+  void intersectCaps(Ray &ray, std::vector<Geometry::Intersection<Shape>>& intersections);
 };

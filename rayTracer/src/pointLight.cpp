@@ -9,8 +9,6 @@ PointLight::~PointLight() {}
 
 glm::vec4 PointLight::normalAt(glm::vec4 point) { return glm::vec4(); }
 
-std::vector<Geometry::Intersection<Shape>> PointLight::intersectRay(Ray &ray) {
-  return std::vector<Geometry::Intersection<Shape>>();
-}
+void PointLight::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) { return; }
 
 std::string PointLight::type() { return "PointLight"; }

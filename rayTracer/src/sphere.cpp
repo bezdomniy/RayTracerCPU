@@ -7,31 +7,25 @@ Sphere::Sphere()
 
 Sphere::~Sphere() {}
 
-std::vector<Geometry::Intersection<Shape>> Sphere::intersectRay(Ray &ray)
-{
-  std::vector<Geometry::Intersection<Shape>> ret;
+void Sphere::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) {
+    Ray transformedRay = transformRay(ray);
 
-  Ray transformedRay = transformRay(ray);
+    glm::vec4 sphereToRay = transformedRay.origin - glm::vec4(0.f, 0.f, 0.f, 1.f);
+    float a = glm::dot(transformedRay.direction, transformedRay.direction);
+    float b = 2 * glm::dot(transformedRay.direction, sphereToRay);
+    float c =
+        glm::dot(sphereToRay, sphereToRay) - 1;
+    float discriminant = b * b - 4 * a * c;
 
-  // std::cout << transformedRay <<std::endl;
+    if (discriminant < 0)
+        return;
 
-  glm::vec4 sphereToRay = transformedRay.origin - glm::vec4(0.f, 0.f, 0.f, 1.f);
-  float a = glm::dot(transformedRay.direction, transformedRay.direction);
-  float b = 2 * glm::dot(transformedRay.direction, sphereToRay);
-  float c =
-      glm::dot(sphereToRay, sphereToRay) - 1;
-  float discriminant = b * b - 4 * a * c;
+    float t1 = (-b - std::sqrt(discriminant)) / (2 * a);
+    float t2 = (-b + std::sqrt(discriminant)) / (2 * a);
 
-  if (discriminant < 0)
-    return ret;
+    intersections.push_back(Geometry::Intersection<Shape>{t1, this});
+    intersections.push_back(Geometry::Intersection<Shape>{t2, this});
 
-  float t1 = (-b - std::sqrt(discriminant)) / (2 * a);
-  float t2 = (-b + std::sqrt(discriminant)) / (2 * a);
-
-  ret.push_back(Geometry::Intersection<Shape>{t1, this});
-  ret.push_back(Geometry::Intersection<Shape>{t2, this});
-
-  return ret;
 }
 
 glm::vec4 Sphere::normalAt(glm::vec4 point)
