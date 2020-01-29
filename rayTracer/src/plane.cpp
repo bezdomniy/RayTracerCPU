@@ -7,19 +7,17 @@ Plane::Plane()
 
 Plane::~Plane() {}
 
-std::vector<Geometry::Intersection<Shape>> Plane::intersectRay(Ray &ray)
+void Plane::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections)
 {
     Ray transformedRay = transformRay(ray);
 
-    std::vector<Geometry::Intersection<Shape>> ret;
     if (std::abs(transformedRay.direction.y) < Geometry::EPSILON)
-        return ret;
+        return;
 
     float t = -transformedRay.origin.y / transformedRay.direction.y;
 
-    ret.push_back(Geometry::Intersection<Shape>{t, this});
+    intersections.push_back(Geometry::Intersection<Shape>{t, this});
 
-    return ret;
 }
 
 glm::vec4 Plane::normalAt(glm::vec4 point)

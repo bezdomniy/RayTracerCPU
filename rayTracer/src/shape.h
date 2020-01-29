@@ -17,7 +17,7 @@ public:
   Shape();
   virtual ~Shape();
 
-  virtual std::vector<Geometry::Intersection<Shape>> intersectRay(Ray &ray) = 0;
+  virtual void intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) = 0;
   virtual glm::vec4 normalAt(glm::vec4 point) = 0;
   virtual std::string type() = 0;
 

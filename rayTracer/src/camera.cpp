@@ -66,10 +66,7 @@ glm::vec4 Camera::normalAt(glm::vec4 point)
   return glm::vec4();
 }
 
-std::vector<Geometry::Intersection<Shape>> Camera::intersectRay(Ray &ray)
-{
-  return std::vector<Geometry::Intersection<Shape>>();
-}
+void Camera::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) { return; }
 
 std::string Camera::type()
 {

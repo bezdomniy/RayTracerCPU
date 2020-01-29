@@ -7,25 +7,21 @@ Cube::Cube()
 
 Cube::~Cube() {}
 
-std::vector<Geometry::Intersection<Shape>> Cube::intersectRay(Ray &ray)
-{
+void Cube::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) {
     Ray transformedRay = transformRay(ray);
-    std::vector<Geometry::Intersection<Shape>> ret;
 
     std::pair<float, float> xtminmax = Geometry::checkAxis<float>(transformedRay.origin.x, transformedRay.direction.x);
     std::pair<float, float> ytminmax = Geometry::checkAxis<float>(transformedRay.origin.y, transformedRay.direction.y);
     std::pair<float, float> ztminmax = Geometry::checkAxis<float>(transformedRay.origin.z, transformedRay.direction.z);
 
-    float tmin = std::max({xtminmax.first, ytminmax.first, ztminmax.first});
-    float tmax = std::min({xtminmax.second, ytminmax.second, ztminmax.second});
+    float tmin = std::max({ xtminmax.first, ytminmax.first, ztminmax.first });
+    float tmax = std::min({ xtminmax.second, ytminmax.second, ztminmax.second });
 
     if (tmin > tmax)
-        return ret;
+        return;
 
-    ret.push_back(Geometry::Intersection<Shape>{tmin, this});
-    ret.push_back(Geometry::Intersection<Shape>{tmax, this});
-
-    return ret;
+    intersections.push_back(Geometry::Intersection<Shape>{tmin, this});
+    intersections.push_back(Geometry::Intersection<Shape>{tmax, this});
 }
 
 glm::vec4 Cube::normalAt(glm::vec4 point)
