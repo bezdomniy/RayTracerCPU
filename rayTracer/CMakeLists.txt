@@ -49,7 +49,7 @@ endif()
 # target_include_directories(RayTracer PRIVATE ${LIBNOISE_INCLUDE_DIR})
 # target_link_libraries(RayTracer PRIVATE glm yaml-cpp ${LIBNOISE_LIBRARY})
 
-target_include_directories(RayTracer PRIVATE cpp-taskflow)
+# target_include_directories(RayTracer PRIVATE cpp-taskflow)
 target_link_libraries(RayTracer PRIVATE glm yaml-cpp )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

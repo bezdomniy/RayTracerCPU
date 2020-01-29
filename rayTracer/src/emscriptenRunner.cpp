@@ -4,7 +4,8 @@
 
 using namespace emscripten;
 
-EmscriptenRunner::EmscriptenRunner() {
+EmscriptenRunner::EmscriptenRunner()
+{
   this->sqrtRaysPerPixel = (int)std::sqrt(Renderer::RAYS_PER_PIXEL);
   this->halfSubPixelSize = 1.f / (float)(this->sqrtRaysPerPixel) / 2.f;
 
@@ -13,7 +14,8 @@ EmscriptenRunner::EmscriptenRunner() {
 
 EmscriptenRunner::~EmscriptenRunner() {}
 
-void EmscriptenRunner::init(const std::string &sceneDesc) {
+void EmscriptenRunner::init(const std::string &sceneDesc)
+{
   this->camera = this->world.loadFromFile(sceneDesc);
 
   this->renderer = Renderer(this->camera);
@@ -23,8 +25,10 @@ void EmscriptenRunner::init(const std::string &sceneDesc) {
 
   this->pixelsToRender.reserve(this->camera->vsize * this->camera->hsize);
 
-  for (int y = 0; y < this->camera->vsize; y++) {
-    for (int x = 0; x < this->camera->hsize; x++) {
+  for (int y = 0; y < this->camera->vsize; y++)
+  {
+    for (int x = 0; x < this->camera->hsize; x++)
+    {
       this->pixelsToRender.push_back(std::make_pair(x, y));
     }
   }
@@ -33,12 +37,15 @@ void EmscriptenRunner::init(const std::string &sceneDesc) {
                this->g);
 }
 
-void EmscriptenRunner::moveCamera(float posChange) {
+void EmscriptenRunner::moveCamera(float posChange)
+{
   this->pixelsToRender.clear();
   // this->renderer.canvas.clear(glm::vec3(0.f, 0.f, 0.f));
 
-  for (int y = 0; y < this->camera->vsize; y++) {
-    for (int x = 0; x < this->camera->hsize; x++) {
+  for (int y = 0; y < this->camera->vsize; y++)
+  {
+    for (int x = 0; x < this->camera->hsize; x++)
+    {
       this->pixelsToRender.push_back(std::make_pair(x, y));
     }
   }
@@ -64,22 +71,28 @@ void EmscriptenRunner::moveCamera(float posChange) {
   this->camera->updateTransform();
 }
 
-void EmscriptenRunner::render_() {
-  for (int i = 0; i < PIXELS_PER_BATCH; i++) {
-    if (!done()) {
-      this->this.renderPixel(this->world, this->pixelsToRender.back(),
-                             this->sqrtRaysPerPixel, this->halfSubPixelSize);
-      this->pixelsToRender.pop_back();
-    }
-  }
-}
+// void EmscriptenRunner::render_()
+// {
+//   for (int i = 0; i < PIXELS_PER_BATCH; i++)
+//   {
+//     if (!done())
+//     {
+//       this->this.renderPixel(this->world, this->pixelsToRender.back(),
+//                              this->sqrtRaysPerPixel, this->halfSubPixelSize);
+//       this->pixelsToRender.pop_back();
+//     }
+//   }
+// }
 
-emscripten::val EmscriptenRunner::renderToRGBA() {
+emscripten::val EmscriptenRunner::renderToRGBA()
+{
   std::vector<uint8_t> byteBuffer;
   size_t bufferLength;
 
-  for (int i = 0; i < PIXELS_PER_BATCH; i++) {
-    if (!done()) {
+  for (int i = 0; i < PIXELS_PER_BATCH; i++)
+  {
+    if (!done())
+    {
       this->renderer.renderPixel(this->world, this->pixelsToRender.back(),
                                  this->sqrtRaysPerPixel,
                                  this->halfSubPixelSize);
@@ -99,8 +112,8 @@ emscripten::val EmscriptenRunner::renderToRGBA() {
   // taskflow.parallel_for(this->pixelsToRender.begin(),
   //                       this->pixelsToRender.end(),
   //                       [this](auto &pixel) { this.render_(); });
-  executor.run(taskflow);
-  executor.wait_for_all();
+  // executor.run(taskflow);
+  // executor.wait_for_all();
 
   std::tie(byteBuffer, bufferLength) = this->renderer.canvas.writeToRGBA(false);
 

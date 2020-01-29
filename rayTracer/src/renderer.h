@@ -17,10 +17,11 @@
 #include <memory>
 #include <random>
 
-#include <taskflow/taskflow.hpp>
-#include <thread>
+// #include <taskflow/taskflow.hpp>
+// #include <thread>
 
-class Renderer {
+class Renderer
+{
 private:
   std::shared_ptr<Camera> camera;
 

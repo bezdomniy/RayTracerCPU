@@ -17,7 +17,8 @@
 #include "renderer.h"
 #include "world.h"
 
-class EmscriptenRunner {
+class EmscriptenRunner
+{
 private:
   static const int PIXELS_PER_BATCH = 40000;
   //   unsigned int startCurrentBatch = 0;
@@ -33,7 +34,7 @@ private:
   std::random_device rd;
   std::mt19937 g;
 
-  void render_(EmscriptenRunner *runnerPtr);
+  // void render_(EmscriptenRunner *runnerPtr);
 
   void moveCamera(float posChange);
 

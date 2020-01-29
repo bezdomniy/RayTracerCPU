@@ -2,22 +2,26 @@
 
 Renderer::Renderer() {}
 
-Renderer::Renderer(std::shared_ptr<Camera> &c) {
+Renderer::Renderer(std::shared_ptr<Camera> &c)
+{
   this->camera = c;
   this->canvas = Canvas(this->camera->hsize, this->camera->vsize);
 }
 
 Renderer::~Renderer() {}
 
-void Renderer::render(World &world) {
+void Renderer::render(World &world)
+{
   int sqrtRaysPerPixel = std::sqrt(RAYS_PER_PIXEL);
   float halfSubPixelSize = 1.f / (float)sqrtRaysPerPixel / 2.f;
 
   std::vector<std::pair<int, int>> pixels;
   pixels.reserve(this->canvas.height * this->canvas.width);
 
-  for (int y = 0; y < this->canvas.height; y++) {
-    for (int x = 0; x < this->canvas.width; x++) {
+  for (int y = 0; y < this->canvas.height; y++)
+  {
+    for (int x = 0; x < this->canvas.width; x++)
+    {
       pixels.push_back(std::make_pair(x, y));
     }
   }
@@ -27,26 +31,29 @@ void Renderer::render(World &world) {
 
   std::shuffle(pixels.begin(), pixels.end(), g);
 
-  tf::Executor executor(std::thread::hardware_concurrency());
-  tf::Taskflow taskflow;
+  // tf::Executor executor(std::thread::hardware_concurrency());
+  // tf::Taskflow taskflow;
 
-  taskflow.parallel_for(
-      pixels.begin(), pixels.end(),
-      [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &pixel) {
-        renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
-      });
-  executor.run(taskflow);
-  executor.wait_for_all();
-  // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
-  //      it != pixels.end(); ++it) {
-  //   renderPixel(world, *it, sqrtRaysPerPixel, halfSubPixelSize);
-  // }
+  // taskflow.parallel_for(
+  //     pixels.begin(), pixels.end(),
+  //     [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &pixel) {
+  //       renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
+  //     });
+  // executor.run(taskflow);
+  // executor.wait_for_all();
+  for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
+       it != pixels.end(); ++it)
+  {
+    renderPixel(world, *it, sqrtRaysPerPixel, halfSubPixelSize);
+  }
 }
 
 void Renderer::renderPixel(World &world, std::pair<int, int> &pixel,
-                           int sqrtRaysPerPixel, float halfSubPixelSize) {
+                           int sqrtRaysPerPixel, float halfSubPixelSize)
+{
   glm::vec3 cShape(0.f, 0.f, 0.f);
-  for (int i = 0; i < RAYS_PER_PIXEL; i++) {
+  for (int i = 0; i < RAYS_PER_PIXEL; i++)
+  {
     Ray cast = this->camera->rayForPixel(pixel.first, pixel.second, i,
                                          sqrtRaysPerPixel, halfSubPixelSize);
     cShape += colourAt(cast, world, RAY_BOUNCE_LIMIT);
@@ -57,12 +64,14 @@ void Renderer::renderPixel(World &world, std::pair<int, int> &pixel,
   this->canvas.writePixel(pixel.first, pixel.second, cShape);
 }
 
-glm::vec3 Renderer::colourAt(Ray &ray, World &world, short remaining) {
+glm::vec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
+{
   std::vector<Geometry::Intersection<Shape>> intersections =
       world.intersectRay(ray);
   Geometry::Intersection<Shape> *hit;
 
-  if ((hit = Geometry::hit<Shape>(intersections))) {
+  if ((hit = Geometry::hit<Shape>(intersections)))
+  {
     Geometry::getIntersectionParameters<Shape>(*hit, ray, intersections);
     return shadeHit(hit, world, remaining);
   }
@@ -70,12 +79,14 @@ glm::vec3 Renderer::colourAt(Ray &ray, World &world, short remaining) {
 }
 
 glm::vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world,
-                             short remaining) {
+                             short remaining)
+{
   bool inShadow = this->isShadowed(hit->comps->overPoint, world);
 
   glm::vec3 surface(0.f);
 
-  for (auto &light : world.lights) {
+  for (auto &light : world.lights)
+  {
     surface += lighting(hit->shapePtr, light, hit->comps->overPoint,
                         hit->comps->eyev, hit->comps->normalv, inShadow);
   }
@@ -84,7 +95,8 @@ glm::vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world,
   glm::vec3 refraction = refractedColour(hit, world, remaining);
 
   if (hit->shapePtr->material->reflective > 0 &&
-      hit->shapePtr->material->transparency > 0) {
+      hit->shapePtr->material->transparency > 0)
+  {
     float reflectance = Geometry::schlick<Shape>(hit->comps);
     return surface + reflection * reflectance + refraction * (1 - reflectance);
   }
@@ -92,7 +104,8 @@ glm::vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world,
 }
 
 glm::vec3 Renderer::reflectColour(Geometry::Intersection<Shape> *hit,
-                                  World &world, short remaining) {
+                                  World &world, short remaining)
+{
   if (hit->shapePtr->material->reflective == 0 || remaining <= 0)
     return glm::vec3(0.f, 0.f, 0.f);
 
@@ -102,13 +115,15 @@ glm::vec3 Renderer::reflectColour(Geometry::Intersection<Shape> *hit,
 }
 
 glm::vec3 Renderer::refractedColour(Geometry::Intersection<Shape> *hit,
-                                    World &world, short remaining) {
+                                    World &world, short remaining)
+{
   float nRatio = hit->comps->n1 / hit->comps->n2;
   float cosI = glm::dot(hit->comps->eyev, hit->comps->normalv);
   float sin2T = (nRatio * nRatio) * (1 - (cosI * cosI));
 
   if (hit->shapePtr->material->transparency == 0 || sin2T > 1 ||
-      remaining <= 0) {
+      remaining <= 0)
+  {
     return glm::vec3(0.f, 0.f, 0.f);
   }
 
@@ -125,7 +140,8 @@ glm::vec3 Renderer::refractedColour(Geometry::Intersection<Shape> *hit,
 
 glm::vec3 Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
                              glm::vec4 &point, glm::vec4 &eyev,
-                             glm::vec4 &normalv, bool &inShadow) {
+                             glm::vec4 &normalv, bool &inShadow)
+{
   glm::vec3 diffuse;
   glm::vec3 specular;
   glm::vec3 effectiveColour;
@@ -149,10 +165,13 @@ glm::vec3 Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
   // light is on the other side of the surface.​
 
   float lightDotNormal = glm::dot(lightv, normalv);
-  if (lightDotNormal < 0) {
+  if (lightDotNormal < 0)
+  {
     diffuse = glm::vec3(0.f, 0.f, 0.f);
     specular = glm::vec3(0.f, 0.f, 0.f);
-  } else {
+  }
+  else
+  {
     // compute the diffuse contribution​
     diffuse = effectiveColour * shape->material->diffuse * lightDotNormal;
 
@@ -162,9 +181,12 @@ glm::vec3 Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
     glm::vec4 reflectv = glm::reflect(-lightv, normalv);
     float reflectDotEye = glm::dot(reflectv, eyev);
 
-    if (reflectDotEye <= 0) {
+    if (reflectDotEye <= 0)
+    {
       specular = glm::vec3(0.f, 0.f, 0.f);
-    } else {
+    }
+    else
+    {
       // compute the specular contribution​
       float factor = std::pow(reflectDotEye, shape->material->shininess);
       specular = light->intensity * shape->material->specular * factor;
@@ -174,7 +196,8 @@ glm::vec3 Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
   return (ambient + diffuse + specular);
 }
 
-bool Renderer::isShadowed(glm::vec4 &point, World &world) {
+bool Renderer::isShadowed(glm::vec4 &point, World &world)
+{
   glm::vec4 v = world.lights.at(0)->position - point;
   float distance = glm::length(v);
   glm::vec4 direction = glm::normalize(v);
@@ -184,7 +207,8 @@ bool Renderer::isShadowed(glm::vec4 &point, World &world) {
       world.intersectRay(ray);
 
   Geometry::Intersection<Shape> *hit = Geometry::hit<Shape>(intersections);
-  if (hit && hit->t < distance) {
+  if (hit && hit->t < distance)
+  {
     return true;
   }
 

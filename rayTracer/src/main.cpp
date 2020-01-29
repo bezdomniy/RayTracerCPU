@@ -3,8 +3,6 @@
 #include "world.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "VulkanInitialiser.h"
-
 #include <iostream>
 
 #ifdef __EMSCRIPTEN__
@@ -43,13 +41,11 @@ EMSCRIPTEN_BINDINGS(Module)
 
 int main(int argc, char const *argv[])
 {
-   renderToPPM("../../../scenes/reflectionScene.yaml");
+  renderToPPM("../../../scenes/reflectionScene.yaml");
 
-   //VulkanApp vulkanApp;
-   //vulkanApp.initWindow();
-   //vulkanApp.initVulkan();
-
-
+  //VulkanApp vulkanApp;
+  //vulkanApp.initWindow();
+  //vulkanApp.initVulkan();
 
   return 0;
 }
