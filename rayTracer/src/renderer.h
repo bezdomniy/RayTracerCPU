@@ -12,8 +12,14 @@
 #include "world.h"
 // #include <algorithm>
 // #ifdef __EMSCRIPTEN__
+#ifdef linux
+#include <include/pstl/algorithm>
+#include <include/pstl/execution>
+#endif
+#ifdef _WIN32
 #include <pstl/algorithm>
 #include <pstl/execution>
+#endif
 // #else
 // #include <algorithm>
 // #include <execution>

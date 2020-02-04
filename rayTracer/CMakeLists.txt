@@ -7,14 +7,11 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-#set(CMAKE_CXX_FLAGS "-openmp-simd")
-#set(CMAKE_CXX_FLAGS_DEBUG "-Zi")
-#set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS "-openmp-simd")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 set(TO_NATIVE ON)
-
-#SET(CMAKE_TOOLCHAIN_FILE "C:/dev/tools/vcpkg/scripts/buildsystems/vcpkg.cmake")
-
 
 file(GLOB SOURCES
     src/*.h
@@ -37,21 +34,25 @@ if(${TO_NATIVE})
 	set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 	# set(TBB_DIR /home/ilia/dev/tools/tbb/cmake)
-	set(TBB_DIR C:\\dev\\tools\\tbb\\cmake)
-	find_package(TBB CONFIG REQUIRED)
+	#set(TBB_DIR C:\\dev\\tools\\tbb\\cmake)
+	#set(TBB_DIR /home/ilia/vcpkg/installed/x64-linux/share/tbb)
+
+	if (WIN32)
+		find_package(TBB CONFIG REQUIRED)
+	endif (WIN32)
 	find_package(ParallelSTL CONFIG REQUIRED)
 	find_package(glfw3 CONFIG REQUIRED)
 	find_package(yaml-cpp CONFIG REQUIRED)
 	find_package(glm CONFIG REQUIRED)
-	find_package(Vulkan REQUIRED)
+	#find_package(Vulkan REQUIRED)
 	#add_subdirectory(parallelstl)
 	#add_subdirectory(glfw)
 
 	#target_include_directories(RayTracer PRIVATE ${CMAKE_SOURCE_DIR}/glfw/include C:\\VulkanSDK\\1.1.130.0\\Include)
-	target_compile_definitions(RayTracer PRIVATE VK_USE_PLATFORM_WIN32_KHR)
-	target_include_directories(RayTracer PRIVATE Vulkan::Vulkan)
+	#target_compile_definitions(RayTracer PRIVATE VK_USE_PLATFORM_WIN32_KHR)
+	#target_include_directories(RayTracer PRIVATE Vulkan::Vulkan)
 	#target_link_libraries(RayTracer PRIVATE $<$<CXX_COMPILER_ID:Clang>:rt>)
-	target_link_libraries(RayTracer PRIVATE glm yaml-cpp pstl::ParallelSTL  TBB::tbb Vulkan::Vulkan glfw)
+	target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb pstl::ParallelSTL glfw)
 else()
 	message(STATUS "Setting compilation target to WASM")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")

@@ -43,7 +43,7 @@ EMSCRIPTEN_BINDINGS(Module)
 
 int main(int argc, char const *argv[])
 {
-   renderToPPM("../../../scenes/reflectionScene.yaml");
+   renderToPPM("scenes/reflectionScene.yaml");
 
    //VulkanApp vulkanApp;
    //vulkanApp.initWindow();
