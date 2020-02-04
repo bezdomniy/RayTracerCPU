@@ -10,7 +10,7 @@ set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
-set(TO_NATIVE OFF)
+set(TO_NATIVE ON)
 
 # include(CTest)
 # enable_testing()
@@ -49,7 +49,7 @@ endif()
 # target_include_directories(RayTracer PRIVATE ${LIBNOISE_INCLUDE_DIR})
 # target_link_libraries(RayTracer PRIVATE glm yaml-cpp ${LIBNOISE_LIBRARY})
 
-# target_include_directories(RayTracer PRIVATE cpp-taskflow)
+target_include_directories(RayTracer PRIVATE cpp-taskflow)
 target_link_libraries(RayTracer PRIVATE glm yaml-cpp )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
