@@ -27,6 +27,12 @@ glm::vec3 Canvas::getPixel(unsigned int x, unsigned int y)
   return pixels[x * height + y];
 }
 
+glm::ivec3 Canvas::getPixelInt(unsigned int x, unsigned int y)
+{
+  glm::vec3 pixel(getPixel(x,y));
+  return glm::ivec3(rbgFloatToInt(pixel.x),rbgFloatToInt(pixel.y),rbgFloatToInt(pixel.z));
+}
+
 void Canvas::clear(glm::vec3 colour)
 {
   for (int i = 0; i < width * height; i++)

@@ -23,6 +23,7 @@ public:
 
   void writePixel(unsigned int, unsigned int, glm::vec3);
   glm::vec3 getPixel(unsigned int, unsigned int);
+  glm::ivec3 getPixelInt(unsigned int, unsigned int);
 
   void clear(glm::vec3);
 

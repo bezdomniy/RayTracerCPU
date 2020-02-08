@@ -1,6 +1,7 @@
 #include "camera.h"
 #include "renderer.h"
 #include "world.h"
+#include "window.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "VulkanInitialiser.h"
@@ -26,6 +27,12 @@ void renderToPPM(const std::string &sceneDesc)
   renderer.canvas.writeToPPM("out.ppm", false);
 }
 
+void renderToSDL(const std::string &sceneDesc)
+{
+  Window window(sceneDesc);
+  window.run();
+}
+
 #ifdef __EMSCRIPTEN__
 EMSCRIPTEN_BINDINGS(Module)
 {
@@ -43,7 +50,7 @@ EMSCRIPTEN_BINDINGS(Module)
 
 int main(int argc, char const *argv[])
 {
-   renderToPPM("scenes/reflectionScene.yaml");
+   renderToSDL("scenes/reflectionScene.yaml");
 
    //VulkanApp vulkanApp;
    //vulkanApp.initWindow();
