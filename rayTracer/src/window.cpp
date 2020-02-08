@@ -47,10 +47,43 @@ void Window::handleEvents() {
     case SDL_QUIT:
         this->running = false;
         break;
+    case SDL_KEYDOWN:
+        switch(event.key.keysym.sym) {
+        case SDLK_ESCAPE: 
+            this->running = false;
+            break;
+        case SDLK_LEFT:
+
+            this->somethingChanged = true;
+            break;
+        case SDLK_RIGHT:
+
+            this->somethingChanged = true;
+            break;
+        // cases for other keypresses
+        }
+    break;
     default:
         break;
     }
 
+}
+
+
+void moveCamera(float posChange) {
+      glm::mat4 rotationY =
+      glm::rotate(glm::mat4(1.f), posChange, glm::vec3(0.f, 1.f, 0.f));
+
+  // glm::mat4 rotationZ =
+  //     glm::rotate(glm::mat4(1.f), posChange,
+  //                 glm::vec3(0.f, 0.f, 1.f));
+
+    this->camera->position = rotationY * this->camera->position;
+
+  // matrix.makeRotationY(clock.getDelta() * 2 * Math.PI / period);
+
+  // this->camera->position.x += posChange;
+    this->camera->updateTransform();
 }
 
 void Window::update() {
