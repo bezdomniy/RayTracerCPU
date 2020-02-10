@@ -14,6 +14,8 @@ private:
     SDL_Window *window;
     SDL_Renderer *renderer;
     static const int PIXELS_PER_BATCH = 20000;
+    const float STEP_SIZE = 0.05f;
+
     SDL_Event event;
     bool running = false;
 
@@ -32,9 +34,16 @@ private:
     size_t bufferLength;
 
     void handleEvents();
+
+    void moveCamera(float posChange);
+
+
 public:
     Window(const std::string &sceneDesc);
     ~Window();
+
+    void moveLeft();
+    void moveRight();
 
     void initWindow();
     void update();
