@@ -18,16 +18,16 @@ public:
   virtual ~Shape();
 
   virtual void intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) = 0;
-  virtual glm::vec4 normalAt(glm::vec4 point) = 0;
+  virtual glm::dvec4 normalAt(glm::dvec4 point) = 0;
   virtual std::string type() = 0;
 
-  glm::mat4 transform;
-  glm::mat4 inverseTransform;
+  glm::dmat4 transform;
+  glm::dmat4 inverseTransform;
 
   std::shared_ptr<Material> material;
   void setMaterial(std::shared_ptr<Material> &mat);
-  glm::vec3 patternAt(glm::vec4 point);
-  void multiplyTransform(glm::mat4 &transform);
+  glm::dvec3 patternAt(glm::dvec4 point);
+  void multiplyTransform(glm::dmat4 &transform);
   void calculateInverseTranform();
 
   Ray transformRay(Ray &ray);

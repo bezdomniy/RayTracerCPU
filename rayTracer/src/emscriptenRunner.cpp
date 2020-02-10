@@ -6,7 +6,7 @@ using namespace emscripten;
 
 EmscriptenRunner::EmscriptenRunner() {
   this->sqrtRaysPerPixel = (int)std::sqrt(Renderer::RAYS_PER_PIXEL);
-  this->halfSubPixelSize = 1.f / (float)(this->sqrtRaysPerPixel) / 2.f;
+  this->halfSubPixelSize = 1.0 / (double)(this->sqrtRaysPerPixel) / 2.0;
 
   this->g = std::mt19937(this->rd());
 }
@@ -17,7 +17,7 @@ void EmscriptenRunner::init(const std::string &sceneDesc) {
   this->camera = this->world.loadFromFile(sceneDesc);
 
   this->renderer = Renderer(this->camera);
-  // this->renderer.canvas.clear(glm::vec3(0.f, 0.f, 0.f));
+  // this->renderer.canvas.clear(glm::dvec3(0.0, 0.0, 0.0));
 
   this->pixelsToRender.clear();
 
@@ -33,9 +33,9 @@ void EmscriptenRunner::init(const std::string &sceneDesc) {
                this->g);
 }
 
-void EmscriptenRunner::moveCamera(float posChange) {
+void EmscriptenRunner::moveCamera(double posChange) {
   this->pixelsToRender.clear();
-  // this->renderer.canvas.clear(glm::vec3(0.f, 0.f, 0.f));
+  // this->renderer.canvas.clear(glm::dvec3(0.0, 0.0, 0.0));
 
   for (int y = 0; y < this->camera->vsize; y++) {
     for (int x = 0; x < this->camera->hsize; x++) {
@@ -45,16 +45,16 @@ void EmscriptenRunner::moveCamera(float posChange) {
   std::shuffle(this->pixelsToRender.begin(), this->pixelsToRender.end(),
                this->g);
 
-  // glm::mat4 rotationX =
-  //     glm::rotate(glm::mat4(1.f), posChange,
-  //                 glm::vec3(1.f, 0.f, 0.f));
+  // glm::dmat4 rotationX =
+  //     glm::rotate(glm::dmat4(1.0), posChange,
+  //                 glm::dvec3(1.0, 0.0, 0.0));
 
-  glm::mat4 rotationY =
-      glm::rotate(glm::mat4(1.f), posChange, glm::vec3(0.f, 1.f, 0.f));
+  glm::dmat4 rotationY =
+      glm::rotate(glm::dmat4(1.0), posChange, glm::dvec3(0.0, 1.0, 0.0));
 
-  // glm::mat4 rotationZ =
-  //     glm::rotate(glm::mat4(1.f), posChange,
-  //                 glm::vec3(0.f, 0.f, 1.f));
+  // glm::dmat4 rotationZ =
+  //     glm::rotate(glm::dmat4(1.0), posChange,
+  //                 glm::dvec3(0.0, 0.0, 1.0));
 
   this->camera->position = rotationY * this->camera->position;
 

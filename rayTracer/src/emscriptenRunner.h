@@ -26,13 +26,13 @@ private:
   std::vector<std::pair<int, int>> pixelsToRender;
 
   int sqrtRaysPerPixel;
-  float halfSubPixelSize;
-  const float STEP_SIZE = 0.05f;
+  double halfSubPixelSize;
+  const double STEP_SIZE = 0.05f;
 
   std::random_device rd;
   std::mt19937 g;
 
-  void moveCamera(float posChange);
+  void moveCamera(double posChange);
 
 public:
   EmscriptenRunner(/* args */);

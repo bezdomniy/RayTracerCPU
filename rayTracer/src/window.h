@@ -14,7 +14,7 @@ private:
     SDL_Window *window;
     SDL_Renderer *renderer;
     static const int PIXELS_PER_BATCH = 20000;
-    const float STEP_SIZE = 0.05f;
+    const double STEP_SIZE = 0.05f;
 
     SDL_Event event;
     bool running = false;
@@ -35,7 +35,7 @@ private:
 
     void handleEvents();
 
-    void moveCamera(float posChange);
+    void moveCamera(double posChange);
 
 
 public:

@@ -27,7 +27,7 @@ public:
   void addShape(std::shared_ptr<Shape> &shape_ptr);
   void addLight(std::shared_ptr<PointLight> &light);
 
-  bool isShadowed(glm::vec4 point);
+  bool isShadowed(glm::dvec4 point);
   std::vector<Geometry::Intersection<Shape>> intersectRay(Ray &ray);
 
   std::vector<std::shared_ptr<Shape>> shapes;

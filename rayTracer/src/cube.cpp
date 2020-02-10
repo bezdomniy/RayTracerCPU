@@ -10,12 +10,12 @@ Cube::~Cube() {}
 void Cube::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) {
     Ray transformedRay = transformRay(ray);
 
-    std::pair<float, float> xtminmax = Geometry::checkAxis<float>(transformedRay.origin.x, transformedRay.direction.x);
-    std::pair<float, float> ytminmax = Geometry::checkAxis<float>(transformedRay.origin.y, transformedRay.direction.y);
-    std::pair<float, float> ztminmax = Geometry::checkAxis<float>(transformedRay.origin.z, transformedRay.direction.z);
+    std::pair<double, double> xtminmax = Geometry::checkAxis<double>(transformedRay.origin.x, transformedRay.direction.x);
+    std::pair<double, double> ytminmax = Geometry::checkAxis<double>(transformedRay.origin.y, transformedRay.direction.y);
+    std::pair<double, double> ztminmax = Geometry::checkAxis<double>(transformedRay.origin.z, transformedRay.direction.z);
 
-    float tmin = std::max({ xtminmax.first, ytminmax.first, ztminmax.first });
-    float tmax = std::min({ xtminmax.second, ytminmax.second, ztminmax.second });
+    double tmin = std::max({ xtminmax.first, ytminmax.first, ztminmax.first });
+    double tmax = std::min({ xtminmax.second, ytminmax.second, ztminmax.second });
 
     if (tmin > tmax)
         return;
@@ -24,25 +24,25 @@ void Cube::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& in
     intersections.push_back(Geometry::Intersection<Shape>{tmax, this});
 }
 
-glm::vec4 Cube::normalAt(glm::vec4 point)
+glm::dvec4 Cube::normalAt(glm::dvec4 point)
 {
-    // glm::mat4 transformInverse(glm::affineInverse(this->transform));
-    glm::vec4 objectPoint = this->inverseTransform * point;
-    glm::vec4 objectNormal;
+    // glm::dmat4 transformInverse(glm::affineInverse(this->transform));
+    glm::dvec4 objectPoint = this->inverseTransform * point;
+    glm::dvec4 objectNormal;
 
-    float points[3] = {std::abs(objectPoint.x), std::abs(objectPoint.y), std::abs(objectPoint.z)};
-    const int N = sizeof(points) / sizeof(float);
+    double points[3] = {std::abs(objectPoint.x), std::abs(objectPoint.y), std::abs(objectPoint.z)};
+    const int N = sizeof(points) / sizeof(double);
     int indexMaxC = std::distance(points, std::max_element(points, points + N));
 
     if (indexMaxC == 0)
-        objectNormal = glm::normalize(glm::vec4(objectPoint.x, 0.f, 0.f, 0.f));
+        objectNormal = glm::normalize(glm::dvec4(objectPoint.x, 0.0, 0.0, 0.0));
     else if (indexMaxC == 1)
-        objectNormal = glm::normalize(glm::vec4(0.f, objectPoint.y, 0.f, 0.f));
+        objectNormal = glm::normalize(glm::dvec4(0.0, objectPoint.y, 0.0, 0.0));
     else
-        objectNormal = glm::normalize(glm::vec4(0.f, 0.f, objectPoint.z, 0.f));
+        objectNormal = glm::normalize(glm::dvec4(0.0, 0.0, objectPoint.z, 0.0));
 
-    glm::vec4 worldNormal = glm::transpose(this->inverseTransform) * objectNormal;
-    worldNormal.w = 0.f;
+    glm::dvec4 worldNormal = glm::transpose(this->inverseTransform) * objectNormal;
+    worldNormal.w = 0.0;
 
     return glm::normalize(worldNormal);
 }

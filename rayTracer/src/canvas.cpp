@@ -12,7 +12,7 @@ Canvas::Canvas(unsigned int w, unsigned int h)
 
 Canvas::~Canvas() {}
 
-void Canvas::writePixel(unsigned int x, unsigned int y, glm::vec3 colour)
+void Canvas::writePixel(unsigned int x, unsigned int y, glm::dvec3 colour)
 {
   if (height >= width)
     pixels[y * width + x] = colour;
@@ -20,7 +20,7 @@ void Canvas::writePixel(unsigned int x, unsigned int y, glm::vec3 colour)
     pixels[x * height + y] = colour;
 }
 
-glm::vec3 Canvas::getPixel(unsigned int x, unsigned int y)
+glm::dvec3 Canvas::getPixel(unsigned int x, unsigned int y)
 {
   if (height >= width)
     return pixels[y * width + x];
@@ -29,11 +29,11 @@ glm::vec3 Canvas::getPixel(unsigned int x, unsigned int y)
 
 glm::ivec3 Canvas::getPixelInt(unsigned int x, unsigned int y)
 {
-  glm::vec3 pixel(getPixel(x,y));
-  return glm::ivec3(rbgFloatToInt(pixel.x),rbgFloatToInt(pixel.y),rbgFloatToInt(pixel.z));
+  glm::dvec3 pixel(getPixel(x,y));
+  return glm::ivec3(rbgdoubleToInt(pixel.x),rbgdoubleToInt(pixel.y),rbgdoubleToInt(pixel.z));
 }
 
-void Canvas::clear(glm::vec3 colour)
+void Canvas::clear(glm::dvec3 colour)
 {
   for (int i = 0; i < width * height; i++)
   {
@@ -41,14 +41,14 @@ void Canvas::clear(glm::vec3 colour)
   }
 }
 
-uint8_t Canvas::rbgFloatToInt(float f)
+uint8_t Canvas::rbgdoubleToInt(double f)
 {
   uint8_t c;
-  if (f < 0.f)
+  if (f < 0.0)
   {
     c = (uint8_t)0;
   }
-  else if (f > 1.f)
+  else if (f > 1.0)
   {
     c = (uint8_t)255;
   }
@@ -60,10 +60,10 @@ uint8_t Canvas::rbgFloatToInt(float f)
   return c;
 }
 
-void Canvas::_writeRgbString(float f, bool &newLine, int &charsInLine,
+void Canvas::_writeRgbString(double f, bool &newLine, int &charsInLine,
                              std::ofstream *streamPtr)
 {
-  std::string c = std::to_string(rbgFloatToInt(f));
+  std::string c = std::to_string(rbgdoubleToInt(f));
 
   charsInLine += c.length() + 1;
   if (charsInLine >= 70)
@@ -145,9 +145,9 @@ std::pair<std::vector<uint8_t>, size_t> Canvas::writeToRGBA(bool invertY)
     {
       for (int j = 0; j < width; j++)
       {
-        bytes[bytesIndex] = rbgFloatToInt(getPixel(j, i).x);
-        bytes[bytesIndex + 1] = rbgFloatToInt(getPixel(j, i).y);
-        bytes[bytesIndex + 2] = rbgFloatToInt(getPixel(j, i).z);
+        bytes[bytesIndex] = rbgdoubleToInt(getPixel(j, i).x);
+        bytes[bytesIndex + 1] = rbgdoubleToInt(getPixel(j, i).y);
+        bytes[bytesIndex + 2] = rbgdoubleToInt(getPixel(j, i).z);
         bytes[bytesIndex + 3] = 1;
 
         bytesIndex += 4;
@@ -160,9 +160,9 @@ std::pair<std::vector<uint8_t>, size_t> Canvas::writeToRGBA(bool invertY)
     {
       for (int j = 0; j < width; j++)
       {
-        bytes[bytesIndex] = rbgFloatToInt(getPixel(j, i).x);
-        bytes[bytesIndex + 1] = rbgFloatToInt(getPixel(j, i).y);
-        bytes[bytesIndex + 2] = rbgFloatToInt(getPixel(j, i).z);
+        bytes[bytesIndex] = rbgdoubleToInt(getPixel(j, i).x);
+        bytes[bytesIndex + 1] = rbgdoubleToInt(getPixel(j, i).y);
+        bytes[bytesIndex + 2] = rbgdoubleToInt(getPixel(j, i).z);
         bytes[bytesIndex + 3] = 1;
 
         bytesIndex += 4;

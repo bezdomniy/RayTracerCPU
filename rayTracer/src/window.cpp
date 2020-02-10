@@ -74,13 +74,13 @@ void Window::moveLeft() { moveCamera(STEP_SIZE); }
 
 void Window::moveRight() { moveCamera(-STEP_SIZE); }
 
-void Window::moveCamera(float posChange) {
-      glm::mat4 rotationY =
-      glm::rotate(glm::mat4(1.f), posChange, glm::vec3(0.f, 1.f, 0.f));
+void Window::moveCamera(double posChange) {
+      glm::dmat4 rotationY =
+      glm::rotate(glm::dmat4(1.0), posChange, glm::dvec3(0.0, 1.0, 0.0));
 
-  // glm::mat4 rotationZ =
-  //     glm::rotate(glm::mat4(1.f), posChange,
-  //                 glm::vec3(0.f, 0.f, 1.f));
+  // glm::dmat4 rotationZ =
+  //     glm::rotate(glm::dmat4(1.0), posChange,
+  //                 glm::dvec3(0.0, 0.0, 1.0));
 
     this->camera->position = rotationY * this->camera->position;
 

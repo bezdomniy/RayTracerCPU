@@ -12,13 +12,13 @@ public:
   Pattern(const Pattern &pattern);
   virtual ~Pattern();
 
-  virtual glm::vec3 patternAt(glm::vec4 point) = 0;
-  void setTransform(glm::mat4 transform);
-  void multiplyTransform(glm::mat4 &transform);
+  virtual glm::dvec3 patternAt(glm::dvec4 point) = 0;
+  void setTransform(glm::dmat4 transform);
+  void multiplyTransform(glm::dmat4 &transform);
   void calculateInverseTranform();
 
-  glm::mat4 transform;
-  glm::mat4 inverseTransform;
+  glm::dmat4 transform;
+  glm::dmat4 inverseTransform;
   // virtual std::string type();
 };
 
@@ -29,14 +29,14 @@ private:
 public:
   ColourPattern();
   ColourPattern(const ColourPattern &colouredPattern);
-  ColourPattern(glm::vec3 colourA, glm::vec3 colourB);
+  ColourPattern(glm::dvec3 colourA, glm::dvec3 colourB);
   virtual ~ColourPattern();
 
-  glm::vec3 colourA;
-  glm::vec3 colourB;
+  glm::dvec3 colourA;
+  glm::dvec3 colourB;
 
-  // virtual glm::vec3 patternAt(glm::vec4 point) = 0;
+  // virtual glm::dvec3 patternAt(glm::dvec4 point) = 0;
   // virtual std::string type() override;
 
-  void setColour(glm::vec3 colour, int index);
+  void setColour(glm::dvec3 colour, int index);
 };

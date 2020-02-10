@@ -10,40 +10,40 @@ class StripedPattern : public ColourPattern {
 private:
   /* data */
 public:
-  StripedPattern(glm::vec3 colourA, glm::vec3 colourB);
+  StripedPattern(glm::dvec3 colourA, glm::dvec3 colourB);
   ~StripedPattern();
-  virtual glm::vec3 patternAt(glm::vec4 point) override;
-  // virtual void setColour(glm::vec3 colour, int index) override;
+  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
+  // virtual void setColour(glm::dvec3 colour, int index) override;
 };
 
 class GradientPattern : public ColourPattern {
 private:
   /* data */
 public:
-  GradientPattern(glm::vec3 colourA, glm::vec3 colourB);
+  GradientPattern(glm::dvec3 colourA, glm::dvec3 colourB);
   ~GradientPattern();
-  virtual glm::vec3 patternAt(glm::vec4 point) override;
-  // virtual void setColour(glm::vec3 colour, int index) override;
+  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
+  // virtual void setColour(glm::dvec3 colour, int index) override;
 };
 
 class RingPattern : public ColourPattern {
 private:
   /* data */
 public:
-  RingPattern(glm::vec3 colourA, glm::vec3 colourB);
+  RingPattern(glm::dvec3 colourA, glm::dvec3 colourB);
   ~RingPattern();
-  virtual glm::vec3 patternAt(glm::vec4 point) override;
-  // virtual void setColour(glm::vec3 colour, int index) override;
+  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
+  // virtual void setColour(glm::dvec3 colour, int index) override;
 };
 
 class CheckedPattern : public ColourPattern {
 private:
   /* data */
 public:
-  CheckedPattern(glm::vec3 colourA, glm::vec3 colourB);
+  CheckedPattern(glm::dvec3 colourA, glm::dvec3 colourB);
   ~CheckedPattern();
-  virtual glm::vec3 patternAt(glm::vec4 point) override;
-  // virtual void setColour(glm::vec3 colour, int index) override;
+  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
+  // virtual void setColour(glm::dvec3 colour, int index) override;
 };
 
 class BlendedPattern : public Pattern {
@@ -56,7 +56,7 @@ public:
   ~BlendedPattern();
 
   // void addPattern(std::shared_ptr<Pattern>& pattern);
-  virtual glm::vec3 patternAt(glm::vec4 point) override;
+  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
 
   std::shared_ptr<Pattern> patternA;
   std::shared_ptr<Pattern> patternB;
@@ -65,14 +65,14 @@ public:
 class PerturbedPattern : public Pattern {
 private:
   /* data */
-  float perturbedCoeff;
+  double perturbedCoeff;
 
 public:
-  PerturbedPattern(std::shared_ptr<Pattern> &pattern, float perturbedCoeff);
+  PerturbedPattern(std::shared_ptr<Pattern> &pattern, double perturbedCoeff);
   PerturbedPattern(const PerturbedPattern &perturbedPattern);
   ~PerturbedPattern();
 
-  virtual glm::vec3 patternAt(glm::vec4 point) override;
+  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
 
   std::shared_ptr<Pattern> pattern;
 };

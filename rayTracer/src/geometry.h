@@ -20,22 +20,22 @@
 // class Shape;
 
 namespace Geometry {
-static const float EPSILON = 0.0001f;
-// static const float EPSILON = std::numeric_limits<float>::epsilon();
+static const double EPSILON = 0.000000001;
+// static const double EPSILON = std::numeric_limits<double>::epsilon();
 struct IntersectionParameters {
-  glm::vec4 point;
-  glm::vec4 normalv;
-  glm::vec4 eyev;
-  glm::vec4 reflectv;
-  glm::vec4 overPoint;
-  glm::vec4 underPoint;
-  float n1;
-  float n2;
+  glm::dvec4 point;
+  glm::dvec4 normalv;
+  glm::dvec4 eyev;
+  glm::dvec4 reflectv;
+  glm::dvec4 overPoint;
+  glm::dvec4 underPoint;
+  double n1;
+  double n2;
   bool inside;
 };
 
 template <typename T> struct Intersection {
-  float t;
+  double t;
   T *shapePtr;
   std::unique_ptr<IntersectionParameters> comps;
 };
@@ -48,7 +48,7 @@ void getRefractiveIndexFromTo(std::vector<Intersection<T>> &intersections,
   for (auto &intersection : intersections) {
     if (&intersection == &hit) {
       if (objects.empty())
-        intersection.comps->n1 = 1.f;
+        intersection.comps->n1 = 1.0;
       else
         intersection.comps->n1 = objects.back()->material->refractiveIndex;
     }
@@ -62,7 +62,7 @@ void getRefractiveIndexFromTo(std::vector<Intersection<T>> &intersections,
 
     if (&intersection == &hit) {
       if (objects.empty())
-        intersection.comps->n2 = 1.f;
+        intersection.comps->n2 = 1.0;
       else
         intersection.comps->n2 = objects.back()->material->refractiveIndex;
       break;
@@ -123,34 +123,34 @@ Intersection<T> *hit(std::vector<Intersection<T>> &intersections) {
 }
 
 template <typename T>
-float schlick(std::unique_ptr<IntersectionParameters> &comps) {
-  float cos = glm::dot(comps->eyev, comps->normalv);
+double schlick(std::unique_ptr<IntersectionParameters> &comps) {
+  double cos = glm::dot(comps->eyev, comps->normalv);
   if (comps->n1 > comps->n2) {
-    float n = comps->n1 / comps->n2;
-    float sin2T = std::pow(n, 2) * (1.f - std::pow(cos, 2));
-    if (sin2T > 1.f)
-      return 1.f;
+    double n = comps->n1 / comps->n2;
+    double sin2T = std::pow(n, 2) * (1.0 - std::pow(cos, 2));
+    if (sin2T > 1.0)
+      return 1.0;
 
-    float cosT = std::sqrt(1.f - sin2T);
+    double cosT = std::sqrt(1.0 - sin2T);
     cos = cosT;
   }
-  float r0 = std::pow((comps->n1 - comps->n2) / (comps->n1 + comps->n2), 2);
-  return r0 + (1.f - r0) * std::pow(1.f - cos, 5);
+  double r0 = std::pow((comps->n1 - comps->n2) / (comps->n1 + comps->n2), 2);
+  return r0 + (1.0 - r0) * std::pow(1.0 - cos, 5);
 }
 
 template <typename T>
-std::pair<float, float> checkAxis(float origin, float direction) {
-  float tmin_numerator = -1 - origin;
-  float tmax_numerator = 1 - origin;
+std::pair<double, double> checkAxis(double origin, double direction) {
+  double tmin_numerator = -1 - origin;
+  double tmax_numerator = 1 - origin;
 
-  std::pair<float, float> ret;
+  std::pair<double, double> ret;
 
   if (std::abs(direction) >= EPSILON) {
     ret.first = tmin_numerator / direction;
     ret.second = tmax_numerator / direction;
   } else {
-    ret.first = tmin_numerator * std::numeric_limits<float>::infinity();
-    ret.second = tmax_numerator * std::numeric_limits<float>::infinity();
+    ret.first = tmin_numerator * std::numeric_limits<double>::infinity();
+    ret.second = tmax_numerator * std::numeric_limits<double>::infinity();
   }
   if (ret.first > ret.second)
     std::swap(ret.first, ret.second);

@@ -25,8 +25,8 @@ private:
   struct Value
   {
     bool isScalar;
-    float scalar;
-    std::unique_ptr<glm::vec3> vector;
+    double scalar;
+    std::unique_ptr<glm::dvec3> vector;
   };
 
   struct Definition

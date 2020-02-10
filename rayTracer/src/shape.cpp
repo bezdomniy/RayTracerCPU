@@ -2,8 +2,8 @@
 
 Shape::Shape()
 {
-  this->transform = glm::mat4(1.f);
-  this->inverseTransform = glm::mat4(1.f);
+  this->transform = glm::dmat4(1.0);
+  this->inverseTransform = glm::dmat4(1.0);
 }
 
 Ray Shape::transformRay(Ray &ray)
@@ -21,18 +21,18 @@ void Shape::setMaterial(std::shared_ptr<Material> &mat)
   this->material = mat;
 }
 
-glm::vec3 Shape::patternAt(glm::vec4 point)
+glm::dvec3 Shape::patternAt(glm::dvec4 point)
 {
-  // glm::mat4 shapeTransformInverse(glm::affineInverse(this->transform));
-  glm::vec4 objectPoint = this->inverseTransform * point;
+  // glm::dmat4 shapeTransformInverse(glm::affineInverse(this->transform));
+  glm::dvec4 objectPoint = this->inverseTransform * point;
 
-  glm::mat4 patternTransformInverse(glm::affineInverse(this->material->pattern->transform));
-  glm::vec4 patternPoint = patternTransformInverse * objectPoint;
+  glm::dmat4 patternTransformInverse(glm::affineInverse(this->material->pattern->transform));
+  glm::dvec4 patternPoint = patternTransformInverse * objectPoint;
 
   return this->material->pattern->patternAt(patternPoint);
 }
 
-void Shape::multiplyTransform(glm::mat4 &transform)
+void Shape::multiplyTransform(glm::dmat4 &transform)
 {
   this->transform = transform * this->transform;
   // this->inverseTransform = glm::affineInverse(this->transform);
