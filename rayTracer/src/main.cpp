@@ -50,8 +50,8 @@ EMSCRIPTEN_BINDINGS(Module)
 
 int main(int argc, char const *argv[])
 {
-  renderToSDL("scenes/shadowPuppets.yaml");
-  // renderToPPM("scenes/reflectionScene.yaml");
+  // renderToSDL("scenes/shadowPuppets.yaml");
+  renderToPPM("scenes/reflectionScene.yaml");
    //VulkanApp vulkanApp;
    //vulkanApp.initWindow();
    //vulkanApp.initVulkan();

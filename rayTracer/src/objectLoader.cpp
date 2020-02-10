@@ -444,3 +444,7 @@ void ObjectLoader::parseTransform(const YAML::Node &node,
   }
   definition.empty = false;
 }
+
+std::shared_ptr<Shape> ObjectLoader::loadModel(const std::string &fileName) {
+  return std::make_shared<Cube>();
+}
