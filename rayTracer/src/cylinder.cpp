@@ -12,6 +12,16 @@ Cylinder::Cylinder(double minimum, double maximum, bool capped) : Shape() {
   this->capped = capped;
 }
 
+// TODO refactor to use unique_ptrs in object loader and make explicit copy constructors for all shapes
+Cylinder::Cylinder(const Cylinder &c2) {
+  this->maximum = c2.maximum;
+  this->minimum = c2.minimum;
+  this->capped = c2.capped;
+  this->inverseTransform = c2.inverseTransform;
+  this->transform = c2.transform;
+  this->parent = c2.parent;
+}
+
 Cylinder::~Cylinder() {}
 
 void Cylinder::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) { 
@@ -50,7 +60,7 @@ void Cylinder::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>
 }
 
 glm::dvec4 Cylinder::normalAt(glm::dvec4 point) {
-  glm::dvec4 objectPoint = this->inverseTransform * point;
+  glm::dvec4 objectPoint = worldToObject(point);
 
   double dist = std::pow(objectPoint.x, 2) + std::pow(objectPoint.z, 2);
   glm::dvec4 objectNormal;
@@ -62,10 +72,7 @@ glm::dvec4 Cylinder::normalAt(glm::dvec4 point) {
   else
     objectNormal = glm::dvec4(objectPoint.x, 0.0, objectPoint.z, 0.0);
 
-  glm::dvec4 worldNormal = glm::transpose(this->inverseTransform) * objectNormal;
-  worldNormal.w = 0.0;
-
-  return glm::normalize(worldNormal);
+  return normalToWorld(objectNormal);
 }
 
 std::string Cylinder::type() { return "Cylinder"; }

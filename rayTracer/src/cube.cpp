@@ -27,7 +27,7 @@ void Cube::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& in
 glm::dvec4 Cube::normalAt(glm::dvec4 point)
 {
     // glm::dmat4 transformInverse(glm::affineInverse(this->transform));
-    glm::dvec4 objectPoint = this->inverseTransform * point;
+    glm::dvec4 objectPoint = worldToObject(point);
     glm::dvec4 objectNormal;
 
     double points[3] = {std::abs(objectPoint.x), std::abs(objectPoint.y), std::abs(objectPoint.z)};
@@ -41,10 +41,7 @@ glm::dvec4 Cube::normalAt(glm::dvec4 point)
     else
         objectNormal = glm::normalize(glm::dvec4(0.0, 0.0, objectPoint.z, 0.0));
 
-    glm::dvec4 worldNormal = glm::transpose(this->inverseTransform) * objectNormal;
-    worldNormal.w = 0.0;
-
-    return glm::normalize(worldNormal);
+    return normalToWorld(objectNormal);
 }
 
 std::string Cube::type()

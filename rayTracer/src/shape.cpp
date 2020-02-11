@@ -43,4 +43,24 @@ void Shape::calculateInverseTranform()
   this->inverseTransform = glm::affineInverse(this->transform);
 }
 
+glm::dvec4 Shape::worldToObject(glm::dvec4 point) {
+  if (this->parent) {
+    point = this->parent->worldToObject(point);
+  }
+
+  return this->inverseTransform * point;
+}
+
+glm::dvec4 Shape::normalToWorld(glm::dvec4 normal) {
+  normal = glm::transpose(this->inverseTransform) * normal;
+  normal.w = 0.0;
+  normal = glm::normalize(normal);
+
+  if (this->parent) {
+    normal = this->parent->normalToWorld(normal);
+  }
+
+  return normal;
+}
+
 Shape::~Shape() {}

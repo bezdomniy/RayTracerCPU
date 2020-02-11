@@ -22,13 +22,10 @@ void Plane::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& i
 
 glm::dvec4 Plane::normalAt(glm::dvec4 point)
 {
-    // glm::dmat4 transformInverse(glm::affineInverse(this->transform));
-    // glm::dvec4 objectPoint = transformInverse * point;
+    // glm::dvec4 objectPoint = worldToObject(point);
     glm::dvec4 objectNormal(0.0, 1.0, 0.0, 0.0);
-    glm::dvec4 worldNormal = glm::transpose(this->inverseTransform) * objectNormal;
-    worldNormal.w = 0.0;
 
-    return glm::normalize(worldNormal);
+    return normalToWorld(objectNormal);
 }
 
 std::string Plane::type()

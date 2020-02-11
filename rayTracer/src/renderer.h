@@ -42,7 +42,7 @@ public:
   ~Renderer();
 
   static const int RAY_BOUNCE_LIMIT = 5;
-  static const int RAYS_PER_PIXEL = 64;
+  static const int RAYS_PER_PIXEL = 1;
   Canvas canvas;
 
   glm::dvec3 colourAt(Ray &ray, World &world, short remaining);

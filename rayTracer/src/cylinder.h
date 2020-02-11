@@ -9,6 +9,8 @@ class Cylinder : public Shape {
 public:
   Cylinder();
   Cylinder(double minimum, double maximum, bool capped);
+
+  Cylinder(const Cylinder &c2);
   ~Cylinder();
 
   virtual void intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) override;

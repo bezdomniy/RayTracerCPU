@@ -38,10 +38,10 @@ void Triangle::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>
 
 glm::dvec4 Triangle::normalAt(glm::dvec4 point)
 {
-    glm::dvec4 worldNormal = glm::transpose(this->inverseTransform) * this->normal;
-    worldNormal.w = 0.0;
+    // glm::dvec4 worldNormal = glm::transpose(this->inverseTransform) * this->normal;
+    // worldNormal.w = 0.0;
 
-    return glm::normalize(worldNormal);
+    return normalToWorld(this->normal);
 }
 
 std::string Triangle::type()

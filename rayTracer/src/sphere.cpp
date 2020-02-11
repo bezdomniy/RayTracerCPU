@@ -31,12 +31,10 @@ void Sphere::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& 
 glm::dvec4 Sphere::normalAt(glm::dvec4 point)
 {
   // glm::dmat4 transformInverse(glm::affineInverse(this->transform));
-  glm::dvec4 objectPoint = this->inverseTransform * point;
+  glm::dvec4 objectPoint = worldToObject(point);
   glm::dvec4 objectNormal = objectPoint - glm::dvec4(0.0, 0.0, 0.0, 1.0);
-  glm::dvec4 worldNormal = glm::transpose(this->inverseTransform) * objectNormal;
-  worldNormal.w = 0.0;
 
-  return glm::normalize(worldNormal);
+  return normalToWorld(objectNormal);
 }
 
 std::string Sphere::type()

@@ -15,7 +15,9 @@ private:
   /* data */
 public:
   Shape();
-  virtual ~Shape();
+  virtual ~Shape() = 0;
+
+  std::shared_ptr<Shape> parent;
 
   virtual void intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) = 0;
   virtual glm::dvec4 normalAt(glm::dvec4 point) = 0;
@@ -29,6 +31,9 @@ public:
   glm::dvec3 patternAt(glm::dvec4 point);
   void multiplyTransform(glm::dmat4 &transform);
   void calculateInverseTranform();
+
+  glm::dvec4 worldToObject(glm::dvec4 point);
+  glm::dvec4 normalToWorld(glm::dvec4 normal);
 
   Ray transformRay(Ray &ray);
   void transformRayInPlace(Ray &ray);
