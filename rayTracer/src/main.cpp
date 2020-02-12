@@ -64,10 +64,18 @@ int main(int argc, char const *argv[])
 
   std::shared_ptr<Group> group = std::make_shared<Group>();
 
-  std::shared_ptr<Shape> sphere = std::make_shared<Sphere>();
+  std::shared_ptr<Shape> cube = std::make_shared<Cube>();
   glm::dmat4 scale =
-          glm::scale(glm::dmat4(1.0), glm::dvec3(3.,3.,3.));
-  sphere->multiplyTransform(scale);
+          glm::scale(glm::dmat4(1.0), glm::dvec3(2.,2.,2.));
+  cube->multiplyTransform(scale);
+
+  glm::dmat4 rotation =
+          glm::rotate(glm::dmat4(1.0), 0.4,
+                      glm::dvec3(1.0, 0.0, 0.0));
+
+  cube->multiplyTransform(rotation);
+
+  cube->calculateInverseTranform();
 
   std::shared_ptr<PointLight> light = std::make_shared<PointLight>(
         glm::dvec4(glm::dvec4(10.,10.,10.,1.)),
@@ -76,9 +84,9 @@ int main(int argc, char const *argv[])
 
   std::shared_ptr<Material> material = std::make_shared<Material>();
   material->colour = glm::dvec3(0.1,0.1,1.);
-  sphere->setMaterial(material);
+  cube->setMaterial(material);
 
-  group->addChild(sphere);
+  group->addChild(cube);
   std::shared_ptr<Shape> groupShape = std::move(std::dynamic_pointer_cast<Shape>(group));
 
   // TODO add local_intersect function to group to make this work

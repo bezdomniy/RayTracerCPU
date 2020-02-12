@@ -2,20 +2,28 @@
 
 Group::Group(/* args */) : Shape()
 {
+  this->boundingBox = std::pair<glm::dvec4,glm::dvec4>(glm::dvec4(std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity(),1.) \
+                                            ,glm::dvec4(-std::numeric_limits<double>::infinity(),-std::numeric_limits<double>::infinity(),-std::numeric_limits<double>::infinity(),1.));
 }
 
 Group::~Group()
 {
 }
 
-// TODO
 void Group::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) { 
     Ray transformedRay = transformRay(ray);
 
+    if (boundIntersection(transformedRay)) {
+      for (auto &shape: this->children) {
+        std::shared_ptr<Shape> p = shape.lock();
+        p->intersectRay(transformedRay, intersections);
+      }
+    }
+    return;
 }
 
 glm::dvec4 Group::normalAt(glm::dvec4 point) {
-  std::cout << "Shouldn't be called.\n";
+  throw std::runtime_error("group shouldn't run normal function");
   glm::dvec4 objectPoint = this->inverseTransform * point;
   return glm::normalize(glm::dvec4());
 }
@@ -36,6 +44,51 @@ if (child->type() == "Sphere") {
   } else {
     throw std::invalid_argument("Not a valid shape for group");
   }
+
+  updateBoundingBox(child);
+}
+
+void Group::updateBoundingBox(std::shared_ptr<Shape>& shape) {
+  std::vector<glm::dvec4> points(8);
+  points.at(0) = shape->bounds().first;
+  points.at(1) = glm::dvec4(shape->bounds().first.x, shape->bounds().first.y, shape->bounds().second.z,1.);
+  points.at(2) = glm::dvec4(shape->bounds().first.x, shape->bounds().second.y, shape->bounds().first.z,1.);
+  points.at(3) = glm::dvec4(shape->bounds().first.x, shape->bounds().second.y, shape->bounds().second.z,1.);
+  points.at(4) = glm::dvec4(shape->bounds().second.x, shape->bounds().first.y, shape->bounds().first.z,1.);
+  points.at(5) = glm::dvec4(shape->bounds().second.x, shape->bounds().first.y, shape->bounds().second.z,1.);
+  points.at(6) = glm::dvec4(shape->bounds().second.x, shape->bounds().second.y, shape->bounds().first.z,1.);
+  points.at(7) = shape->bounds().second;
+
+  for (auto point: points) {
+    glm::dvec4 transformedPoint(shape->transform * point);
+    this->boundingBox.first = glm::min(this->boundingBox.first, transformedPoint);
+    this->boundingBox.second = glm::max(this->boundingBox.second, transformedPoint);
+  }
+
+  // newBoundingBox.first = shape->transform * newBoundingBox.first;
+  // newBoundingBox.second = shape->transform * newBoundingBox.second;
+
+  std::cout << "shape bounding box: " << this->boundingBox.first.x << " "  << this->boundingBox.first.y << " "  << this->boundingBox.first.z << " " \
+   << this->boundingBox.second.x << " "  << this->boundingBox.second.y << " "  << this->boundingBox.second.z << " " <<std::endl;
+
+}
+
+std::pair<glm::dvec4,glm::dvec4> Group::bounds() {
+  return this->boundingBox;
+}
+
+bool Group::boundIntersection(Ray& transformedRay) {
+    std::pair<double, double> xtminmax = Geometry::checkAxis<double>(transformedRay.origin.x, transformedRay.direction.x, this->boundingBox.first.x,this->boundingBox.second.x);
+    std::pair<double, double> ytminmax = Geometry::checkAxis<double>(transformedRay.origin.y, transformedRay.direction.y, this->boundingBox.first.y,this->boundingBox.second.y);
+    std::pair<double, double> ztminmax = Geometry::checkAxis<double>(transformedRay.origin.z, transformedRay.direction.z, this->boundingBox.first.z,this->boundingBox.second.z);
+
+    double tmin = std::max({ xtminmax.first, ytminmax.first, ztminmax.first });
+    double tmax = std::min({ xtminmax.second, ytminmax.second, ztminmax.second });
+
+    if (tmin > tmax)
+        return false;
+
+    return true;
 }
 
 

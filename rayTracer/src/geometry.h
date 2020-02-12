@@ -139,9 +139,9 @@ double schlick(std::unique_ptr<IntersectionParameters> &comps) {
 }
 
 template <typename T>
-std::pair<double, double> checkAxis(double origin, double direction) {
-  double tmin_numerator = -1 - origin;
-  double tmax_numerator = 1 - origin;
+std::pair<double, double> checkAxis(double origin, double direction, double lowerBound = -1.0, double upperBound = 1.0) {
+  double tmin_numerator = lowerBound - origin;
+  double tmax_numerator = upperBound - origin;
 
   std::pair<double, double> ret;
 

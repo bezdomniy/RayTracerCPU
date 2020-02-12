@@ -28,7 +28,11 @@ glm::dvec4 Plane::normalAt(glm::dvec4 point)
     return normalToWorld(objectNormal);
 }
 
+std::pair<glm::dvec4,glm::dvec4> Plane::bounds() {
+  return std::pair<glm::dvec4,glm::dvec4>(glm::dvec4(-std::numeric_limits<double>::infinity(),0.,-std::numeric_limits<double>::infinity(),1.),glm::dvec4(std::numeric_limits<double>::infinity(),0.,std::numeric_limits<double>::infinity(),1.));
+}
+
 std::string Plane::type()
 {
-    return "plane";
+    return "Plane";
 }

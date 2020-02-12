@@ -75,6 +75,10 @@ glm::dvec4 Cylinder::normalAt(glm::dvec4 point) {
   return normalToWorld(objectNormal);
 }
 
+std::pair<glm::dvec4,glm::dvec4> Cylinder::bounds() {
+  return std::pair<glm::dvec4,glm::dvec4>(glm::dvec4(-1.,this->minimum,-1.,1.),glm::dvec4(1.,this->maximum,1.,1.));
+}
+
 std::string Cylinder::type() { return "Cylinder"; }
 
 bool Cylinder::checkCap(Ray &ray, double t) {
@@ -83,6 +87,7 @@ bool Cylinder::checkCap(Ray &ray, double t) {
 
   return (std::pow(x, 2) + std::pow(z, 2)) <= 1;
 }
+
 
 void Cylinder::intersectCaps(Ray &ray, std::vector<Geometry::Intersection<Shape>>& intersections) {
   if (!this->capped || std::abs(ray.direction.y) < Geometry::EPSILON)

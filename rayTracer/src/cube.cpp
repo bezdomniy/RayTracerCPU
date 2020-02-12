@@ -44,7 +44,11 @@ glm::dvec4 Cube::normalAt(glm::dvec4 point)
     return normalToWorld(objectNormal);
 }
 
+std::pair<glm::dvec4,glm::dvec4> Cube::bounds() {
+  return std::pair<glm::dvec4,glm::dvec4>(glm::dvec4(-1.,-1.,-1.,1.),glm::dvec4(1.,1.,1.,1.));
+}
+
 std::string Cube::type()
 {
-    return "cube";
+    return "Cube";
 }

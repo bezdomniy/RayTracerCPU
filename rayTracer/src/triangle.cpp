@@ -44,7 +44,13 @@ glm::dvec4 Triangle::normalAt(glm::dvec4 point)
     return normalToWorld(this->normal);
 }
 
+std::pair<glm::dvec4,glm::dvec4> Triangle::bounds() {
+    glm::dvec4 min(std::min({p1.x,p2.x,p3.x}),std::min({p1.y,p2.y,p3.y}),std::min({p1.z,p2.z,p3.z}),1.);
+    glm::dvec4 max(std::max({p1.x,p2.x,p3.x}),std::max({p1.y,p2.y,p3.y}),std::max({p1.z,p2.z,p3.z}),1.);
+  return std::pair<glm::dvec4,glm::dvec4>(min,max);
+}
+
 std::string Triangle::type()
 {
-    return "triangle";
+    return "Triangle";
 }

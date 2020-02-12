@@ -66,6 +66,10 @@ glm::dvec4 Camera::normalAt(glm::dvec4 point)
   return glm::dvec4();
 }
 
+std::pair<glm::dvec4,glm::dvec4> Camera::bounds() {
+  return std::pair<glm::dvec4,glm::dvec4>();
+}
+
 void Camera::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) { return; }
 
 std::string Camera::type()
