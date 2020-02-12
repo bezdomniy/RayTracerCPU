@@ -41,6 +41,8 @@ if (child->type() == "Sphere") {
     this->children.push_back(std::dynamic_pointer_cast<Cylinder>(child));
   } else if (child->type() == "Triangle") {
     this->children.push_back(std::dynamic_pointer_cast<Triangle>(child));
+  } else if (child->type() == "Group") {
+    this->children.push_back(std::dynamic_pointer_cast<Group>(child));
   } else {
     throw std::invalid_argument("Not a valid shape for group");
   }

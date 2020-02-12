@@ -62,8 +62,10 @@ std::shared_ptr<Shape> hexagonCorner() {
 
     glm::dmat4 translate =
             glm::translate(glm::dmat4(1.0), glm::dvec3(0.,0.,-1.));
-    corner->multiplyTransform(translate);
+    
     corner->multiplyTransform(scale);
+    corner->multiplyTransform(translate);
+    
 
     corner->calculateInverseTranform();
 
@@ -71,7 +73,7 @@ std::shared_ptr<Shape> hexagonCorner() {
 }
 
 std::shared_ptr<Shape> hexagonEdge() {
-    std::shared_ptr<Shape> edge = std::make_shared<Cylinder>(0.,0.,false);
+    std::shared_ptr<Shape> edge = std::make_shared<Cylinder>(0.,1.,false);
           std::shared_ptr<Material> material = std::make_shared<Material>();
   material->colour = glm::dvec3(0.8,0.8,0.8);
   edge->setMaterial(material);
@@ -115,11 +117,13 @@ std::shared_ptr<Group> hexagonSide() {
 std::shared_ptr<Group> hexagon() {
     std::shared_ptr<Group> hex = std::make_shared<Group>();
 
-    for (int i = 0; i < 5; i++) {
+    for (int i = 0; i < 6; i++) {
       std::shared_ptr<Shape> side = hexagonSide();
       glm::dmat4 rotationy =
           glm::rotate(glm::dmat4(1.0), i * 1.0471975512 ,
                       glm::dvec3(0.0, 1.0, 0.0));
+      side->multiplyTransform(rotationy);
+    
       side->calculateInverseTranform();
       hex->addChild(side);
     }
@@ -139,7 +143,7 @@ int main(int argc, char const *argv[])
 
 
   World world;
-  std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(10., 0., -10., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 200,  0.524);
+  std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(10., 5., -10., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 200,  0.524);
 
   std::shared_ptr<Group> group = hexagon();
   // std::shared_ptr<Shape> hexCorner1 = hexagonCorner();
