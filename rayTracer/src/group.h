@@ -22,7 +22,7 @@ public:
     Group(/* args */);
     ~Group();
 
-    std::vector<std::weak_ptr<Shape>> children;
+    std::vector<std::shared_ptr<Shape>> children;
     std::pair<glm::dvec4,glm::dvec4> boundingBox;
 
     void addChild(std::shared_ptr<Shape>& child);

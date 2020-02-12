@@ -15,8 +15,8 @@ void Group::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& i
 
     if (boundIntersection(transformedRay)) {
       for (auto &shape: this->children) {
-        std::shared_ptr<Shape> p = shape.lock();
-        p->intersectRay(transformedRay, intersections);
+        // std::shared_ptr<Shape> p = shape.lock();
+        shape->intersectRay(transformedRay, intersections);
       }
     }
     return;
