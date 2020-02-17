@@ -135,45 +135,37 @@ std::shared_ptr<Group> hexagon() {
 
 int main(int argc, char const *argv[])
 {
-  // renderToSDL("scenes/shadowPuppets.yaml");
+  // renderToSDL("scenes/reflectionScene.yaml");
+  // renderToSDL("scenes/coverScene.yaml");
+  renderToSDL("scenes/groups.yaml");
+  // renderToSDL("scenes/hippy.yaml");
+  // renderToSDL("scenes/reflectionScene.yaml");
+  // renderToSDL("scenes/reflectionScene.yaml");
+  // renderToSDL("scenes/reflectionScene.yaml");
+
   // renderToPPM("scenes/reflectionScene.yaml");
    //VulkanApp vulkanApp;
    //vulkanApp.initWindow();
    //vulkanApp.initVulkan();
 
 
-  World world;
-  std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(10., 5., -10., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 200,  0.524);
+  // World world;
+  // std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(10., 5., -10., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 200,  0.524);
 
-  std::shared_ptr<Group> group = hexagon();
-  // std::shared_ptr<Shape> hexCorner1 = hexagonCorner();
-  // std::shared_ptr<Shape> hexCorner2 = hexagonCorner();
-  // std::shared_ptr<Group> group = std::make_shared<Group>();
-
-  //     glm::dmat4 translate =
-  //           glm::translate(glm::dmat4(1.0), glm::dvec3(1.,0.,0.));
-
-  //   hexCorner2->multiplyTransform(translate);
-  //   hexCorner2->calculateInverseTranform();
+  // std::shared_ptr<Group> group = hexagon();
+  // std::shared_ptr<PointLight> light = std::make_shared<PointLight>(
+  //       glm::dvec4(glm::dvec4(10.,10.,10.,1.)),
+  //       glm::dvec3(1.,1.,1.));
 
 
-  // group->addChild(hexCorner1);
-  // group->addChild(hexCorner2);
+  // std::shared_ptr<Shape> groupShape = std::move(std::dynamic_pointer_cast<Shape>(group));
 
-  std::shared_ptr<PointLight> light = std::make_shared<PointLight>(
-        glm::dvec4(glm::dvec4(10.,10.,10.,1.)),
-        glm::dvec3(1.,1.,1.));
+  // world.addShape(groupShape);
+  // world.addLight(light);
 
-
-  std::shared_ptr<Shape> groupShape = std::move(std::dynamic_pointer_cast<Shape>(group));
-
-  world.addShape(groupShape);
-  world.addLight(light);
-
-  Renderer renderer(camera);
-  renderer.render(world);
-  renderer.canvas.writeToPPM("out.ppm", false);
-
+  // Renderer renderer(camera);
+  // renderer.render(world);
+  // renderer.canvas.writeToPPM("out.ppm", false);
 
 
   return 0;
