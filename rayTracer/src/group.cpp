@@ -1,5 +1,6 @@
 #include "group.h"
 
+// TODO implement pattern inheritance for groups
 Group::Group(/* args */) : Shape()
 {
   this->boundingBox = std::pair<glm::dvec4,glm::dvec4>(glm::dvec4(std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity(),1.) \

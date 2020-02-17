@@ -10,6 +10,8 @@
 #include "pointLight.h"
 #include "shape.h"
 #include "sphere.h"
+#include "cone.h"
+#include "group.h"
 #include "triangle.h"
 #include "yaml-cpp/yaml.h"
 // #include <filesystem>

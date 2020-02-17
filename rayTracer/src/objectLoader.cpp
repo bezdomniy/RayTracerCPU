@@ -112,7 +112,7 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode) {
                                   nextKey);
     }
   }
-
+// Add new shapes here
   if (shapeType == "sphere") {
     ret = std::make_shared<Sphere>();
   } else if (shapeType == "plane") {
@@ -124,6 +124,13 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode) {
       ret = std::make_shared<Cylinder>();
     else
       ret = std::make_shared<Cylinder>(Cylinder(
+          args.at(0).scalar, args.at(1).scalar,
+          std::abs(args.at(2).scalar) > std::numeric_limits<double>::epsilon()));
+  } else if (shapeType == "cone") {
+    if (args.empty())
+      ret = std::make_shared<Cone>();
+    else
+      ret = std::make_shared<Cone>(Cone(
           args.at(0).scalar, args.at(1).scalar,
           std::abs(args.at(2).scalar) > std::numeric_limits<double>::epsilon()));
   } else if (shapeType == "triangle") {
