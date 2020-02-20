@@ -32,13 +32,13 @@ class ObjectLoader
 private:
   struct Value
   {
-    bool isScalar;
     double scalar;
-    std::unique_ptr<glm::dvec3> vector;
+    glm::dvec3 vector;
   };
 
   struct Definition
   {
+    virtual ~Definition() = default;
     bool empty = true;
     std::shared_ptr<Definition> inheritFrom;
     std::unordered_map<std::string, Value> values;
@@ -46,9 +46,21 @@ private:
     std::shared_ptr<Pattern> pattern;
   };
 
+  struct ShapeDefinition : Definition
+  {
+    std::string shapeType;
+    Definition materialDefinition;
+    Definition transformDefinition;
+    std::vector<Value> args;
+    std::vector<ShapeDefinition> children;
+  };
+
   std::unordered_map<std::string, std::shared_ptr<Definition>> definitions;
+  // std::unordered_map<std::string, std::shared_ptr<ShapeDefinition>> shapeDefinitions;
 
   std::shared_ptr<Shape> addShape(const YAML::Node &shapeNode);
+  std::shared_ptr<Shape> shapeFromDefinition(ShapeDefinition& shapeDefinition);
+
   void addDefinition(const YAML::Node &definitionNode);
   void assignDefinition(std::shared_ptr<Shape> &shapePtr,
                         Definition &definition);
@@ -56,6 +68,7 @@ private:
   void parseTransform(const YAML::Node &node, Definition &definition);
   void parsePattern(const YAML::Node &node, Definition &definition);
   void parseArgs(const YAML::Node &node, std::vector<Value> &args);
+  void parseShape(const YAML::Node &node, ShapeDefinition &shapeDefinition);
 
 public:
   ObjectLoader();

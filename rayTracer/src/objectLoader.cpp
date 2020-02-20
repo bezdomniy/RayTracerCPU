@@ -42,8 +42,9 @@ ObjectLoader::loadYaml(const std::string &fileName) {
 std::shared_ptr<Shape> ObjectLoader::shapeFromDefinition(ShapeDefinition& shapeDefinition) {
   std::shared_ptr<Shape> ret;
   // Add new shapes here
-  if (definitions[shapeDefinition.shapeType]) {
-    std::shared_ptr<ShapeDefinition> shapeDef = std::dynamic_pointer_cast<ShapeDefinition>(definitions[shapeDefinition.shapeType]);
+
+  if (definitions.find(shapeDefinition.shapeType) != definitions.end()) {
+    std::shared_ptr<ShapeDefinition> shapeDef = std::dynamic_pointer_cast<ShapeDefinition>(definitions.at(shapeDefinition.shapeType));
     ret = shapeFromDefinition(*shapeDef);
     // throw std::invalid_argument(shapeDefinition.shapeType+": hahah");
   } else if (shapeDefinition.shapeType == "sphere") {
@@ -118,7 +119,16 @@ void ObjectLoader::parseShape(const YAML::Node &node, ShapeDefinition &shapeDefi
     std::string nextKey = it->first.as<std::string>();
 
     if (nextKey == "add") {
-      shapeDefinition.shapeType = it->second.as<std::string>();
+      std::string nextDef = it->second.as<std::string>();
+      if (definitions.find(nextDef) != definitions.end()) {
+        std::shared_ptr<Definition> t = definitions.at(nextDef);
+        std::shared_ptr<ShapeDefinition> s = std::dynamic_pointer_cast<ShapeDefinition>(t);
+        shapeDefinition = *s;
+      }
+      else {
+        shapeDefinition.shapeType = nextDef;
+      }
+      
       // if (shapeDefinitions[shapeType]) {
       //   shapeDefinition = *shapeDefinitions[shapeType];
       // }
@@ -266,12 +276,14 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
 
 // TODO: add patterns
 void ObjectLoader::addDefinition(const YAML::Node &definitionNode) {
-  std::shared_ptr<Definition> newDefinition = std::make_shared<Definition>();
+  std::shared_ptr<ShapeDefinition> newDefinitionShape = std::make_shared<ShapeDefinition>();
+  std::shared_ptr<Definition> newDefinition = newDefinitionShape;
+  // std::shared_ptr<ShapeDefinition> newDefinitionShape = std::dynamic_pointer_cast<ShapeDefinition>(newDefinition);
+
   std::string name;
   std::string inheritFromStr;
 
-  for (YAML::const_iterator it = definitionNode.begin();
-       it != definitionNode.end(); ++it) {
+  for (YAML::const_iterator it = definitionNode.begin(); it != definitionNode.end(); ++it) {
     std::string nextKey = it->first.as<std::string>();
     if (nextKey == "define") {
       name = it->second.as<std::string>();
@@ -280,8 +292,9 @@ void ObjectLoader::addDefinition(const YAML::Node &definitionNode) {
     } else if (nextKey == "value") {
       if (it->second.IsMap()) {
         if (it->second["add"]) {
-          std::shared_ptr<ShapeDefinition> newDefinition = std::make_shared<ShapeDefinition>();
-          parseShape(it->second, *newDefinition);
+          // TODO ahh because this one is going out of scope!
+          // std::shared_ptr<ShapeDefinition> newDefinition = std::make_shared<ShapeDefinition>();
+          parseShape(it->second, *newDefinitionShape);
           
         } else{
           parseMaterial(it->second, *newDefinition);

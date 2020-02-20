@@ -6,7 +6,7 @@
 #include "plane.h"
 #include "triangle.h"
 #include "cylinder.h"
-
+#include "cone.h"
 
 #include <vector>
 #include <iostream>
