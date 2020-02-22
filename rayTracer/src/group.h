@@ -9,7 +9,7 @@
 #include "cone.h"
 
 #include <vector>
-#include <iostream>
+// #include <iostream>
 
 class Group : public Shape, public std::enable_shared_from_this<Group>
 {
@@ -26,6 +26,7 @@ public:
     std::pair<glm::dvec4,glm::dvec4> boundingBox;
 
     void addChild(std::shared_ptr<Shape>& child);
+    void setMaterial(std::shared_ptr<Material> &mat) override;
 
     virtual void intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) override;
     virtual glm::dvec4 normalAt(glm::dvec4 point) override ;

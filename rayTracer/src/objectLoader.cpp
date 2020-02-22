@@ -114,8 +114,7 @@ std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode) {
 
 void ObjectLoader::parseShape(const YAML::Node &node, ShapeDefinition &shapeDefinition)
 {
-  for (YAML::const_iterator it = node.begin(); it != node.end();
-       ++it) {
+  for (YAML::const_iterator it = node.begin(); it != node.end(); ++it) {
     std::string nextKey = it->first.as<std::string>();
 
     if (nextKey == "add") {
@@ -216,29 +215,30 @@ void ObjectLoader::parseArgs(const YAML::Node &node, std::vector<Value> &args) {
 
 void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
                                     Definition &definition) {
-  if (!shapePtr->material)
-    shapePtr->material = std::make_shared<Material>();
+
+  std::shared_ptr<Material> newMaterial = std::make_shared<Material>();
+
 
   if (definition.inheritFrom) {
     assignDefinition(shapePtr, *definition.inheritFrom);
   }
   for (auto &value : definition.valueOrder) {
     if (value == "color") {
-      shapePtr->material->colour = definition.values[value].vector;
+      newMaterial->colour = definition.values[value].vector;
     } else if (value == "diffuse") {
-      shapePtr->material->diffuse = definition.values[value].scalar;
+      newMaterial->diffuse = definition.values[value].scalar;
     } else if (value == "ambient") {
-      shapePtr->material->ambient = definition.values[value].scalar;
+      newMaterial->ambient = definition.values[value].scalar;
     } else if (value == "specular") {
-      shapePtr->material->specular = definition.values[value].scalar;
+      newMaterial->specular = definition.values[value].scalar;
     } else if (value == "shininess") {
-      shapePtr->material->shininess = definition.values[value].scalar;
+      newMaterial->shininess = definition.values[value].scalar;
     } else if (value == "reflective") {
-      shapePtr->material->reflective = definition.values[value].scalar;
+      newMaterial->reflective = definition.values[value].scalar;
     } else if (value == "transparency") {
-      shapePtr->material->transparency = definition.values[value].scalar;
+      newMaterial->transparency = definition.values[value].scalar;
     } else if (value == "refractive-index") {
-      shapePtr->material->refractiveIndex = definition.values[value].scalar;
+      newMaterial->refractiveIndex = definition.values[value].scalar;
     } else if (value == "translate") {
       glm::dmat4 translation =
           glm::translate(glm::dmat4(1.0), definition.values[value].vector);
@@ -267,18 +267,21 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
     }
   }
   if (definition.pattern) {
-    shapePtr->material->setPattern(definition.pattern);
-    shapePtr->material->pattern->calculateInverseTranform();
+    newMaterial->setPattern(definition.pattern);
+    newMaterial->pattern->calculateInverseTranform();
   }
+
+  if (!shapePtr->material)
+    shapePtr->setMaterial(newMaterial);
 
   shapePtr->calculateInverseTranform();
 }
 
 // TODO: add patterns
 void ObjectLoader::addDefinition(const YAML::Node &definitionNode) {
+  // TODO this is bad, make properly polymorphic.
   std::shared_ptr<ShapeDefinition> newDefinitionShape = std::make_shared<ShapeDefinition>();
   std::shared_ptr<Definition> newDefinition = newDefinitionShape;
-  // std::shared_ptr<ShapeDefinition> newDefinitionShape = std::dynamic_pointer_cast<ShapeDefinition>(newDefinition);
 
   std::string name;
   std::string inheritFromStr;
@@ -292,11 +295,8 @@ void ObjectLoader::addDefinition(const YAML::Node &definitionNode) {
     } else if (nextKey == "value") {
       if (it->second.IsMap()) {
         if (it->second["add"]) {
-          // TODO ahh because this one is going out of scope!
-          // std::shared_ptr<ShapeDefinition> newDefinition = std::make_shared<ShapeDefinition>();
           parseShape(it->second, *newDefinitionShape);
-          
-        } else{
+        } else {
           parseMaterial(it->second, *newDefinition);
         }
       } else if (it->second.IsSequence()) {

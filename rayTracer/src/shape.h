@@ -31,7 +31,7 @@ public:
   // std::pair<glm::dvec4,glm::dvec4> boundingMinMax;
 
   std::shared_ptr<Material> material;
-  void setMaterial(std::shared_ptr<Material> &mat);
+  virtual void setMaterial(std::shared_ptr<Material> &mat);
   glm::dvec3 patternAt(glm::dvec4 point);
   void multiplyTransform(glm::dmat4 &transform);
   void calculateInverseTranform();

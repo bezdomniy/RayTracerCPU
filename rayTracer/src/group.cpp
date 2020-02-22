@@ -29,10 +29,22 @@ glm::dvec4 Group::normalAt(glm::dvec4 point) {
   return glm::normalize(glm::dvec4());
 }
 
+void Group::setMaterial(std::shared_ptr<Material> &mat)
+{
+  this->material = mat;
+
+  for (auto& child: this->children) {
+    child->setMaterial(mat);
+  }
+}
+
 void Group::addChild(std::shared_ptr<Shape>& child) {
   child->parent = shared_from_this();
 
-if (child->type() == "Sphere") {
+  if (this->material)
+    child->setMaterial(this->material);
+
+  if (child->type() == "Sphere") {
     this->children.push_back(std::dynamic_pointer_cast<Sphere>(child));
   } else if (child->type() == "Plane") {
     this->children.push_back(std::dynamic_pointer_cast<Plane>(child));
@@ -73,8 +85,8 @@ void Group::updateBoundingBox(std::shared_ptr<Shape>& shape) {
   // newBoundingBox.first = shape->transform * newBoundingBox.first;
   // newBoundingBox.second = shape->transform * newBoundingBox.second;
 
-  std::cout << "shape bounding box: " << this->boundingBox.first.x << " "  << this->boundingBox.first.y << " "  << this->boundingBox.first.z << " " \
-   << this->boundingBox.second.x << " "  << this->boundingBox.second.y << " "  << this->boundingBox.second.z << " " <<std::endl;
+  // std::cout << "shape bounding box: " << this->boundingBox.first.x << " "  << this->boundingBox.first.y << " "  << this->boundingBox.first.z << " " \
+  //  << this->boundingBox.second.x << " "  << this->boundingBox.second.y << " "  << this->boundingBox.second.z << " " <<std::endl;
 
 }
 
