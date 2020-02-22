@@ -37,10 +37,8 @@ add_executable(RayTracer ${SOURCES})
 
 if(${TO_NATIVE})
 	message(STATUS "Setting compilation target to native binary")
-<<<<<<< HEAD
 	# set_target_properties(RayTracer PROPERTIES LINK_FLAGS -lc++fs)
 	target_link_libraries(RayTracer PRIVATE "pthread")
-=======
 
 	set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 	set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -69,7 +67,6 @@ if(${TO_NATIVE})
 	target_include_directories(RayTracer PRIVATE ${SDL2_INCLUDE_DIRS})
 	#target_link_libraries(RayTracer PRIVATE $<$<CXX_COMPILER_ID:Clang>:rt>)
 	target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb pstl::ParallelSTL SDL2::SDL2main SDL2::SDL2-static assimp::assimp)
->>>>>>> 336f3a3... preparing to implement obj
 else()
 	message(STATUS "Setting compilation target to WASM")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
