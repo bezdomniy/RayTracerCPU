@@ -36,6 +36,7 @@ private:
     glm::dvec3 vector;
   };
 
+// TODO why do I even use a definition? Why not just make the shapes and add copies to the world?
   struct Definition
   {
     virtual ~Definition() = default;
@@ -64,6 +65,7 @@ private:
   void addDefinition(const YAML::Node &definitionNode);
   void assignDefinition(std::shared_ptr<Shape> &shapePtr,
                         Definition &definition);
+
   void parseMaterial(const YAML::Node &node, Definition &definition);
   void parseTransform(const YAML::Node &node, Definition &definition);
   void parsePattern(const YAML::Node &node, Definition &definition);
