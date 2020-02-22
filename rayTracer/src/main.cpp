@@ -14,8 +14,7 @@
 using namespace emscripten;
 #endif
 
-void renderToPPM(const std::string &sceneDesc)
-{
+void renderToPPM(const std::string &sceneDesc) {
   World world;
   std::shared_ptr<Camera> camera = world.loadFromFile(sceneDesc);
 
@@ -25,8 +24,7 @@ void renderToPPM(const std::string &sceneDesc)
 }
 
 #ifdef __EMSCRIPTEN__
-EMSCRIPTEN_BINDINGS(Module)
-{
+EMSCRIPTEN_BINDINGS(Module) {
   class_<EmscriptenRunner>("EmscriptenRunner")
       .constructor()
       .function("init", &EmscriptenRunner::init)
@@ -39,13 +37,12 @@ EMSCRIPTEN_BINDINGS(Module)
 }
 #else
 
-int main(int argc, char const *argv[])
-{
-  renderToPPM("scenes/reflectionScene.yaml");
+int main(int argc, char const *argv[]) {
+  renderToPPM("scenes/groups.yaml");
 
-  //VulkanApp vulkanApp;
-  //vulkanApp.initWindow();
-  //vulkanApp.initVulkan();
+  // VulkanApp vulkanApp;
+  // vulkanApp.initWindow();
+  // vulkanApp.initVulkan();
 
   return 0;
 }

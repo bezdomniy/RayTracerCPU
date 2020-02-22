@@ -1,19 +1,19 @@
-#include "cylinder.h"
+#include "cone.h"
 
-Cylinder::Cylinder() : Shape() {
+Cone::Cone() : Shape() {
   this->minimum = -std::numeric_limits<double>::infinity();
   this->maximum = std::numeric_limits<double>::infinity();
   this->capped = false;
 }
 
-Cylinder::Cylinder(double minimum, double maximum, bool capped) : Shape() {
+Cone::Cone(double minimum, double maximum, bool capped) : Shape() {
   this->minimum = minimum;
   this->maximum = maximum;
   this->capped = capped;
 }
 
 // TODO refactor to use unique_ptrs in object loader and make explicit copy constructors for all shapes
-Cylinder::Cylinder(const Cylinder &c2) {
+Cone::Cone(const Cone &c2) {
   this->maximum = c2.maximum;
   this->minimum = c2.minimum;
   this->capped = c2.capped;
@@ -22,22 +22,33 @@ Cylinder::Cylinder(const Cylinder &c2) {
   this->parent = c2.parent;
 }
 
-Cylinder::~Cylinder() {}
+Cone::~Cone() {}
 
-void Cylinder::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) { 
+void Cone::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) { 
     Ray transformedRay = transformRay(ray);
+    bool singleIntersection = false;
 
-    double a = std::pow(transformedRay.direction.x, 2) +
+    double a = std::pow(transformedRay.direction.x, 2) - std::pow(transformedRay.direction.y, 2) +
         std::pow(transformedRay.direction.z, 2);
-
-    if (std::abs(a) < Geometry::EPSILON)
-        return;
-
-    double b = (2 * transformedRay.origin.x * transformedRay.direction.x) +
+        
+    double b = (2 * transformedRay.origin.x * transformedRay.direction.x) -
+              (2 * transformedRay.origin.y * transformedRay.direction.y) +
         (2 * transformedRay.origin.z * transformedRay.direction.z);
 
-    double c = std::pow(transformedRay.origin.x, 2) +
-        std::pow(transformedRay.origin.z, 2) - 1;
+    if (std::abs(a) < Geometry::EPSILON)
+      if (std::abs(b) < Geometry::EPSILON)
+        return;
+      else
+        singleIntersection = false;
+
+    double c = std::pow(transformedRay.origin.x, 2) - std::pow(transformedRay.origin.y, 2) +
+        std::pow(transformedRay.origin.z, 2) ;
+
+    if (singleIntersection) {
+      double t = -c / (2 * b);
+      intersections.push_back(Geometry::Intersection<Shape>{t, this});
+      return;
+    }
 
     double discriminant = std::pow(b, 2) - 4 * a * c;
 
@@ -59,7 +70,7 @@ void Cylinder::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>
 
 }
 
-glm::dvec4 Cylinder::normalAt(glm::dvec4 point) {
+glm::dvec4 Cone::normalAt(glm::dvec4 point) {
   glm::dvec4 objectPoint = worldToObject(point);
 
   double dist = std::pow(objectPoint.x, 2) + std::pow(objectPoint.z, 2);
@@ -69,36 +80,42 @@ glm::dvec4 Cylinder::normalAt(glm::dvec4 point) {
     objectNormal = glm::dvec4(0.0, 1.0, 0.0, 0.0);
   else if (dist < 1 && objectPoint.y <= (this->minimum + Geometry::EPSILON))
     objectNormal = glm::dvec4(0.0, -1.0, 0.0, 0.0);
-  else
-    objectNormal = glm::dvec4(objectPoint.x, 0.0, objectPoint.z, 0.0);
+  else {
+    double y = std::sqrt(std::pow(objectPoint.x, 2) + std::pow(objectPoint.z,2));
+    if (objectPoint.y  - Geometry::EPSILON > 0) {
+      y = -y;
+    }
+    objectNormal = glm::dvec4(objectPoint.x, y, objectPoint.z, 0.0);
+  }
+  
 
   return normalToWorld(objectNormal);
 }
 
-std::pair<glm::dvec4,glm::dvec4> Cylinder::bounds() {
+std::pair<glm::dvec4,glm::dvec4> Cone::bounds() {
   return std::pair<glm::dvec4,glm::dvec4>(glm::dvec4(-1.,this->minimum,-1.,1.),glm::dvec4(1.,this->maximum,1.,1.));
 }
 
-std::string Cylinder::type() { return "Cylinder"; }
+std::string Cone::type() { return "Cone"; }
 
-bool Cylinder::checkCap(Ray &ray, double t) {
+bool Cone::checkCap(Ray &ray, double t, double y) {
   double x = ray.origin.x + t * ray.direction.x;
   double z = ray.origin.z + t * ray.direction.z;
 
-  return (std::pow(x, 2) + std::pow(z, 2)) <= 1;
+  return (std::pow(x, 2) + std::pow(z, 2)) <= std::fabs(y);
 }
 
 
-void Cylinder::intersectCaps(Ray &ray, std::vector<Geometry::Intersection<Shape>>& intersections) {
+void Cone::intersectCaps(Ray &ray, std::vector<Geometry::Intersection<Shape>>& intersections) {
   if (!this->capped || std::abs(ray.direction.y) < Geometry::EPSILON)
     return;
 
   double t1 = (this->minimum - ray.origin.y) / ray.direction.y;
-  if (checkCap(ray, t1))
+  if (checkCap(ray, t1, this->minimum))
       intersections.push_back(Geometry::Intersection<Shape>{t1, this});
 
   double t2 = (this->maximum - ray.origin.y) / ray.direction.y;
-  if (checkCap(ray, t2))
+  if (checkCap(ray, t2, this->maximum))
       intersections.push_back(Geometry::Intersection<Shape>{t2, this});
 
 }

@@ -1,46 +1,46 @@
 #include "patterns.h"
 
-StripedPattern::StripedPattern(glm::vec3 colourA, glm::vec3 colourB)
+StripedPattern::StripedPattern(glm::dvec3 colourA, glm::dvec3 colourB)
     : ColourPattern(colourA, colourB) {}
 
 StripedPattern::~StripedPattern() {}
 
-glm::vec3 StripedPattern::patternAt(glm::vec4 point) {
+glm::dvec3 StripedPattern::patternAt(glm::dvec4 point) {
   if ((int)(std::floor(point.x)) % 2 == 0)
     return this->colourA;
   return this->colourB;
 }
 
-GradientPattern::GradientPattern(glm::vec3 colourA, glm::vec3 colourB)
+GradientPattern::GradientPattern(glm::dvec3 colourA, glm::dvec3 colourB)
     : ColourPattern(colourA, colourB) {}
 
 GradientPattern::~GradientPattern() {}
 
-glm::vec3 GradientPattern::patternAt(glm::vec4 point) {
-  glm::vec3 distance = this->colourB - this->colourA;
-  float fraction = point.x - std::floor(point.x);
+glm::dvec3 GradientPattern::patternAt(glm::dvec4 point) {
+  glm::dvec3 distance = this->colourB - this->colourA;
+  double fraction = point.x - std::floor(point.x);
 
   return this->colourA + distance * fraction;
 }
 
-RingPattern::RingPattern(glm::vec3 colourA, glm::vec3 colourB)
+RingPattern::RingPattern(glm::dvec3 colourA, glm::dvec3 colourB)
     : ColourPattern(colourA, colourB) {}
 
 RingPattern::~RingPattern() {}
 
-glm::vec3 RingPattern::patternAt(glm::vec4 point) {
+glm::dvec3 RingPattern::patternAt(glm::dvec4 point) {
   if ((int)std::floor(std::sqrt(point.x * point.x + point.z * point.z)) % 2 ==
       0)
     return this->colourA;
   return this->colourB;
 }
 
-CheckedPattern::CheckedPattern(glm::vec3 colourA, glm::vec3 colourB)
+CheckedPattern::CheckedPattern(glm::dvec3 colourA, glm::dvec3 colourB)
     : ColourPattern(colourA, colourB) {}
 
 CheckedPattern::~CheckedPattern() {}
 
-glm::vec3 CheckedPattern::patternAt(glm::vec4 point) {
+glm::dvec3 CheckedPattern::patternAt(glm::dvec4 point) {
   if (((int)(std::floor(point.x) + std::floor(point.y) + std::floor(point.z))) %
           2 ==
       0)
@@ -63,20 +63,20 @@ BlendedPattern::BlendedPattern(const BlendedPattern &blendedPattern)
 
 BlendedPattern::~BlendedPattern() {}
 
-glm::vec3 BlendedPattern::patternAt(glm::vec4 point) {
-  glm::mat4 patternTransformA(glm::affineInverse(patternA->transform));
-  glm::vec4 patternPointA = patternTransformA * point;
+glm::dvec3 BlendedPattern::patternAt(glm::dvec4 point) {
+  glm::dmat4 patternTransformA(glm::affineInverse(patternA->transform));
+  glm::dvec4 patternPointA = patternTransformA * point;
 
-  glm::mat4 patternTransformB(glm::affineInverse(patternB->transform));
-  glm::vec4 patternPointB = patternTransformB * point;
+  glm::dmat4 patternTransformB(glm::affineInverse(patternB->transform));
+  glm::dvec4 patternPointB = patternTransformB * point;
 
   return (this->patternA->patternAt(patternPointA) +
           this->patternB->patternAt(patternPointB)) *
-         0.5f;
+         0.5;
 }
 
 PerturbedPattern::PerturbedPattern(std::shared_ptr<Pattern> &pattern,
-                                   float perturbedCoeff)
+                                   double perturbedCoeff)
     : Pattern() {
   this->pattern = pattern;
   this->perturbedCoeff = perturbedCoeff;
@@ -90,13 +90,13 @@ PerturbedPattern::PerturbedPattern(const PerturbedPattern &perturbedPattern)
 
 PerturbedPattern::~PerturbedPattern() {}
 
-glm::vec3 PerturbedPattern::patternAt(glm::vec4 point) {
-  glm::mat4 patternTransform(glm::affineInverse(pattern->transform));
-  glm::vec4 patternPoint = patternTransform * point;
+glm::dvec3 PerturbedPattern::patternAt(glm::dvec4 point) {
+  glm::dmat4 patternTransform(glm::affineInverse(pattern->transform));
+  glm::dvec4 patternPoint = patternTransform * point;
 
-  float value = SimplexNoise::noise(patternPoint.x * perturbedCoeff,
-                                    patternPoint.y * perturbedCoeff,
-                                    patternPoint.z * perturbedCoeff);
+  double value = SimplexNoise::noise(patternPoint.x * perturbedCoeff,
+                                     patternPoint.y * perturbedCoeff,
+                                     patternPoint.z * perturbedCoeff);
 
   patternPoint.x += value;
   patternPoint.y += value;
