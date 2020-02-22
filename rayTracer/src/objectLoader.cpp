@@ -215,13 +215,17 @@ void ObjectLoader::parseArgs(const YAML::Node &node, std::vector<Value> &args) {
 
 void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
                                     Definition &definition) {
-
-  std::shared_ptr<Material> newMaterial = std::make_shared<Material>();
-
-
   if (definition.inheritFrom) {
     assignDefinition(shapePtr, *definition.inheritFrom);
   }
+
+  std::shared_ptr<Material> newMaterial;
+
+  if (!shapePtr->material)
+    newMaterial = std::make_shared<Material>();
+  else
+    newMaterial = shapePtr->material;
+
   for (auto &value : definition.valueOrder) {
     if (value == "color") {
       newMaterial->colour = definition.values[value].vector;
@@ -271,7 +275,7 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
     newMaterial->pattern->calculateInverseTranform();
   }
 
-  if (!shapePtr->material)
+  // if (!shapePtr->material)
     shapePtr->setMaterial(newMaterial);
 
   shapePtr->calculateInverseTranform();
