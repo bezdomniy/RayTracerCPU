@@ -172,26 +172,20 @@ glm::dvec3 Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
 }
 
 bool Renderer::isShadowed(glm::dvec4 &point, World &world, std::shared_ptr<PointLight>& light) {
-  // std::vector<bool> lightShadow;
-  // lightShadow.reserve(world.lights.size());
 
+  glm::dvec4 v = light->position - point;
+  double distance = glm::length(v);
+  glm::dvec4 direction = glm::normalize(v);
 
-    glm::dvec4 v = light->position - point;
-    double distance = glm::length(v);
-    glm::dvec4 direction = glm::normalize(v);
+  Ray ray = Ray(point, direction);
+  std::vector<Geometry::Intersection<Shape>> intersections =
+      world.intersectRayShadow(ray);
 
-    Ray ray = Ray(point, direction);
-    std::vector<Geometry::Intersection<Shape>> intersections =
-        world.intersectRayShadow(ray);
-
-    Geometry::Intersection<Shape> *hit = Geometry::hit<Shape>(intersections);
-    if ((hit && hit->t < distance)) {
-      // lightShadow.push_back(true);
+  Geometry::Intersection<Shape> *hit = Geometry::hit<Shape>(intersections);
+  if ((hit && hit->t < distance)) {
       return true;
-    }
-    // else {
-    //   lightShadow.push_back(false);
-    // }
+  }
+
   
 
 

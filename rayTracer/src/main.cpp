@@ -139,11 +139,11 @@ int main(int argc, char const *argv[])
   // renderToSDL("scenes/coverScene.yaml");
   // renderToSDL("scenes/groups.yaml");
   // renderToSDL("scenes/hippy.yaml");
-  // renderToSDL("scenes/christmas.yaml");
+  renderToSDL("scenes/christmas.yaml");
   // renderToSDL("scenes/reflectionScene.yaml");
   // renderToSDL("scenes/reflectionScene.yaml");
 
-  renderToPPM("scenes/christmas.yaml");
+  // renderToPPM("scenes/christmas.yaml");
   // renderToPPM("scenes/reflectionScene.yaml");
    //VulkanApp vulkanApp;
    //vulkanApp.initWindow();

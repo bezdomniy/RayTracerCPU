@@ -21,7 +21,7 @@ FirBranch::FirBranch(/* args */) : Group()
     branchMaterial->diffuse = 0.6;
 
     branch->setMaterial(branchMaterial);
-    // branch->parent = std::shared_ptr<FirBranch>(this);
+    branch->parent = std::shared_ptr<FirBranch>(this);
 
     this->children.push_back(branch);
     this->updateBoundingBox(branch);
@@ -68,7 +68,9 @@ FirBranch::FirBranch(/* args */) : Group()
             subgroup->addChild(triangle);
 
         }
+        // this->addChild(subgroup);
         this->children.push_back(subgroup);
+        subgroup->parent = std::shared_ptr<FirBranch>(this);
 
         std::shared_ptr<Shape> subgroupShape = std::dynamic_pointer_cast<Shape>(subgroup);
         updateBoundingBox(subgroupShape);

@@ -40,7 +40,6 @@ glm::dvec4 Triangle::normalAt(glm::dvec4 point)
 {
     // glm::dvec4 worldNormal = glm::transpose(this->inverseTransform) * this->normal;
     // worldNormal.w = 0.0;
-
     return normalToWorld(this->normal);
 }
 
