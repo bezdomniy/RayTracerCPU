@@ -23,6 +23,8 @@ public:
   double transparency;
   double refractiveIndex;
 
+  bool shadow = true;
+
   std::shared_ptr<Pattern> pattern;
   void setPattern(std::shared_ptr<Pattern> &pattern);
 };

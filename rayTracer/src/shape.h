@@ -28,6 +28,8 @@ public:
   glm::dmat4 transform;
   glm::dmat4 inverseTransform;
 
+
+
   // std::pair<glm::dvec4,glm::dvec4> boundingMinMax;
 
   std::shared_ptr<Material> material;

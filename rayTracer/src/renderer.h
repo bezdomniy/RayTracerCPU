@@ -55,7 +55,7 @@ public:
                      short remaining);
   glm::dvec3 refractedColour(Geometry::Intersection<Shape> *hit, World &world,
                             short remaining);
-  bool isShadowed(glm::dvec4 &point, World &world);
+  bool isShadowed(glm::dvec4 &point, World &world, std::shared_ptr<PointLight>& light);
 
   void render(World &world);
   void renderPixel(World &world, std::pair<int, int> &pixel,

@@ -15,7 +15,7 @@ class Group : public Shape, public std::enable_shared_from_this<Group>
 {
 private:
     /* data */
-    void updateBoundingBox(std::shared_ptr<Shape>& shape);
+    
     bool boundIntersection(Ray& transformedRay);
     
 public:
@@ -24,6 +24,8 @@ public:
 
     std::vector<std::shared_ptr<Shape>> children;
     std::pair<glm::dvec4,glm::dvec4> boundingBox;
+
+    void updateBoundingBox(std::shared_ptr<Shape>& shape);
 
     void addChild(std::shared_ptr<Shape>& child);
     void setMaterial(std::shared_ptr<Material> &mat) override;
