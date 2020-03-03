@@ -38,17 +38,17 @@
 # ======================================================
 
 - add: light
-  at: [ 10000, 10000, -10000 ]
-  intensity: [ 0.25, 0.25, 0.25 ]
+  at: [10000, 10000, -10000]
+  intensity: [0.25, 0.25, 0.25]
 - add: light
-  at: [ -10000, 10000, -10000 ]
-  intensity: [ 0.25, 0.25, 0.25 ]
+  at: [-10000, 10000, -10000]
+  intensity: [0.25, 0.25, 0.25]
 - add: light
-  at: [ 10000, -10000, -10000 ]
-  intensity: [ 0.25, 0.25, 0.25 ]
+  at: [10000, -10000, -10000]
+  intensity: [0.25, 0.25, 0.25]
 - add: light
-  at: [ -10000, -10000, -10000 ]
-  intensity: [ 0.25, 0.25, 0.25 ]
+  at: [-10000, -10000, -10000]
+  intensity: [0.25, 0.25, 0.25]
 
 # ======================================================
 # These describe groups that will be reused within
@@ -63,15 +63,15 @@
     children:
       - add: sphere
         transform:
-          - [ scale, 0.25, 0.25, 0.25 ]
-          - [ translate, 0, 0, -1 ]
+          - [scale, 0.25, 0.25, 0.25]
+          - [translate, 0, 0, -1]
       - add: cylinder
         args: [0, 1, 0]
         transform:
-          - [ scale, 0.25, 1, 0.25 ]
-          - [ rotate-z, -1.5708 ]
-          - [ rotate-y, -0.5236 ]
-          - [ translate, 0, 0, -1 ]
+          - [scale, 0.25, 1, 0.25]
+          - [rotate-z, -1.5708]
+          - [rotate-y, -0.5236]
+          - [translate, 0, 0, -1]
 
 - define: cap
   value:
@@ -80,38 +80,38 @@
       - add: cone
         args: [-1, 0, 0]
         transform:
-          - [ scale, 0.24606, 1.37002, 0.24606 ]
-          - [ rotate-x, -0.7854 ]
+          - [scale, 0.24606, 1.37002, 0.24606]
+          - [rotate-x, -0.7854]
       - add: cone
         args: [-1, 0, 0]
         transform:
-          - [ scale, 0.24606, 1.37002, 0.24606 ]
-          - [ rotate-x, -0.7854 ]
-          - [ rotate-y, 1.0472 ]
+          - [scale, 0.24606, 1.37002, 0.24606]
+          - [rotate-x, -0.7854]
+          - [rotate-y, 1.0472]
       - add: cone
         args: [-1, 0, 0]
         transform:
-          - [ scale, 0.24606, 1.37002, 0.24606 ]
-          - [ rotate-x, -0.7854 ]
-          - [ rotate-y, 2.0944 ]
+          - [scale, 0.24606, 1.37002, 0.24606]
+          - [rotate-x, -0.7854]
+          - [rotate-y, 2.0944]
       - add: cone
         args: [-1, 0, 0]
         transform:
-          - [ scale, 0.24606, 1.37002, 0.24606 ]
-          - [ rotate-x, -0.7854 ]
-          - [ rotate-y, 3.1416 ]
+          - [scale, 0.24606, 1.37002, 0.24606]
+          - [rotate-x, -0.7854]
+          - [rotate-y, 3.1416]
       - add: cone
         args: [-1, 0, 0]
         transform:
-          - [ scale, 0.24606, 1.37002, 0.24606 ]
-          - [ rotate-x, -0.7854 ]
-          - [ rotate-y, 4.1888 ]
+          - [scale, 0.24606, 1.37002, 0.24606]
+          - [rotate-x, -0.7854]
+          - [rotate-y, 4.1888]
       - add: cone
         args: [-1, 0, 0]
         transform:
-          - [ scale, 0.24606, 1.37002, 0.24606 ]
-          - [ rotate-x, -0.7854 ]
-          - [ rotate-y, 5.236 ]
+          - [scale, 0.24606, 1.37002, 0.24606]
+          - [rotate-x, -0.7854]
+          - [rotate-y, 5.236]
 
 - define: wacky
   value:
@@ -120,26 +120,26 @@
       - add: leg
       - add: leg
         transform:
-          - [ rotate-y, 1.0472 ]
+          - [rotate-y, 1.0472]
       - add: leg
         transform:
-          - [ rotate-y, 2.0944 ]
+          - [rotate-y, 2.0944]
       - add: leg
         transform:
-          - [ rotate-y, 3.1416 ]
+          - [rotate-y, 3.1416]
       - add: leg
         transform:
-          - [ rotate-y, 4.1888 ]
+          - [rotate-y, 4.1888]
       - add: leg
         transform:
-          - [ rotate-y, 5.236 ]
+          - [rotate-y, 5.236]
       - add: cap
         transform:
-          - [ translate, 0, 1, 0 ]
+          - [translate, 0, 1, 0]
       - add: cap
         transform:
-          - [ translate, 0, 1, 0 ]
-          - [ rotate-x, 3.1416 ]
+          - [translate, 0, 1, 0]
+          - [rotate-x, 3.1416]
 
 # ======================================================
 # Construct the scene itself
@@ -148,21 +148,21 @@
 # a white backdrop
 - add: plane
   transform:
-    - [ rotate-x, 1.5708 ]
-    - [ translate, 0, 0, 100 ]
+    - [rotate-x, 1.5708]
+    - [translate, 0, 0, 100]
   material:
-    color: [ 1, 1, 1 ]
+    color: [1, 1, 1]
     ambient: 1
     diffuse: 0
     specular: 0
 
 - add: wacky
   transform:
-    - [ rotate-y, 0.1745 ]
-    - [ rotate-x, 0.4363 ]
-    - [ translate, -2.8, 0, 0 ]
+    - [rotate-y, 0.1745]
+    - [rotate-x, 0.4363]
+    - [translate, -2.8, 0, 0]
   material:
-    color: [ 0.9, 0.2, 0.4 ]
+    color: [0.9, 0.2, 0.4]
     ambient: 0.2
     diffuse: 0.8
     specular: 0.7
@@ -170,9 +170,9 @@
 
 - add: wacky
   transform:
-    - [ rotate-y, 0.1745 ]
+    - [rotate-y, 0.1745]
   material:
-    color: [ 0.2, 0.9, 0.6 ]
+    color: [0.2, 0.9, 0.6]
     ambient: 0.2
     diffuse: 0.8
     specular: 0.7
@@ -180,11 +180,11 @@
 
 - add: wacky
   transform:
-    - [ rotate-y, -0.1745 ]
-    - [ rotate-x, -0.4363 ]
-    - [ translate, 2.8, 0, 0 ]
+    - [rotate-y, -0.1745]
+    - [rotate-x, -0.4363]
+    - [translate, 2.8, 0, 0]
   material:
-    color: [ 0.2, 0.3, 1.0 ]
+    color: [0.2, 0.3, 1.0]
     ambient: 0.2
     diffuse: 0.8
     specular: 0.7

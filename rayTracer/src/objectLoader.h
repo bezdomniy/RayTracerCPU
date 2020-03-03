@@ -13,6 +13,7 @@
 #include "cone.h"
 #include "group.h"
 #include "triangle.h"
+#include "firBranch.h"
 #include "yaml-cpp/yaml.h"
 // #include <filesystem>
 #include <glm/glm.hpp>
@@ -21,7 +22,6 @@
 // #include <assimp/Importer.hpp>
 // #include <assimp/scene.h>
 // #include <assimp/postprocess.h>
-
 
 #include <string>
 #include <unordered_map>
@@ -36,7 +36,7 @@ private:
     glm::dvec3 vector;
   };
 
-// TODO why do I even use a definition? Why not just make the shapes and add copies to the world?
+  // TODO why do I even use a definition? Why not just make the shapes and add copies to the world?
   struct Definition
   {
     virtual ~Definition() = default;
@@ -45,6 +45,8 @@ private:
     std::unordered_map<std::string, Value> values;
     std::vector<std::string> valueOrder;
     std::shared_ptr<Pattern> pattern;
+
+    std::unordered_map<std::string, int> transformCounts{{"rotate-x", 0}, {"rotate-y", 0}, {"rotate-z", 0}, {"translate", 0}, {"scale", 0}};
   };
 
   struct ShapeDefinition : Definition
@@ -60,7 +62,7 @@ private:
   // std::unordered_map<std::string, std::shared_ptr<ShapeDefinition>> shapeDefinitions;
 
   std::shared_ptr<Shape> addShape(const YAML::Node &shapeNode);
-  std::shared_ptr<Shape> shapeFromDefinition(ShapeDefinition& shapeDefinition);
+  std::shared_ptr<Shape> shapeFromDefinition(ShapeDefinition &shapeDefinition);
 
   void addDefinition(const YAML::Node &definitionNode);
   void assignDefinition(std::shared_ptr<Shape> &shapePtr,

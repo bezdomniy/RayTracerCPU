@@ -91,15 +91,23 @@ std::shared_ptr<Shape> ObjectLoader::shapeFromDefinition(ShapeDefinition& shapeD
     ret = std::make_shared<PointLight>(
         glm::dvec4(shapeDefinition.values["at"].vector, 1.0),
         shapeDefinition.values["intensity"].vector);
-  } else {
+  } else if (shapeDefinition.shapeType == "fir_branch") {
+    ret = std::make_shared<FirBranch>();
+  }
+  
+  else {
     throw std::invalid_argument(shapeDefinition.shapeType+": this shape is not implemented");
   }
+
+
 
   if (!shapeDefinition.materialDefinition.empty)
     assignDefinition(ret, shapeDefinition.materialDefinition);
   if (!shapeDefinition.transformDefinition.empty)
     assignDefinition(ret, shapeDefinition.transformDefinition);
 
+  if (shapeDefinition.values.count("shadow") && !shapeDefinition.values["shadow"].scalar)
+    ret->material->shadow = false;
   return ret;
 }
 
@@ -190,7 +198,8 @@ void ObjectLoader::parseShape(const YAML::Node &node, ShapeDefinition &shapeDefi
                                             it->second[2].as<double>())};
       shapeDefinition.valueOrder.push_back("intensity");
     } else if (nextKey == "shadow") {
-      // TODO add functionality for shadowless shape
+      shapeDefinition.values["shadow"] = it->second.as<bool>() ? Value{1.0} : Value{};
+      shapeDefinition.valueOrder.push_back("shadow");
     } else {
       throw std::invalid_argument("invalid operator in add statement: " +
                                   nextKey);
@@ -243,25 +252,25 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
       newMaterial->transparency = definition.values[value].scalar;
     } else if (value == "refractive-index") {
       newMaterial->refractiveIndex = definition.values[value].scalar;
-    } else if (value == "translate") {
+    } else if (value.substr(0,9) == "translate") {
       glm::dmat4 translation =
           glm::translate(glm::dmat4(1.0), definition.values[value].vector);
       shapePtr->multiplyTransform(translation);
-    } else if (value == "scale") {
+    } else if (value.substr(0,5) == "scale") {
       glm::dmat4 scale =
           glm::scale(glm::dmat4(1.0), definition.values[value].vector);
       shapePtr->multiplyTransform(scale);
-    } else if (value == "rotate-x") {
+    } else if (value.substr(0,8) == "rotate-x") {
       glm::dmat4 rotation =
           glm::rotate(glm::dmat4(1.0), definition.values[value].scalar,
                       glm::dvec3(1.0, 0.0, 0.0));
       shapePtr->multiplyTransform(rotation);
-    } else if (value == "rotate-y") {
+    } else if (value.substr(0,8) == "rotate-y") {
       glm::dmat4 rotation =
           glm::rotate(glm::dmat4(1.0), definition.values[value].scalar,
                       glm::dvec3(0.0, 1.0, 0.0));
       shapePtr->multiplyTransform(rotation);
-    } else if (value == "rotate-z") {
+    } else if (value.substr(0,8) == "rotate-z") {
       glm::dmat4 rotation =
           glm::rotate(glm::dmat4(1.0), definition.values[value].scalar,
                       glm::dvec3(0.0, 0.0, 1.0));
@@ -275,7 +284,7 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
     newMaterial->pattern->calculateInverseTranform();
   }
 
-  // if (!shapePtr->material)
+  if (!shapePtr->material)
     shapePtr->setMaterial(newMaterial);
 
   shapePtr->calculateInverseTranform();
@@ -489,18 +498,22 @@ void ObjectLoader::parseTransform(const YAML::Node &node,
       if (item.IsScalar()) {
         definition.inheritFrom = definitions.at(item.as<std::string>());
       } else {
+        std::string newValueName = item[0].as<std::string>()+std::to_string(definition.transformCounts.at(item[0].as<std::string>()));
         if (item[0].as<std::string>().substr(0, 6) == "rotate") {
-          definition.values[item[0].as<std::string>()] =
-              Value{item[1].as<double>()};
-          definition.valueOrder.push_back(item[0].as<std::string>());
+          definition.values[newValueName] = Value{item[1].as<double>()};
+          definition.valueOrder.push_back(newValueName);
+
         } else {
-          definition.values[item[0].as<std::string>()] =
+          definition.values[newValueName] =
               Value{0.0,
                     glm::dvec3(item[1].as<double>(),
                                                 item[2].as<double>(),
                                                 item[3].as<double>())};
-          definition.valueOrder.push_back(item[0].as<std::string>());
+          definition.valueOrder.push_back(newValueName);
+
+          // definition.transformCounts.at(item[0].as<std::string>())
         }
+        definition.transformCounts.at(item[0].as<std::string>())++;
       }
     }
   } else {

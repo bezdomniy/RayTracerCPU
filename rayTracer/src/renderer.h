@@ -10,15 +10,15 @@
 #include "ray.h"
 // #include "sphere.h"
 #include "world.h"
+
+#include <taskflow/taskflow.hpp>
+
 #include <algorithm>
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <iostream>
 #include <memory>
 #include <random>
-
-#include <taskflow/taskflow.hpp>
-// #include <thread>
 
 class Renderer
 {
@@ -30,7 +30,7 @@ public:
   Renderer(std::shared_ptr<Camera> &c);
   ~Renderer();
 
-  static const int RAY_BOUNCE_LIMIT = 4;
+  static const int RAY_BOUNCE_LIMIT = 5;
   static const int RAYS_PER_PIXEL = 1;
   Canvas canvas;
 
@@ -44,7 +44,7 @@ public:
                       short remaining);
   glm::dvec3 refractedColour(Geometry::Intersection<Shape> *hit, World &world,
                              short remaining);
-  bool isShadowed(glm::dvec4 &point, World &world);
+  bool isShadowed(glm::dvec4 &point, World &world, std::shared_ptr<PointLight> &light);
 
   void render(World &world);
   void renderPixel(World &world, std::pair<int, int> &pixel,

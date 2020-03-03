@@ -1,6 +1,5 @@
 #include "group.h"
 
-// TODO implement pattern inheritance for groups
 Group::Group(/* args */) : Shape()
 {
   this->boundingBox = std::pair<glm::dvec4,glm::dvec4>(glm::dvec4(std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity(),std::numeric_limits<double>::infinity(),1.) \
@@ -24,7 +23,7 @@ void Group::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& i
 }
 
 glm::dvec4 Group::normalAt(glm::dvec4 point) {
-  throw std::runtime_error("group shouldn't run normal function");
+  throw std::runtime_error("group shouldn't call normal function");
   glm::dvec4 objectPoint = this->inverseTransform * point;
   return glm::normalize(glm::dvec4());
 }
@@ -34,14 +33,15 @@ void Group::setMaterial(std::shared_ptr<Material> &mat)
   this->material = mat;
 
   for (auto& child: this->children) {
-    child->setMaterial(mat);
+    if (!child->material)
+      child->setMaterial(mat);
   }
 }
 
 void Group::addChild(std::shared_ptr<Shape>& child) {
-  child->parent = shared_from_this();
+  child->parent = this;
 
-  if (this->material)
+  if (this->material && !child->material)
     child->setMaterial(this->material);
 
   if (child->type() == "Sphere") {

@@ -28,8 +28,7 @@ Pattern::~Pattern() {}
 
 ColourPattern::ColourPattern() {}
 
-ColourPattern::ColourPattern(glm::dvec3 colourA, glm::dvec3 colourB)
-    : Pattern() {
+ColourPattern::ColourPattern(glm::dvec3 colourA, glm::dvec3 colourB) : Pattern() {
   this->colourA = colourA;
   this->colourB = colourB;
 }

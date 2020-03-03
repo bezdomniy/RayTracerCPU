@@ -95,8 +95,8 @@ glm::dvec3 PerturbedPattern::patternAt(glm::dvec4 point) {
   glm::dvec4 patternPoint = patternTransform * point;
 
   double value = SimplexNoise::noise(patternPoint.x * perturbedCoeff,
-                                     patternPoint.y * perturbedCoeff,
-                                     patternPoint.z * perturbedCoeff);
+                                    patternPoint.y * perturbedCoeff,
+                                    patternPoint.z * perturbedCoeff);
 
   patternPoint.x += value;
   patternPoint.y += value;
