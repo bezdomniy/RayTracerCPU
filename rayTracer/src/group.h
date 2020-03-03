@@ -9,10 +9,10 @@
 #include "cone.h"
 
 #include <vector>
-// #include <iostream>
 
-class Group : public Shape, public std::enable_shared_from_this<Group>
+class Group : public Shape
 {
+   
 private:
     /* data */
     

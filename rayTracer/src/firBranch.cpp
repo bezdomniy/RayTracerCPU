@@ -21,10 +21,7 @@ FirBranch::FirBranch(/* args */) : Group()
     branchMaterial->diffuse = 0.6;
 
     branch->setMaterial(branchMaterial);
-    branch->parent = std::shared_ptr<FirBranch>(this);
-
-    this->children.push_back(branch);
-    this->updateBoundingBox(branch);
+    this->addChild(branch);
 
     double segSize = length / (segments - 1);
     double theta = 2.1 * glm::pi<double>() / (double)perSegment;
@@ -68,12 +65,8 @@ FirBranch::FirBranch(/* args */) : Group()
             subgroup->addChild(triangle);
 
         }
-        // this->addChild(subgroup);
-        this->children.push_back(subgroup);
-        subgroup->parent = std::shared_ptr<FirBranch>(this);
-
         std::shared_ptr<Shape> subgroupShape = std::dynamic_pointer_cast<Shape>(subgroup);
-        updateBoundingBox(subgroupShape);
+        this->addChild(subgroupShape);
     }
 
 }

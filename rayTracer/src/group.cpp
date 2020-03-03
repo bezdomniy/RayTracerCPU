@@ -39,7 +39,7 @@ void Group::setMaterial(std::shared_ptr<Material> &mat)
 }
 
 void Group::addChild(std::shared_ptr<Shape>& child) {
-  child->parent = shared_from_this();
+  child->parent = this;
 
   if (this->material && !child->material)
     child->setMaterial(this->material);
