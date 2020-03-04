@@ -4,7 +4,8 @@
 #include <glm/glm.hpp>
 #include <memory>
 
-class Material {
+class Material
+{
 private:
   /* data */
 public:

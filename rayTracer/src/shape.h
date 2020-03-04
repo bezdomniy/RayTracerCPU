@@ -20,6 +20,8 @@ public:
 
   Shape *parent = nullptr;
 
+  bool materialSet = false;
+
   virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) = 0;
   virtual glm::dvec4 normalAt(glm::dvec4 point) = 0;
   virtual std::string type() = 0;
