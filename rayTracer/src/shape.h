@@ -13,22 +13,22 @@ class Shape
 {
 private:
   /* data */
-  
+
 public:
   Shape();
   virtual ~Shape() = 0;
 
-  Shape* parent = nullptr;
+  Shape *parent = nullptr;
 
-  virtual void intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) = 0;
+  bool materialSet = false;
+
+  virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) = 0;
   virtual glm::dvec4 normalAt(glm::dvec4 point) = 0;
   virtual std::string type() = 0;
-  virtual std::pair<glm::dvec4,glm::dvec4> bounds() = 0;
+  virtual std::pair<glm::dvec4, glm::dvec4> bounds() = 0;
 
   glm::dmat4 transform;
   glm::dmat4 inverseTransform;
-
-
 
   // std::pair<glm::dvec4,glm::dvec4> boundingMinMax;
 

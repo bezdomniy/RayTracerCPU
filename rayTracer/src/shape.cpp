@@ -19,6 +19,7 @@ void Shape::transformRayInPlace(Ray &ray)
 void Shape::setMaterial(std::shared_ptr<Material> &mat)
 {
   this->material = mat;
+  this->materialSet = true;
 }
 
 glm::dvec3 Shape::patternAt(glm::dvec4 point)
@@ -43,20 +44,24 @@ void Shape::calculateInverseTranform()
   this->inverseTransform = glm::affineInverse(this->transform);
 }
 
-glm::dvec4 Shape::worldToObject(glm::dvec4 point) {
-  if (this->parent) {
+glm::dvec4 Shape::worldToObject(glm::dvec4 point)
+{
+  if (this->parent)
+  {
     point = this->parent->worldToObject(point);
   }
 
   return this->inverseTransform * point;
 }
 
-glm::dvec4 Shape::normalToWorld(glm::dvec4 normal) {
+glm::dvec4 Shape::normalToWorld(glm::dvec4 normal)
+{
   normal = glm::transpose(this->inverseTransform) * normal;
   normal.w = 0.0;
   normal = glm::normalize(normal);
 
-  if (this->parent) {
+  if (this->parent)
+  {
     normal = this->parent->normalToWorld(normal);
   }
 
