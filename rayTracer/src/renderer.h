@@ -13,8 +13,10 @@
 // #include <algorithm>
 // #ifdef __EMSCRIPTEN__
 #ifdef linux
-#include <include/pstl/algorithm>
-#include <include/pstl/execution>
+// #include <include/pstl/algorithm>
+// #include <include/pstl/execution>
+#include <algorithm>
+#include <execution>
 #endif
 #ifdef _WIN32
 #include <pstl/algorithm>
@@ -32,7 +34,8 @@
 #include <memory>
 #include <random>
 
-class Renderer {
+class Renderer
+{
 private:
   std::shared_ptr<Camera> camera;
 
@@ -47,15 +50,15 @@ public:
 
   glm::dvec3 colourAt(Ray &ray, World &world, short remaining);
   glm::dvec3 reflectColour(Geometry::Intersection<Shape> *hit, World &world,
-                          short remaining);
+                           short remaining);
   glm::dvec3 lighting(Shape *shape, std::shared_ptr<PointLight> &light,
-                     glm::dvec4 &point, glm::dvec4 &eyev, glm::dvec4 &normalv,
-                     bool &inShadow);
+                      glm::dvec4 &point, glm::dvec4 &eyev, glm::dvec4 &normalv,
+                      bool &inShadow);
   glm::dvec3 shadeHit(Geometry::Intersection<Shape> *hit, World &world,
-                     short remaining);
+                      short remaining);
   glm::dvec3 refractedColour(Geometry::Intersection<Shape> *hit, World &world,
-                            short remaining);
-  bool isShadowed(glm::dvec4 &point, World &world, std::shared_ptr<PointLight>& light);
+                             short remaining);
+  bool isShadowed(glm::dvec4 &point, World &world, std::shared_ptr<PointLight> &light);
 
   void render(World &world);
   void renderPixel(World &world, std::pair<int, int> &pixel,
