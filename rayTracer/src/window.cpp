@@ -4,8 +4,8 @@
 Window::Window(const std::string &sceneDesc)
 {
     this->sceneDesc = sceneDesc;
-    // initWindow();
-    _drawTest();
+    initWindow();
+    // _drawTest();
 }
 
 Window::~Window()
@@ -24,6 +24,7 @@ void Window::initWindow()
     this->camera = this->world.loadFromFile(this->sceneDesc);
     this->rayTraceRenderer = Renderer(this->camera);
 
+    SDL_SetMainReady();
     SDL_Init(SDL_INIT_VIDEO);
     SDL_CreateWindowAndRenderer(this->camera->hsize, this->camera->vsize, 0, &this->window, &this->renderer);
 

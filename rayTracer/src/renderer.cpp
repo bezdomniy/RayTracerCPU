@@ -32,7 +32,7 @@ void Renderer::render(World &world)
   std::shuffle(pixels.begin(), pixels.end(), g);
 
   std::for_each(
-      pstl::execution::par_unseq, pixels.begin(), pixels.end(),
+      std::execution::par_unseq, pixels.begin(), pixels.end(),
       [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &&pixel) {
         renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
       });

@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef _WIN32
+#define SDL_MAIN_HANDLED
+#endif
+
 #include <SDL.h>
 #include <vector>
 #include <cmath>
@@ -36,6 +40,8 @@ private:
     void handleEvents();
 
     void moveCamera(double posChange);
+
+    void _drawTest();
 
 
 public:
