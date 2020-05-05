@@ -600,11 +600,16 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
 
       if (mappingType == "spherical") {
         textureMap = std::make_shared<SphericalMap>();
+      } else if (mappingType == "planar") {
+        textureMap = std::make_shared<PlanarMap>();
+      } else if (mappingType == "cylindrical") {
+        textureMap = std::make_shared<CylinderMap>();
+      } else if (mappingType == "cube") {
+        textureMap = std::make_shared<CubeMap>();
       }
-      
     }
     else if (valueKey == "uv_pattern") {
-      std::string uvMappingType;
+      std::string uvPatternType;
       std::unordered_map<std::string, Value> values;
       
 
@@ -615,7 +620,7 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
 
         if (uvKey == "type")
         {
-          uvMappingType = uvIt->second.as<std::string>();
+          uvPatternType = uvIt->second.as<std::string>();
         }
         else if (uvKey == "width") {
           values["width"].scalar = uvIt->second.as<int>();
@@ -633,7 +638,7 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
           }
       }
       
-      if (uvMappingType == "checkers") {
+      if (uvPatternType == "checkers") {
         uvTexture = std::make_shared<CheckeredTexture>(values["colourA"].vector,values["colourB"].vector,values["width"].scalar, values["height"].scalar);
       }
     }
