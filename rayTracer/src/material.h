@@ -4,24 +4,27 @@
 #include <glm/glm.hpp>
 #include <memory>
 
-class Material {
+class Material
+{
 private:
   /* data */
 public:
   Material();
-  Material(glm::vec3 colour, float ambient, float diffuse, float specular,
-           float shininess);
+  Material(glm::dvec3 colour, double ambient, double diffuse, double specular,
+           double shininess);
 
   ~Material();
 
-  glm::vec3 colour;
-  float ambient;
-  float diffuse;
-  float specular;
-  float shininess;
-  float reflective;
-  float transparency;
-  float refractiveIndex;
+  glm::dvec3 colour;
+  double ambient;
+  double diffuse;
+  double specular;
+  double shininess;
+  double reflective;
+  double transparency;
+  double refractiveIndex;
+
+  bool shadow = true;
 
   std::shared_ptr<Pattern> pattern;
   void setPattern(std::shared_ptr<Pattern> &pattern);

@@ -8,3 +8,6 @@
 [submodule "rayTracer/parallelstl"]
 	path = rayTracer/parallelstl
 	url = https://github.com/intel/parallelstl.git
+[submodule "rayTracer/glfw"]
+	path = rayTracer/glfw
+	url = https://github.com/glfw/glfw.git

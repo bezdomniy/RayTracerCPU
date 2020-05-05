@@ -2,7 +2,7 @@
 
 Ray::Ray() {}
 
-Ray::Ray(glm::vec4 origin, glm::vec4 direction)
+Ray::Ray(glm::dvec4 origin, glm::dvec4 direction)
 {
   this->origin = origin;
   this->direction = direction;
@@ -19,22 +19,22 @@ std::ostream &operator<<(std::ostream &out, Ray const &r)
   return out;
 }
 
-glm::vec4 Ray::position(float t)
+glm::dvec4 Ray::position(double t)
 {
   return origin + direction * t;
 }
 
-Ray Ray::transform(glm::mat4 &m)
+Ray Ray::transform(glm::dmat4 &m)
 {
   return Ray(m * this->origin, m * this->direction);
 }
 
-Ray Ray::transform(glm::mat4 &m, glm::vec4 newOrigin)
+Ray Ray::transform(glm::dmat4 &m, glm::dvec4 newOrigin)
 {
   return Ray(newOrigin, m * this->direction);
 }
 
-void Ray::transformInPlace(glm::mat4 &m)
+void Ray::transformInPlace(glm::dmat4 &m)
 {
   this->origin = m * this->origin;
   this->direction = m * this->direction;

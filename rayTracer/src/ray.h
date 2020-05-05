@@ -3,21 +3,20 @@
 #include <glm/glm.hpp>
 #include <ostream>
 
-class Ray
-{
+class Ray {
 public:
   Ray();
-  Ray(glm::vec4, glm::vec4);
+  Ray(glm::dvec4, glm::dvec4);
   ~Ray();
 
-  glm::vec4 position(float);
+  glm::dvec4 position(double);
 
-  glm::vec4 origin;
-  glm::vec4 direction;
+  glm::dvec4 origin;
+  glm::dvec4 direction;
 
-  Ray transform(glm::mat4 &m);
-  Ray transform(glm::mat4 &m, glm::vec4 newOrigin);
-  void transformInPlace(glm::mat4 &m);
+  Ray transform(glm::dmat4 &m);
+  Ray transform(glm::dmat4 &m, glm::dvec4 newOrigin);
+  void transformInPlace(glm::dmat4 &m);
 
 private:
 };

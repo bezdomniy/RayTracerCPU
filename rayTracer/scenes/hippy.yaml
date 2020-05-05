@@ -1,12 +1,15 @@
 - add: camera
-  width: 1920
-  height: 1080
+  width: 800
+  height: 400
   field-of-view: 1.0472
   from: [-.2, 2, -5]
   to: [0, 0.8, 0]
   up: [0, 1, 0]
 - add: light
   at: [-5, 10, -5]
+  intensity: [1, 1, 1]
+- add: light
+  at: [5, 10, -5]
   intensity: [1, 1, 1]
 - define: base-material
   value:

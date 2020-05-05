@@ -12,8 +12,9 @@ public:
     Cube();
     ~Cube();
 
-    virtual std::vector<Geometry::Intersection<Shape>> intersectRay(Ray &ray) override;
-    virtual glm::vec4 normalAt(glm::vec4 point) override;
+    virtual void intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) override;
+    virtual glm::dvec4 normalAt(glm::dvec4 point) override;
+    virtual std::pair<glm::dvec4,glm::dvec4> bounds() override;
     virtual std::string type() override;
 
 private:

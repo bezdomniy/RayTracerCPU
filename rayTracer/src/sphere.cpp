@@ -7,42 +7,38 @@ Sphere::Sphere()
 
 Sphere::~Sphere() {}
 
-std::vector<Geometry::Intersection<Shape>> Sphere::intersectRay(Ray &ray)
-{
-  std::vector<Geometry::Intersection<Shape>> ret;
+void Sphere::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) {
+    Ray transformedRay = transformRay(ray);
 
-  Ray transformedRay = transformRay(ray);
+    glm::dvec4 sphereToRay = transformedRay.origin - glm::dvec4(0.0, 0.0, 0.0, 1.0);
+    double a = glm::dot(transformedRay.direction, transformedRay.direction);
+    double b = 2 * glm::dot(transformedRay.direction, sphereToRay);
+    double c =
+        glm::dot(sphereToRay, sphereToRay) - 1;
+    double discriminant = b * b - 4 * a * c;
 
-  // std::cout << transformedRay <<std::endl;
+    if (discriminant < 0)
+        return;
 
-  glm::vec4 sphereToRay = transformedRay.origin - glm::vec4(0.f, 0.f, 0.f, 1.f);
-  float a = glm::dot(transformedRay.direction, transformedRay.direction);
-  float b = 2 * glm::dot(transformedRay.direction, sphereToRay);
-  float c =
-      glm::dot(sphereToRay, sphereToRay) - 1;
-  float discriminant = b * b - 4 * a * c;
+    double t1 = (-b - std::sqrt(discriminant)) / (2 * a);
+    double t2 = (-b + std::sqrt(discriminant)) / (2 * a);
 
-  if (discriminant < 0)
-    return ret;
+    intersections.push_back(Geometry::Intersection<Shape>{t1, this});
+    intersections.push_back(Geometry::Intersection<Shape>{t2, this});
 
-  float t1 = (-b - std::sqrt(discriminant)) / (2 * a);
-  float t2 = (-b + std::sqrt(discriminant)) / (2 * a);
-
-  ret.push_back(Geometry::Intersection<Shape>{t1, this});
-  ret.push_back(Geometry::Intersection<Shape>{t2, this});
-
-  return ret;
 }
 
-glm::vec4 Sphere::normalAt(glm::vec4 point)
+glm::dvec4 Sphere::normalAt(glm::dvec4 point)
 {
-  // glm::mat4 transformInverse(glm::affineInverse(this->transform));
-  glm::vec4 objectPoint = this->inverseTransform * point;
-  glm::vec4 objectNormal = objectPoint - glm::vec4(0.f, 0.f, 0.f, 1.f);
-  glm::vec4 worldNormal = glm::transpose(this->inverseTransform) * objectNormal;
-  worldNormal.w = 0.f;
+  // glm::dmat4 transformInverse(glm::affineInverse(this->transform));
+  glm::dvec4 objectPoint = worldToObject(point);
+  glm::dvec4 objectNormal = objectPoint - glm::dvec4(0.0, 0.0, 0.0, 1.0);
 
-  return glm::normalize(worldNormal);
+  return normalToWorld(objectNormal);
+}
+
+std::pair<glm::dvec4,glm::dvec4> Sphere::bounds() {
+  return std::pair<glm::dvec4,glm::dvec4>(glm::dvec4(-1.,-1.,-1.,1.),glm::dvec4(1.,1.,1.,1.));
 }
 
 std::string Sphere::type()
