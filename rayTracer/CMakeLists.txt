@@ -9,7 +9,8 @@ endif()
 
 #set(CMAKE_CXX_FLAGS "-openmp-simd")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
+# set(CMAKE_CXX_FLAGS_RELEASE "/O2")
 
 set(TO_NATIVE ON)
 

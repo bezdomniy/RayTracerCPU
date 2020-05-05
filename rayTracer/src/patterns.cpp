@@ -41,9 +41,7 @@ CheckedPattern::CheckedPattern(glm::dvec3 colourA, glm::dvec3 colourB)
 CheckedPattern::~CheckedPattern() {}
 
 glm::dvec3 CheckedPattern::patternAt(glm::dvec4 point) {
-  if (((int)(std::floor(point.x) + std::floor(point.y) + std::floor(point.z))) %
-          2 ==
-      0)
+  if (((int)(std::floor(point.x) + std::floor(point.y) + std::floor(point.z))) % 2 == 0)
     return this->colourA;
   return this->colourB;
 }
@@ -103,4 +101,23 @@ glm::dvec3 PerturbedPattern::patternAt(glm::dvec4 point) {
   patternPoint.z += value;
 
   return this->pattern->patternAt(patternPoint);
+}
+
+MappedPattern::MappedPattern(std::shared_ptr<UVTexture> &uvTexture, std::shared_ptr<TextureMap> &textureMap)
+    : Pattern() {
+  this->uvTexture = uvTexture;
+  this->textureMap = textureMap;
+}
+
+MappedPattern::MappedPattern(const MappedPattern &mappedPattern)
+    : Pattern() {
+  this->uvTexture = mappedPattern.uvTexture;
+  this->textureMap = mappedPattern.textureMap;
+}
+
+MappedPattern::~MappedPattern() {}
+
+glm::dvec3 MappedPattern::patternAt(glm::dvec4 point) {
+  glm::dvec2 uv = this->textureMap->uv_map(point);
+  return this->uvTexture->patternAt(uv);
 }

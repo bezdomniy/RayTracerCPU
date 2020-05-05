@@ -547,7 +547,12 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
   std::string type;
   std::shared_ptr<Pattern> pattern;
   double perturbedCoeff;
+
+  std::shared_ptr<UVTexture> uvTexture;
+  std::shared_ptr<TextureMap> textureMap;
+
   bool blendedPattern = false;
+  bool mappedPattern = false;
   for (YAML::const_iterator valueIt = node.begin(); valueIt != node.end();
        ++valueIt)
   {
@@ -576,14 +581,60 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
         pattern = std::make_unique<CheckedPattern>(glm::dvec3(1.0, 0.0, 0.0),
                                                    glm::dvec3(0.0, 1.0, 0.0));
       }
+      else if (valueIt->second.as<std::string>() == "map")
+      {
+        mappedPattern = true;
+      }
       else if (valueIt->second.as<std::string>() == "blended")
       {
         blendedPattern = true;
-        break;
+        // break;
       }
       else
       {
         throw std::invalid_argument("invalid pattern type");
+      }
+    }
+    else if (valueKey == "mapping") {
+      std::string mappingType = valueIt->second.as<std::string>();
+
+      if (mappingType == "spherical") {
+        textureMap = std::make_shared<SphericalMap>();
+      }
+      
+    }
+    else if (valueKey == "uv_pattern") {
+      std::string uvMappingType;
+      std::unordered_map<std::string, Value> values;
+      
+
+      for (YAML::const_iterator uvIt = valueIt->second.begin(); uvIt != valueIt->second.end();
+       ++uvIt)
+      {
+        std::string uvKey = uvIt->first.as<std::string>();
+
+        if (uvKey == "type")
+        {
+          uvMappingType = uvIt->second.as<std::string>();
+        }
+        else if (uvKey == "width") {
+          values["width"].scalar = uvIt->second.as<int>();
+        }
+        else if (uvKey == "height") {
+          values["height"].scalar = uvIt->second.as<int>();
+        }
+        else if (uvKey == "colors") {
+          values["colourA"].vector = glm::dvec3(uvIt->second[0][0].as<double>(),
+                            uvIt->second[0][1].as<double>(),
+                            uvIt->second[0][2].as<double>());
+          values["colourB"].vector = glm::dvec3(uvIt->second[1][0].as<double>(),
+                            uvIt->second[1][1].as<double>(),
+                            uvIt->second[1][2].as<double>());
+          }
+      }
+      
+      if (uvMappingType == "checkers") {
+        uvTexture = std::make_shared<CheckeredTexture>(values["colourA"].vector,values["colourB"].vector,values["width"].scalar, values["height"].scalar);
       }
     }
     else if (valueKey == "perturbed")
@@ -672,6 +723,9 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
 
     pattern = std::make_shared<BlendedPattern>(patternADefinition.pattern,
                                                patternBDefinition.pattern);
+  }
+  else if (mappedPattern) {
+    pattern = std::make_unique<MappedPattern>(uvTexture, textureMap);
   }
 
   if (perturbedCoeff)
