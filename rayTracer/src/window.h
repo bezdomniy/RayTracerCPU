@@ -39,7 +39,7 @@ private:
 
     void handleEvents();
 
-    void moveCamera(double posChange);
+    void moveCamera(double posChange, glm::dvec3 axis);
 
     void _drawTest();
 
@@ -50,6 +50,8 @@ public:
 
     void moveLeft();
     void moveRight();
+    void moveUp();
+    void moveDown();
 
     void initWindow();
     void update();
