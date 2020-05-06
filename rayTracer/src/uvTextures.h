@@ -9,24 +9,39 @@
 #include <SDL_image.h>
 #include <string>
 #include <cmath>
+#include <vector>
 
 class UVTexture
 {
-private:
-  /* data */
 public:
   UVTexture(/* args */);
   ~UVTexture();
 
-  virtual glm::dvec3 patternAt(glm::dvec2 uv) = 0;
+  virtual void loadRight(std::string const &path) = 0;
+  virtual void loadLeft(std::string const &path) = 0;
+  virtual void loadUp(std::string const &path) = 0;
+  virtual void loadDown(std::string const &path) = 0;
+  virtual void loadFront(std::string const &path) = 0;
+  virtual void loadBack(std::string const &path) = 0;
+
+  virtual glm::dvec3 patternAt(glm::dvec2 uv, int faceIndex = 0) = 0;
 };
 
 class CheckeredTexture : public UVTexture
 {
+private:
+  virtual void loadRight(std::string const &path) override;
+  virtual void loadLeft(std::string const &path) override;
+  virtual void loadUp(std::string const &path) override;
+  virtual void loadDown(std::string const &path) override;
+  virtual void loadFront(std::string const &path) override;
+  virtual void loadBack(std::string const &path) override;
+
 public:
+  CheckeredTexture();
   CheckeredTexture(glm::dvec3 colourA, glm::dvec3 colourB, int width, int height);
   ~CheckeredTexture();
-  virtual glm::dvec3 patternAt(glm::dvec2 uv) override;
+  virtual glm::dvec3 patternAt(glm::dvec2 uv, int faceIndex = 0) override;
 
   glm::dvec3 colourA;
   glm::dvec3 colourB;
@@ -37,15 +52,24 @@ public:
 class ImageTexture : public UVTexture
 {
 private:
-  Uint32 pixelFromSurface(int x, int y);
-  glm::dvec3 rgbFromPixel(int x, int y);
+  Uint32 pixelFromSurface(SDL_Surface *surface, int x, int y);
+  glm::dvec3 rgbFromPixel(SDL_Surface *surface, int x, int y);
 
 public:
+  ImageTexture();
   ImageTexture(std::string const &path);
   ~ImageTexture();
-  virtual glm::dvec3 patternAt(glm::dvec2 uv) override;
 
-  SDL_Surface *texture;
+  virtual void loadRight(std::string const &path) override;
+  virtual void loadLeft(std::string const &path) override;
+  virtual void loadUp(std::string const &path) override;
+  virtual void loadDown(std::string const &path) override;
+  virtual void loadFront(std::string const &path) override;
+  virtual void loadBack(std::string const &path) override;
+
+  virtual glm::dvec3 patternAt(glm::dvec2 uv, int faceIndex = 0) override;
+
+  std::vector<SDL_Surface *> textures;
   int width;
   int height;
 };
