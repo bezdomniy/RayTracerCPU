@@ -681,7 +681,6 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
     {
       for (auto &transformValue : valueIt->second)
       {
-        std::cout << "transform: " << transformValue[0].as<std::string>() << std::endl;
         if (transformValue[0].as<std::string>() == "translate")
         {
           glm::dvec3 vector(transformValue[1].as<double>(),
