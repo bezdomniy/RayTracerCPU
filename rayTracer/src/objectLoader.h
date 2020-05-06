@@ -46,8 +46,7 @@ private:
     std::vector<std::string> valueOrder;
     std::shared_ptr<Pattern> pattern;
 
-    std::unordered_map<std::string, int> transformCounts {{"rotate-x",0},{"rotate-y",0},{"rotate-z",0},{"translate",0},{"scale",0}};
-
+    std::unordered_map<std::string, int> transformCounts{{"rotate-x", 0}, {"rotate-y", 0}, {"rotate-z", 0}, {"translate", 0}, {"scale", 0}};
   };
 
   struct ShapeDefinition : Definition
@@ -74,6 +73,7 @@ private:
   void parsePattern(const YAML::Node &node, Definition &definition);
   void parseArgs(const YAML::Node &node, std::vector<Value> &args);
   void parseShape(const YAML::Node &node, ShapeDefinition &shapeDefinition);
+  void parseUV(const YAML::Node &node, std::shared_ptr<UVTexture> &uvTexture, int face = 0);
 
 public:
   ObjectLoader();

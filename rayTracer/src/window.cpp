@@ -70,6 +70,14 @@ void Window::handleEvents()
             moveRight();
             this->somethingChanged = true;
             break;
+        case SDLK_UP:
+            moveUp();
+            this->somethingChanged = true;
+            break;
+        case SDLK_DOWN:
+            moveDown();
+            this->somethingChanged = true;
+            break;
             // cases for other keypresses
         }
         break;
@@ -78,14 +86,16 @@ void Window::handleEvents()
     }
 }
 
-void Window::moveLeft() { moveCamera(STEP_SIZE); }
+void Window::moveLeft() { moveCamera(STEP_SIZE, glm::dvec3(0.0, 1.0, 0.0)); }
+void Window::moveRight() { moveCamera(-STEP_SIZE, glm::dvec3(0.0, 1.0, 0.0)); }
+void Window::moveUp() { moveCamera(-STEP_SIZE, glm::dvec3(1.0, 0.0, 0.0)); }
+void Window::moveDown() { moveCamera(STEP_SIZE, glm::dvec3(1.0, 0.0, 0.0)); }
 
-void Window::moveRight() { moveCamera(-STEP_SIZE); }
 
-void Window::moveCamera(double posChange)
+void Window::moveCamera(double posChange, glm::dvec3 axis)
 {
     glm::dmat4 rotationY =
-        glm::rotate(glm::dmat4(1.0), posChange, glm::dvec3(0.0, 1.0, 0.0));
+        glm::rotate(glm::dmat4(1.0), posChange, axis);
 
     // glm::dmat4 rotationZ =
     //     glm::rotate(glm::dmat4(1.0), posChange,
