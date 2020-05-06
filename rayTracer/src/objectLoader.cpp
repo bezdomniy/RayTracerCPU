@@ -397,13 +397,13 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
     newMaterial->pattern->calculateInverseTranform();
   }
 
-  if (!shapePtr->material) {
+  if (!shapePtr->material)
+  {
     if (newPattern)
       shapePtr->setMaterial(newMaterial);
     else
       shapePtr->material = newMaterial;
   }
-    
 
   shapePtr->calculateInverseTranform();
 }
@@ -595,26 +595,35 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
         throw std::invalid_argument("invalid pattern type");
       }
     }
-    else if (valueKey == "mapping") {
+    else if (valueKey == "mapping")
+    {
       std::string mappingType = valueIt->second.as<std::string>();
 
-      if (mappingType == "spherical") {
+      if (mappingType == "spherical")
+      {
         textureMap = std::make_shared<SphericalMap>();
-      } else if (mappingType == "planar") {
+      }
+      else if (mappingType == "planar")
+      {
         textureMap = std::make_shared<PlanarMap>();
-      } else if (mappingType == "cylindrical") {
+      }
+      else if (mappingType == "cylindrical")
+      {
         textureMap = std::make_shared<CylinderMap>();
-      } else if (mappingType == "cube") {
+      }
+      else if (mappingType == "cube")
+      {
         textureMap = std::make_shared<CubeMap>();
       }
     }
-    else if (valueKey == "uv_pattern") {
+    else if (valueKey == "uv_pattern")
+    {
       std::string uvPatternType;
       std::unordered_map<std::string, Value> values;
-      
+      std::string imageFileName;
 
       for (YAML::const_iterator uvIt = valueIt->second.begin(); uvIt != valueIt->second.end();
-       ++uvIt)
+           ++uvIt)
       {
         std::string uvKey = uvIt->first.as<std::string>();
 
@@ -622,24 +631,36 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
         {
           uvPatternType = uvIt->second.as<std::string>();
         }
-        else if (uvKey == "width") {
+        else if (uvKey == "file")
+        {
+          imageFileName = uvIt->second.as<std::string>();
+        }
+        else if (uvKey == "width")
+        {
           values["width"].scalar = uvIt->second.as<int>();
         }
-        else if (uvKey == "height") {
+        else if (uvKey == "height")
+        {
           values["height"].scalar = uvIt->second.as<int>();
         }
-        else if (uvKey == "colors") {
+        else if (uvKey == "colors")
+        {
           values["colourA"].vector = glm::dvec3(uvIt->second[0][0].as<double>(),
-                            uvIt->second[0][1].as<double>(),
-                            uvIt->second[0][2].as<double>());
+                                                uvIt->second[0][1].as<double>(),
+                                                uvIt->second[0][2].as<double>());
           values["colourB"].vector = glm::dvec3(uvIt->second[1][0].as<double>(),
-                            uvIt->second[1][1].as<double>(),
-                            uvIt->second[1][2].as<double>());
-          }
+                                                uvIt->second[1][1].as<double>(),
+                                                uvIt->second[1][2].as<double>());
+        }
       }
-      
-      if (uvPatternType == "checkers") {
-        uvTexture = std::make_shared<CheckeredTexture>(values["colourA"].vector,values["colourB"].vector,values["width"].scalar, values["height"].scalar);
+
+      if (uvPatternType == "checkers")
+      {
+        uvTexture = std::make_shared<CheckeredTexture>(values["colourA"].vector, values["colourB"].vector, values["width"].scalar, values["height"].scalar);
+      }
+      else if (uvPatternType == "image")
+      {
+        uvTexture = std::make_shared<ImageTexture>(imageFileName);
       }
     }
     else if (valueKey == "perturbed")
@@ -729,7 +750,8 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
     pattern = std::make_shared<BlendedPattern>(patternADefinition.pattern,
                                                patternBDefinition.pattern);
   }
-  else if (mappedPattern) {
+  else if (mappedPattern)
+  {
     pattern = std::make_unique<MappedPattern>(uvTexture, textureMap);
   }
 
