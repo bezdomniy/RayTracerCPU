@@ -61,13 +61,13 @@
       mapping: cube
       uv_pattern:
         type: checkers
-        width: 4
-        height: 4
+        width: 20
+        height: 10
         colors:
-          - [1, 1, 1]
-          - [1, 0, 0]
-    diffuse: 0.7
-    ambient: 0.1
+          - [0, 0, 0]
+          - [0.5, 0.5, 0.5]
+    # diffuse: 0.7
+    # ambient: 0.1
 - define: checked-planar
   value:
     pattern:
@@ -103,11 +103,7 @@
     - [scale, 0.75, 0.75, 0.75]
     - [rotate-y, -0.5]
     - [translate, -0.2, 0.75, 0.5]
-- add: cube
-  material: image-spherical
-  transform:
-    - [scale, 0.5, 0.5, 0.5]
-    - [translate, 1.5, 0.5, -0.5]
+
 - add: sphere
   material: checked-spherical
   transform:
@@ -118,5 +114,10 @@
   transform:
     - [rotate-x, 1.5708]
     - [translate, 0, 0, 2.5]
+- add: cube
+  material: checked-cube
+  transform:
+    - [scale, 0.5, 0.5, 0.5]
+    - [translate, 1.5, 0.5, -0.5]
 - add: plane
   material: blue-material
