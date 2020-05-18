@@ -13,7 +13,8 @@ Triangle::Triangle(glm::dvec3 p1, glm::dvec3 p2, glm::dvec3 p3)
 
 Triangle::~Triangle() {}
 
-void Triangle::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) {
+void Triangle::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections)
+{
     Ray transformedRay = transformRay(ray);
 
     glm::dvec3 dirCrossE2 = glm::cross(glm::dvec3(transformedRay.direction), this->e2);
@@ -43,10 +44,11 @@ glm::dvec4 Triangle::normalAt(glm::dvec4 point)
     return normalToWorld(this->normal);
 }
 
-std::pair<glm::dvec4,glm::dvec4> Triangle::bounds() {
-    glm::dvec4 min(std::min({p1.x,p2.x,p3.x}),std::min({p1.y,p2.y,p3.y}),std::min({p1.z,p2.z,p3.z}),1.);
-    glm::dvec4 max(std::max({p1.x,p2.x,p3.x}),std::max({p1.y,p2.y,p3.y}),std::max({p1.z,p2.z,p3.z}),1.);
-  return std::pair<glm::dvec4,glm::dvec4>(min,max);
+std::pair<glm::dvec4, glm::dvec4> Triangle::bounds()
+{
+    glm::dvec4 min(std::min({p1.x, p2.x, p3.x}), std::min({p1.y, p2.y, p3.y}), std::min({p1.z, p2.z, p3.z}), 1.);
+    glm::dvec4 max(std::max({p1.x, p2.x, p3.x}), std::max({p1.y, p2.y, p3.y}), std::max({p1.z, p2.z, p3.z}), 1.);
+    return std::pair<glm::dvec4, glm::dvec4>(min, max);
 }
 
 std::string Triangle::type()

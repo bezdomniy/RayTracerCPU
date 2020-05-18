@@ -4,8 +4,21 @@
 Window::Window(const std::string &sceneDesc)
 {
     this->sceneDesc = sceneDesc;
+    this->world = std::make_shared<World>();
+    this->camera = this->world->loadFromFile(this->sceneDesc);
+    this->rayTraceRenderer = Renderer(this->camera);
+
     initWindow();
     // _drawTest();
+}
+
+Window::Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<World> &world)
+{
+    this->camera = camera;
+    this->world = world;
+    this->rayTraceRenderer = Renderer(this->camera);
+
+    initWindow();
 }
 
 Window::~Window()
@@ -14,16 +27,13 @@ Window::~Window()
 
 void Window::_drawTest()
 {
-    this->camera = this->world.loadFromFile(this->sceneDesc);
+    this->camera = this->world->loadFromFile(this->sceneDesc);
     this->rayTraceRenderer = Renderer(this->camera);
     update();
 }
 
 void Window::initWindow()
 {
-    this->camera = this->world.loadFromFile(this->sceneDesc);
-    this->rayTraceRenderer = Renderer(this->camera);
-
     SDL_SetMainReady();
     SDL_Init(SDL_INIT_VIDEO);
     SDL_CreateWindowAndRenderer(this->camera->hsize, this->camera->vsize, 0, &this->window, &this->renderer);
@@ -91,7 +101,6 @@ void Window::moveRight() { moveCamera(-STEP_SIZE, glm::dvec3(0.0, 1.0, 0.0)); }
 void Window::moveUp() { moveCamera(-STEP_SIZE, glm::dvec3(1.0, 0.0, 0.0)); }
 void Window::moveDown() { moveCamera(STEP_SIZE, glm::dvec3(1.0, 0.0, 0.0)); }
 
-
 void Window::moveCamera(double posChange, glm::dvec3 axis)
 {
     glm::dmat4 rotationY =
@@ -111,7 +120,7 @@ void Window::moveCamera(double posChange, glm::dvec3 axis)
 
 void Window::update()
 {
-    this->rayTraceRenderer.render(world);
+    this->rayTraceRenderer.render(*world);
     this->somethingChanged = false;
 }
 
