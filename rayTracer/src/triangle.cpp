@@ -39,9 +39,12 @@ void Triangle::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>>
 
 glm::dvec4 Triangle::normalAt(glm::dvec4 point)
 {
-    // glm::dvec4 worldNormal = glm::transpose(this->inverseTransform) * this->normal;
-    // worldNormal.w = 0.0;
     return normalToWorld(this->normal);
+}
+
+glm::dvec4 Triangle::normalAt(glm::dvec4 point, glm::dvec2 uv)
+{
+    return normalAt(point);
 }
 
 std::pair<glm::dvec4, glm::dvec4> Triangle::bounds()

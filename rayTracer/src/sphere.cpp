@@ -37,6 +37,11 @@ glm::dvec4 Sphere::normalAt(glm::dvec4 point)
   return normalToWorld(objectNormal);
 }
 
+glm::dvec4 Sphere::normalAt(glm::dvec4 point, glm::dvec2 uv)
+{
+  return normalAt(point);
+}
+
 std::pair<glm::dvec4, glm::dvec4> Sphere::bounds()
 {
   return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(-1., -1., -1., 1.), glm::dvec4(1., 1., 1., 1.));

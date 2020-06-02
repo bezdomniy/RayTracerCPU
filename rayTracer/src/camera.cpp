@@ -14,7 +14,8 @@ Camera::Camera(glm::dvec4 position, glm::dvec4 centre, glm::dvec4 up, int hsize,
   setPixelSize();
 }
 
-void Camera::updateTransform() {
+void Camera::updateTransform()
+{
   this->transform = glm::lookAt(glm::dvec3(position),
                                 glm::dvec3(this->centre), glm::dvec3(this->up));
 }
@@ -53,7 +54,7 @@ Ray Camera::rayForPixel(double px, double py, int currentRayNumber, int sqrtRays
   double worldY = this->halfHeight - yOffset;
 
   glm::dvec4 pixel = glm::affineInverse(this->transform) *
-                    glm::dvec4(worldX, worldY, -1.0, 1.0);
+                     glm::dvec4(worldX, worldY, -1.0, 1.0);
   glm::dvec4 origin =
       glm::affineInverse(this->transform) * glm::dvec4(0.0, 0.0, 0.0, 1.0);
   glm::dvec4 direction = glm::normalize(pixel - origin);
@@ -66,11 +67,17 @@ glm::dvec4 Camera::normalAt(glm::dvec4 point)
   return glm::dvec4();
 }
 
-std::pair<glm::dvec4,glm::dvec4> Camera::bounds() {
-  return std::pair<glm::dvec4,glm::dvec4>();
+glm::dvec4 Camera::normalAt(glm::dvec4 point, glm::dvec2 uv)
+{
+  return normalAt(point);
 }
 
-void Camera::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) { return; }
+std::pair<glm::dvec4, glm::dvec4> Camera::bounds()
+{
+  return std::pair<glm::dvec4, glm::dvec4>();
+}
+
+void Camera::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) { return; }
 
 std::string Camera::type()
 {

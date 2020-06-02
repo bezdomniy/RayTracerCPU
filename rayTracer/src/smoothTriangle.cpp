@@ -35,6 +35,11 @@ void SmoothTriangle::intersectRay(Ray &ray, std::vector<Geometry::Intersection<S
     intersections.push_back(Geometry::Intersection<Shape>{t, this, glm::dvec2(u, v)});
 }
 
+// glm::dvec4 SmoothTriangle::normalAt(glm::dvec4 point)
+// {
+//     return normalToWorld(this->normal);
+// }
+
 glm::dvec4 SmoothTriangle::normalAt(glm::dvec4 point, glm::dvec2 uv)
 {
     return normalToWorld(glm::dvec4(this->n2 * uv.x + this->n3 * uv.y + this->n1 * (1. - uv.x - uv.y), 0.));

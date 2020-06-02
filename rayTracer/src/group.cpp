@@ -31,6 +31,11 @@ glm::dvec4 Group::normalAt(glm::dvec4 point)
   return glm::normalize(glm::dvec4());
 }
 
+glm::dvec4 Group::normalAt(glm::dvec4 point, glm::dvec2 uv)
+{
+  return normalAt(point);
+}
+
 void Group::setMaterial(std::shared_ptr<Material> &mat)
 {
   this->material = mat;

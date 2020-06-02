@@ -5,6 +5,9 @@ Model::Model()
 {
 }
 
+// #include <iostream>
+// TODO use group information in model loading
+// TODO use uvs and normals in model loading
 Model::Model(std::string const &path)
 {
 	this->mesh = std::make_shared<Group>();
@@ -50,7 +53,7 @@ Model::Model(std::string const &path)
 		}
 		else if (line.substr(0, 2) == "vn")
 		{
-			std::istringstream vn(line.substr(2));
+			std::istringstream vn(line.substr(3));
 			glm::dvec3 normal;
 
 			double x, y, z;
@@ -59,23 +62,44 @@ Model::Model(std::string const &path)
 			vn >> z;
 
 			normal = glm::dvec3(x, y, z);
-			temp_vertices.push_back(normal);
+			temp_normals.push_back(normal);
 		}
 		else if (line.substr(0, 2) == "f ")
 		{
 			unsigned int vertexIndex[3], uvIndex[3], normalIndex[3];
-			const char *chh = line.c_str();
-			// sscanf(chh, "f %i/i%/%i %i/i%/%i %i/i%/%i", &vertexIndex[0], &uvIndex[0], &normalIndex[0], &vertexIndex[1], &uvIndex[1], &normalIndex[1], &vertexIndex[2], &uvIndex[2], &normalIndex[2]);
-			sscanf(chh, "f %i//%i %i//%i %i//%i", &vertexIndex[0], &normalIndex[0], &vertexIndex[1], &normalIndex[1], &vertexIndex[2], &normalIndex[2]);
+			std::istringstream f(line.substr(2));
 
-			// sscanf(chh, "f %i %i %i", &vertexIndex[0], &vertexIndex[1], &vertexIndex[2]); //here it read the line start with f and store the corresponding values in the variables
+			if (line.find('/') != std::string::npos)
+			{
+				for (int i = 0; i < 3; i++)
+				{
+					std::string vStr, vtStr, vnStr;
+					std::getline(f, vStr, '/');
+					std::getline(f, vtStr, '/');
+					std::getline(f, vnStr, ' ');
+
+					vertexIndex[i] = atoi(vStr.c_str());
+					uvIndex[i] = atoi(vtStr.c_str());
+					normalIndex[i] = atoi(vnStr.c_str());
+				}
+			}
+			else
+			{
+				std::string vStr[3];
+				std::getline(f, vStr[0], ' ');
+				std::getline(f, vStr[1], ' ');
+				std::getline(f, vStr[2], ' ');
+				vertexIndex[0] = atoi(vStr[0].c_str());
+				vertexIndex[1] = atoi(vStr[1].c_str());
+				vertexIndex[2] = atoi(vStr[2].c_str());
+			}
 
 			vertexIndices.push_back(vertexIndex[0]);
 			vertexIndices.push_back(vertexIndex[1]);
 			vertexIndices.push_back(vertexIndex[2]);
-			// uvIndices.push_back(uvIndex[0]);
-			// uvIndices.push_back(uvIndex[1]);
-			// uvIndices.push_back(uvIndex[2]);
+			uvIndices.push_back(uvIndex[0]);
+			uvIndices.push_back(uvIndex[1]);
+			uvIndices.push_back(uvIndex[2]);
 			normalIndices.push_back(normalIndex[0]);
 			normalIndices.push_back(normalIndex[1]);
 			normalIndices.push_back(normalIndex[2]);
@@ -86,7 +110,18 @@ Model::Model(std::string const &path)
 	{
 		// std::cout << vertexIndices[i] - 1 << " " << vertexIndices[i + 1] - 1 << " " << vertexIndices[i + 2] - 1 << "\n";
 
-		std::shared_ptr<Shape> nextTriangle = std::make_shared<Triangle>(temp_vertices[vertexIndices[i] - 1], temp_vertices[vertexIndices[i + 1] - 1], temp_vertices[vertexIndices[i + 2] - 1]);
+		std::shared_ptr<Shape> nextTriangle;
+
+		if (temp_normals.empty())
+		{
+			nextTriangle = std::make_shared<Triangle>(temp_vertices[vertexIndices[i] - 1], temp_vertices[vertexIndices[i + 1] - 1], temp_vertices[vertexIndices[i + 2] - 1]);
+		}
+		else
+		{
+			nextTriangle = std::make_shared<SmoothTriangle>(temp_vertices[vertexIndices[i] - 1], temp_vertices[vertexIndices[i + 1] - 1], temp_vertices[vertexIndices[i + 2] - 1],
+															temp_normals[normalIndices[i] - 1], temp_normals[normalIndices[i + 1] - 1], temp_normals[normalIndices[i + 2] - 1]);
+		}
+
 		mesh->addChild(nextTriangle);
 	}
 

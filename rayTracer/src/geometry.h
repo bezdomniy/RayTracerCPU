@@ -86,9 +86,9 @@ namespace Geometry
     intersection.comps = std::make_unique<IntersectionParameters>();
     intersection.comps->point =
         ray.origin + glm::normalize(ray.direction) * intersection.t;
-    // TODO refactors normal at to include hit uv
+    // TODO check that uv only null have using none-uv normalAt version
     intersection.comps->normalv =
-        intersection.shapePtr->normalAt(intersection.comps->point);
+        intersection.shapePtr->normalAt(intersection.comps->point, intersection.uv);
     intersection.comps->eyev = -ray.direction;
 
     if (glm::dot(intersection.comps->normalv, intersection.comps->eyev) < 0)
