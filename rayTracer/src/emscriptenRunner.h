@@ -26,6 +26,8 @@ private:
   Renderer renderer;
   std::vector<std::pair<int, int>> pixelsToRender;
 
+  // std::vector<std::pair<int, int>>::iterator currentBatchEnd;
+
   int sqrtRaysPerPixel;
   double halfSubPixelSize;
   const double STEP_SIZE = 0.05f;
