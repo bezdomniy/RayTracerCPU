@@ -2,9 +2,10 @@
 
 #ifdef _WIN32
 #define SDL_MAIN_HANDLED
-#endif
-
 #include <SDL.h>
+#else
+#include <SDL2/SDL.h>
+#endif
 #include <vector>
 #include <cmath>
 
