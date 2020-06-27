@@ -9,17 +9,10 @@
 #include "pointLight.h"
 #include "ray.h"
 #include "world.h"
-<<<<<<< HEAD
 
 #include <taskflow/taskflow.hpp>
 
 #include <algorithm>
-=======
-#include <algorithm>
-#include <execution>
-
-#include <functional>
->>>>>>> 0d43310519f8353236ee83e9f8acc7717a6e27ca
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <iostream>
