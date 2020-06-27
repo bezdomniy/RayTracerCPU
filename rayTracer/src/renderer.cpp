@@ -26,10 +26,10 @@ void Renderer::render(World &world)
     }
   }
 
-  std::random_device rd;
-  std::mt19937 g(rd());
+  // std::random_device rd;
+  // std::mt19937 g(rd());
 
-  std::shuffle(pixels.begin(), pixels.end(), g);
+  // std::shuffle(pixels.begin(), pixels.end(), g);
 
   std::for_each(
       std::execution::par_unseq, pixels.begin(), pixels.end(),

@@ -6,7 +6,8 @@
 #include <memory>
 #include <cmath>
 
-class Cone : public Shape {
+class Cone : public Shape
+{
 public:
   Cone();
   Cone(double minimum, double maximum, bool capped);
@@ -14,9 +15,10 @@ public:
   Cone(const Cone &c2);
   ~Cone();
 
-  virtual void intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) override;
+  virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
   virtual glm::dvec4 normalAt(glm::dvec4 point) override;
-  virtual std::pair<glm::dvec4,glm::dvec4> bounds() override;
+  virtual glm::dvec4 normalAt(glm::dvec4 point, glm::dvec2 uv) override;
+  virtual std::pair<glm::dvec4, glm::dvec4> bounds() override;
   virtual std::string type() override;
 
   double minimum;
@@ -26,5 +28,5 @@ public:
 private:
   bool checkCap(Ray &ray, double t, double y);
 
-  void intersectCaps(Ray &ray, std::vector<Geometry::Intersection<Shape>>& intersections);
+  void intersectCaps(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections);
 };

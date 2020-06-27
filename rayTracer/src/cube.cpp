@@ -7,15 +7,16 @@ Cube::Cube()
 
 Cube::~Cube() {}
 
-void Cube::intersectRay(Ray& ray, std::vector<Geometry::Intersection<Shape>>& intersections) {
+void Cube::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections)
+{
     Ray transformedRay = transformRay(ray);
 
     std::pair<double, double> xtminmax = Geometry::checkAxis<double>(transformedRay.origin.x, transformedRay.direction.x);
     std::pair<double, double> ytminmax = Geometry::checkAxis<double>(transformedRay.origin.y, transformedRay.direction.y);
     std::pair<double, double> ztminmax = Geometry::checkAxis<double>(transformedRay.origin.z, transformedRay.direction.z);
 
-    double tmin = std::max({ xtminmax.first, ytminmax.first, ztminmax.first });
-    double tmax = std::min({ xtminmax.second, ytminmax.second, ztminmax.second });
+    double tmin = std::max({xtminmax.first, ytminmax.first, ztminmax.first});
+    double tmax = std::min({xtminmax.second, ytminmax.second, ztminmax.second});
 
     if (tmin > tmax)
         return;
@@ -44,8 +45,14 @@ glm::dvec4 Cube::normalAt(glm::dvec4 point)
     return normalToWorld(objectNormal);
 }
 
-std::pair<glm::dvec4,glm::dvec4> Cube::bounds() {
-  return std::pair<glm::dvec4,glm::dvec4>(glm::dvec4(-1.,-1.,-1.,1.),glm::dvec4(1.,1.,1.,1.));
+glm::dvec4 Cube::normalAt(glm::dvec4 point, glm::dvec2 uv)
+{
+    return normalAt(point);
+}
+
+std::pair<glm::dvec4, glm::dvec4> Cube::bounds()
+{
+    return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(-1., -1., -1., 1.), glm::dvec4(1., 1., 1., 1.));
 }
 
 std::string Cube::type()

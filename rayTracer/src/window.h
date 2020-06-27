@@ -2,9 +2,10 @@
 
 #ifdef _WIN32
 #define SDL_MAIN_HANDLED
-#endif
-
 #include <SDL.h>
+#else
+#include <SDL2/SDL.h>
+#endif
 #include <vector>
 #include <cmath>
 
@@ -33,7 +34,7 @@ private:
 
     Renderer rayTraceRenderer;
 
-    World world;
+    std::shared_ptr<World> world;
     std::vector<uint8_t> byteBuffer;
     size_t bufferLength;
 
@@ -43,9 +44,9 @@ private:
 
     void _drawTest();
 
-
 public:
     Window(const std::string &sceneDesc);
+    Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<World> &world);
     ~Window();
 
     void moveLeft();
@@ -58,6 +59,3 @@ public:
     void draw();
     void run();
 };
-
-
-

@@ -12,6 +12,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
 # set(CMAKE_CXX_FLAGS_RELEASE "/O2")
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+
+
 set(TO_NATIVE ON)
 
 file(GLOB SOURCES
@@ -39,14 +42,18 @@ if(${TO_NATIVE})
 	#set(TBB_DIR /home/ilia/vcpkg/installed/x64-linux/share/tbb)
 
 	if (WIN32)
-		find_package(TBB CONFIG REQUIRED)
+		#find_package(TBB CONFIG REQUIRED)
 	endif (WIN32)
 	# find_package(ParallelSTL CONFIG REQUIRED)
 	# find_package(glfw3 CONFIG REQUIRED)
 	find_package(SDL2 CONFIG REQUIRED)
-	find_package(SDL2-image REQUIRED)
+	find_package(SDL2_image REQUIRED)
 	find_package(yaml-cpp CONFIG REQUIRED)
 	find_package(glm CONFIG REQUIRED)
+
+	find_package(TBB CONFIG REQUIRED)
+
+	# find_package(CUDA)
 	# find_package(assimp CONFIG REQUIRED)
 	#find_package(Vulkan REQUIRED)
 	#add_subdirectory(parallelstl)
@@ -58,7 +65,7 @@ if(${TO_NATIVE})
 	target_include_directories(RayTracer PRIVATE ${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIR})
 	#target_link_libraries(RayTracer PRIVATE $<$<CXX_COMPILER_ID:Clang>:rt>)
 	# target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb SDL2::SDL2main SDL2::SDL2-static)
-	target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb SDL2::SDL2 SDL2::SDL2main SDL2::SDL2_image)
+	target_link_libraries(RayTracer PRIVATE ${GLM_LIBRARIES} tbb yaml-cpp ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 else()
 	message(STATUS "Setting compilation target to WASM")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")

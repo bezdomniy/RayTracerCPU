@@ -2,11 +2,16 @@
 
 #ifdef _WIN32
 #define SDL_MAIN_HANDLED
-#endif
-
-#include <glm/glm.hpp>
 #include <SDL.h>
 #include <SDL_image.h>
+#else
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#endif
+
+
+#include <glm/glm.hpp>
+
 #include <string>
 #include <cmath>
 #include <vector>
