@@ -8,8 +8,17 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 #set(CMAKE_CXX_FLAGS "-openmp-simd")
+<<<<<<< HEAD
 set(CMAKE_CXX_FLAGS_DEBUG "-g -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1")
 set(CMAKE_CXX_FLAGS_RELEASE "-O3 -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1")
+=======
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
+# set(CMAKE_CXX_FLAGS_RELEASE "/O2")
+
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
+
+>>>>>>> 0d43310519f8353236ee83e9f8acc7717a6e27ca
 
 set(TO_NATIVE OFF)
 
@@ -44,14 +53,19 @@ if(${TO_NATIVE})
 	#set(TBB_DIR /home/ilia/vcpkg/installed/x64-linux/share/tbb)
 
 	if (WIN32)
-		find_package(TBB CONFIG REQUIRED)
+		#find_package(TBB CONFIG REQUIRED)
 	endif (WIN32)
-	find_package(ParallelSTL CONFIG REQUIRED)
+	# find_package(ParallelSTL CONFIG REQUIRED)
 	# find_package(glfw3 CONFIG REQUIRED)
 	find_package(SDL2 CONFIG REQUIRED)
+	find_package(SDL2_image REQUIRED)
 	find_package(yaml-cpp CONFIG REQUIRED)
 	find_package(glm CONFIG REQUIRED)
-	find_package(assimp CONFIG REQUIRED)
+
+	find_package(TBB CONFIG REQUIRED)
+
+	# find_package(CUDA)
+	# find_package(assimp CONFIG REQUIRED)
 	#find_package(Vulkan REQUIRED)
 	#add_subdirectory(parallelstl)
 	#add_subdirectory(glfw)
@@ -59,9 +73,10 @@ if(${TO_NATIVE})
 	#target_include_directories(RayTracer PRIVATE ${CMAKE_SOURCE_DIR}/glfw/include C:\\VulkanSDK\\1.1.130.0\\Include)
 	#target_compile_definitions(RayTracer PRIVATE VK_USE_PLATFORM_WIN32_KHR)
 	#target_include_directories(RayTracer PRIVATE Vulkan::Vulkan)
-	target_include_directories(RayTracer PRIVATE ${SDL2_INCLUDE_DIRS})
+	target_include_directories(RayTracer PRIVATE ${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIR})
 	#target_link_libraries(RayTracer PRIVATE $<$<CXX_COMPILER_ID:Clang>:rt>)
-	target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb pstl::ParallelSTL SDL2::SDL2main SDL2::SDL2-static assimp::assimp)
+	# target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb SDL2::SDL2main SDL2::SDL2-static)
+	target_link_libraries(RayTracer PRIVATE ${GLM_LIBRARIES} tbb yaml-cpp ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
 else()
 	message(STATUS "Setting compilation target to WASM")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")

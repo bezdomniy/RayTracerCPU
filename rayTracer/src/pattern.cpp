@@ -26,7 +26,7 @@ void Pattern::calculateInverseTranform() {
 
 Pattern::~Pattern() {}
 
-ColourPattern::ColourPattern() {}
+ColourPattern::ColourPattern() : Pattern() {}
 
 ColourPattern::ColourPattern(glm::dvec3 colourA, glm::dvec3 colourB) : Pattern() {
   this->colourA = colourA;

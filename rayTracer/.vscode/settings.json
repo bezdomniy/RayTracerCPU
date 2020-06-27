@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "files.associations": {
         "array": "cpp",
@@ -56,4 +57,7 @@
         "utility": "cpp",
         "variant": "cpp"
     }
+=======
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools"
+>>>>>>> 0d43310519f8353236ee83e9f8acc7717a6e27ca
 }

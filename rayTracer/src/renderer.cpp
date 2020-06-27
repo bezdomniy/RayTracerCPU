@@ -22,17 +22,23 @@ void Renderer::render(World &world) {
     }
   }
 
-  std::random_device rd;
-  std::mt19937 g(rd());
+  // std::random_device rd;
+  // std::mt19937 g(rd());
 
-  std::shuffle(pixels.begin(), pixels.end(), g);
+  // std::shuffle(pixels.begin(), pixels.end(), g);
 
+<<<<<<< HEAD
   tf::Executor executor(std::thread::hardware_concurrency());
   tf::Taskflow taskflow;
 
   taskflow.parallel_for(
       pixels.begin(), pixels.end(),
       [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &pixel) {
+=======
+  std::for_each(
+      std::execution::par_unseq, pixels.begin(), pixels.end(),
+      [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &&pixel) {
+>>>>>>> 0d43310519f8353236ee83e9f8acc7717a6e27ca
         renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
       });
   executor.run(taskflow);

@@ -16,6 +16,7 @@ std::vector<Geometry::Intersection<Shape>> World::intersectRay(Ray &ray) {
   std::vector<Geometry::Intersection<Shape>> ret;
   ret.reserve(this->shapes.size() * 2);
 
+  // TODO - take out ray transform here and do on CUDA then have another for loop do the rest on cpu
   for (auto &shape : this->shapes)
   {
     shape->intersectRay(ray, ret);

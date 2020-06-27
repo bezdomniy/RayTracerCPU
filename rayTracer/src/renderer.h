@@ -8,12 +8,18 @@
 #include "geometry.h"
 #include "pointLight.h"
 #include "ray.h"
-// #include "sphere.h"
 #include "world.h"
+<<<<<<< HEAD
 
 #include <taskflow/taskflow.hpp>
 
 #include <algorithm>
+=======
+#include <algorithm>
+#include <execution>
+
+#include <functional>
+>>>>>>> 0d43310519f8353236ee83e9f8acc7717a6e27ca
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <iostream>
@@ -30,7 +36,7 @@ public:
   Renderer(std::shared_ptr<Camera> &c);
   ~Renderer();
 
-  static const int RAY_BOUNCE_LIMIT = 5;
+  static const int RAY_BOUNCE_LIMIT = 3;
   static const int RAYS_PER_PIXEL = 1;
   Canvas canvas;
 
