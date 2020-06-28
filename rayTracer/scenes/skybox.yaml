@@ -33,22 +33,22 @@
       mapping: cube
       left:
         type: image
-        file: textures\LancellottiChapel\negx.png
+        file: textures/LancellottiChapel/negx.jpg
       right:
         type: image
-        file: textures\LancellottiChapel\posx.png
+        file: textures/LancellottiChapel/posx.jpg
       front:
         type: image
-        file: textures\LancellottiChapel\posz.png
+        file: textures/LancellottiChapel/posz.jpg
       back:
         type: image
-        file: textures\LancellottiChapel\negz.png
+        file: textures/LancellottiChapel/negz.jpg
       up:
         type: image
-        file: textures\LancellottiChapel\posy.png
+        file: textures/LancellottiChapel/posy.jpg
       down:
         type: image
-        file: textures\LancellottiChapel\negy.png
+        file: textures/LancellottiChapel/negy.jpg
     diffuse: 0
     specular: 0
     ambient: 1

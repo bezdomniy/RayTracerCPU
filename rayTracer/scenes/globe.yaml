@@ -44,7 +44,7 @@
       mapping: spherical
       uv_pattern:
         type: image
-        file: textures\earth.png
+        file: textures/earth.png
     diffuse: 0.9
     specular: 0.1
     shininess: 10
