@@ -114,26 +114,26 @@ glm::dvec3 PerturbedPattern::patternAt(glm::dvec4 point)
   return this->pattern->patternAt(patternPoint);
 }
 
-// MappedPattern::MappedPattern(std::shared_ptr<UVTexture> &uvTexture, std::shared_ptr<TextureMap> &textureMap)
-//     : Pattern()
-// {
-//   this->uvTexture = uvTexture;
-//   this->textureMap = textureMap;
-// }
+MappedPattern::MappedPattern(std::shared_ptr<UVTexture> &uvTexture, std::shared_ptr<TextureMap> &textureMap)
+    : Pattern()
+{
+  this->uvTexture = uvTexture;
+  this->textureMap = textureMap;
+}
 
-// MappedPattern::MappedPattern(const MappedPattern &mappedPattern)
-//     : Pattern()
-// {
-//   this->uvTexture = mappedPattern.uvTexture;
-//   this->textureMap = mappedPattern.textureMap;
-// }
+MappedPattern::MappedPattern(const MappedPattern &mappedPattern)
+    : Pattern()
+{
+  this->uvTexture = mappedPattern.uvTexture;
+  this->textureMap = mappedPattern.textureMap;
+}
 
-// MappedPattern::~MappedPattern() {}
+MappedPattern::~MappedPattern() {}
 
-// glm::dvec3 MappedPattern::patternAt(glm::dvec4 point)
-// {
-//   // glm::dvec2 uv = this->textureMap->uv_map(point);
-//   auto uv = this->textureMap->uv_map(point);
+glm::dvec3 MappedPattern::patternAt(glm::dvec4 point)
+{
+  // glm::dvec2 uv = this->textureMap->uv_map(point);
+  auto uv = this->textureMap->uv_map(point);
 
-//   return this->uvTexture->patternAt(uv.first, uv.second);
-// }
+  return this->uvTexture->patternAt(uv.first, uv.second);
+}

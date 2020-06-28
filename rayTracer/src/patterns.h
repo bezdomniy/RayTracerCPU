@@ -3,7 +3,7 @@
 #include "../include/SimplexNoise.h"
 #include "pattern.h"
 #include "textureMap.h"
-// #include "uvTextures.h"
+#include "uvTextures.h"
 #include <glm/gtc/matrix_inverse.hpp>
 #include <memory>
 #include <vector>
@@ -67,14 +67,15 @@ public:
   double perturbedCoeff;
 };
 
-// class MappedPattern : public Pattern {
-// public:
-//   MappedPattern(std::shared_ptr<UVTexture> &uvTexture, std::shared_ptr<TextureMap> &textureMap);
-//   MappedPattern(const MappedPattern &mappedPattern);
-//   ~MappedPattern();
+class MappedPattern : public Pattern
+{
+public:
+  MappedPattern(std::shared_ptr<UVTexture> &uvTexture, std::shared_ptr<TextureMap> &textureMap);
+  MappedPattern(const MappedPattern &mappedPattern);
+  ~MappedPattern();
 
-//   virtual glm::dvec3 patternAt(glm::dvec4 point) override;
+  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
 
-//   std::shared_ptr<UVTexture> uvTexture;
-//   std::shared_ptr<TextureMap> textureMap;
-// };
+  std::shared_ptr<UVTexture> uvTexture;
+  std::shared_ptr<TextureMap> textureMap;
+};

@@ -163,14 +163,14 @@ glm::dvec2 CubeMap::cubeUVRight(glm::dvec4 point)
 
 glm::dvec2 CubeMap::cubeUVUp(glm::dvec4 point)
 {
-    double u = std::fmod(point.x+ 1, 2.) / 2.;
+    double u = std::fmod(point.x + 1., 2.) / 2.;
     double v = std::fmod(1. - point.z, 2.) / 2.;
     return glm::dvec2(u, v);
 }
 
 glm::dvec2 CubeMap::cubeUVDown(glm::dvec4 point)
 {
-    double u = std::fmod(1. - point.x, 2.) / 2.;
+    double u = std::fmod(point.x + 1., 2.) / 2.;
     double v = std::fmod(point.z + 1., 2.) / 2.;
     return glm::dvec2(u, v);
 }

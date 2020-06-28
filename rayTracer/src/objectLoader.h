@@ -73,7 +73,7 @@ private:
   void parsePattern(const YAML::Node &node, Definition &definition);
   void parseArgs(const YAML::Node &node, std::vector<Value> &args);
   void parseShape(const YAML::Node &node, ShapeDefinition &shapeDefinition);
-  // void parseUV(const YAML::Node &node, std::shared_ptr<UVTexture> &uvTexture, int face = 0);
+  void parseUV(const YAML::Node &node, std::shared_ptr<UVTexture> &uvTexture, int face = 0);
 
 public:
   ObjectLoader();

@@ -548,13 +548,13 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
   std::shared_ptr<Pattern> pattern;
   double perturbedCoeff = 0;
 
-  // std::shared_ptr<UVTexture> uvTexture;
+  std::shared_ptr<UVTexture> uvTexture;
   std::shared_ptr<TextureMap> textureMap;
 
   bool cubeMapping = false;
 
   bool blendedPattern = false;
-  // bool mappedPattern = false;
+  bool mappedPattern = false;
   for (YAML::const_iterator valueIt = node.begin(); valueIt != node.end();
        ++valueIt)
   {
@@ -583,10 +583,10 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
         pattern = std::make_unique<CheckedPattern>(glm::dvec3(1.0, 0.0, 0.0),
                                                    glm::dvec3(0.0, 1.0, 0.0));
       }
-      // else if (valueIt->second.as<std::string>() == "map")
-      // {
-      //   mappedPattern = true;
-      // }
+      else if (valueIt->second.as<std::string>() == "map")
+      {
+        mappedPattern = true;
+      }
       else if (valueIt->second.as<std::string>() == "blended")
       {
         blendedPattern = true;
@@ -597,61 +597,61 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
         throw std::invalid_argument("invalid pattern type");
       }
     }
-    // else if (valueKey == "mapping")
-    // {
-    //   std::string mappingType = valueIt->second.as<std::string>();
+    else if (valueKey == "mapping")
+    {
+      std::string mappingType = valueIt->second.as<std::string>();
 
-    //   if (mappingType == "spherical")
-    //   {
-    //     textureMap = std::make_shared<SphericalMap>();
-    //   }
-    //   else if (mappingType == "planar")
-    //   {
-    //     textureMap = std::make_shared<PlanarMap>();
-    //   }
-    //   else if (mappingType == "cylindrical")
-    //   {
-    //     textureMap = std::make_shared<CylinderMap>();
-    //   }
-    //   else if (mappingType == "cube")
-    //   {
-    //     textureMap = std::make_shared<CubeMap>();
-    //     uvTexture = std::make_shared<ImageTexture>();
-    //     cubeMapping = true;
-    //   }
-    // }
-    // else if (valueKey == "uv_pattern")
-    // {
-    //   if (cubeMapping)
-    //   {
-    //   }
+      if (mappingType == "spherical")
+      {
+        textureMap = std::make_shared<SphericalMap>();
+      }
+      else if (mappingType == "planar")
+      {
+        textureMap = std::make_shared<PlanarMap>();
+      }
+      else if (mappingType == "cylindrical")
+      {
+        textureMap = std::make_shared<CylinderMap>();
+      }
+      else if (mappingType == "cube")
+      {
+        textureMap = std::make_shared<CubeMap>();
+        uvTexture = std::make_shared<ImageTexture>();
+        cubeMapping = true;
+      }
+    }
+    else if (valueKey == "uv_pattern")
+    {
+      if (cubeMapping)
+      {
+      }
 
-    //   parseUV(valueIt->second, uvTexture);
-    // }
-    // else if (valueKey == "right")
-    // {
-    //   parseUV(valueIt->second, uvTexture, 1);
-    // }
-    // else if (valueKey == "left")
-    // {
-    //   parseUV(valueIt->second, uvTexture, 2);
-    // }
-    // else if (valueKey == "up")
-    // {
-    //   parseUV(valueIt->second, uvTexture, 3);
-    // }
-    // else if (valueKey == "down")
-    // {
-    //   parseUV(valueIt->second, uvTexture, 4);
-    // }
-    // else if (valueKey == "front")
-    // {
-    //   parseUV(valueIt->second, uvTexture, 5);
-    // }
-    // else if (valueKey == "back")
-    // {
-    //   parseUV(valueIt->second, uvTexture, 6);
-    // }
+      parseUV(valueIt->second, uvTexture);
+    }
+    else if (valueKey == "right")
+    {
+      parseUV(valueIt->second, uvTexture, 1);
+    }
+    else if (valueKey == "left")
+    {
+      parseUV(valueIt->second, uvTexture, 2);
+    }
+    else if (valueKey == "up")
+    {
+      parseUV(valueIt->second, uvTexture, 3);
+    }
+    else if (valueKey == "down")
+    {
+      parseUV(valueIt->second, uvTexture, 4);
+    }
+    else if (valueKey == "front")
+    {
+      parseUV(valueIt->second, uvTexture, 5);
+    }
+    else if (valueKey == "back")
+    {
+      parseUV(valueIt->second, uvTexture, 6);
+    }
 
     else if (valueKey == "perturbed")
     {
@@ -798,66 +798,66 @@ void ObjectLoader::parseTransform(const YAML::Node &node,
   definition.empty = false;
 }
 
-// void ObjectLoader::parseUV(const YAML::Node &node, std::shared_ptr<UVTexture> &uvTexture, int face)
-// {
-//   std::string uvPatternType;
-//   std::unordered_map<std::string, Value> values;
-//   std::string imageFileName;
+void ObjectLoader::parseUV(const YAML::Node &node, std::shared_ptr<UVTexture> &uvTexture, int face)
+{
+  std::string uvPatternType;
+  std::unordered_map<std::string, Value> values;
+  std::string imageFileName;
 
-//   for (YAML::const_iterator uvIt = node.begin(); uvIt != node.end();
-//        ++uvIt)
-//   {
-//     std::string uvKey = uvIt->first.as<std::string>();
+  for (YAML::const_iterator uvIt = node.begin(); uvIt != node.end();
+       ++uvIt)
+  {
+    std::string uvKey = uvIt->first.as<std::string>();
 
-//     if (uvKey == "type")
-//     {
-//       uvPatternType = uvIt->second.as<std::string>();
-//     }
-//     else if (uvKey == "file")
-//     {
-//       imageFileName = uvIt->second.as<std::string>();
-//     }
-//     else if (uvKey == "width")
-//     {
-//       values["width"].scalar = uvIt->second.as<int>();
-//     }
-//     else if (uvKey == "height")
-//     {
-//       values["height"].scalar = uvIt->second.as<int>();
-//     }
-//     else if (uvKey == "colors")
-//     {
-//       values["colourA"].vector = glm::dvec3(uvIt->second[0][0].as<double>(),
-//                                             uvIt->second[0][1].as<double>(),
-//                                             uvIt->second[0][2].as<double>());
-//       values["colourB"].vector = glm::dvec3(uvIt->second[1][0].as<double>(),
-//                                             uvIt->second[1][1].as<double>(),
-//                                             uvIt->second[1][2].as<double>());
-//     }
-//   }
+    if (uvKey == "type")
+    {
+      uvPatternType = uvIt->second.as<std::string>();
+    }
+    else if (uvKey == "file")
+    {
+      imageFileName = uvIt->second.as<std::string>();
+    }
+    else if (uvKey == "width")
+    {
+      values["width"].scalar = uvIt->second.as<int>();
+    }
+    else if (uvKey == "height")
+    {
+      values["height"].scalar = uvIt->second.as<int>();
+    }
+    else if (uvKey == "colors")
+    {
+      values["colourA"].vector = glm::dvec3(uvIt->second[0][0].as<double>(),
+                                            uvIt->second[0][1].as<double>(),
+                                            uvIt->second[0][2].as<double>());
+      values["colourB"].vector = glm::dvec3(uvIt->second[1][0].as<double>(),
+                                            uvIt->second[1][1].as<double>(),
+                                            uvIt->second[1][2].as<double>());
+    }
+  }
 
-//   if (uvPatternType == "checkers")
-//   {
-//     uvTexture = std::make_shared<CheckeredTexture>(values["colourA"].vector, values["colourB"].vector, values["width"].scalar, values["height"].scalar);
-//   }
-//   else if (uvPatternType == "image")
-//   {
-//     if (!face)
-//       uvTexture = std::make_shared<ImageTexture>(imageFileName);
-//     else
-//     {
-//       if (face == 1)
-//         uvTexture->loadRight(imageFileName);
-//       else if (face == 2)
-//         uvTexture->loadLeft(imageFileName);
-//       else if (face == 3)
-//         uvTexture->loadUp(imageFileName);
-//       else if (face == 4)
-//         uvTexture->loadDown(imageFileName);
-//       else if (face == 5)
-//         uvTexture->loadFront(imageFileName);
-//       else if (face == 6)
-//         uvTexture->loadBack(imageFileName);
-//     }
-//   }
-// }
+  if (uvPatternType == "checkers")
+  {
+    uvTexture = std::make_shared<CheckeredTexture>(values["colourA"].vector, values["colourB"].vector, values["width"].scalar, values["height"].scalar);
+  }
+  else if (uvPatternType == "image")
+  {
+    if (!face)
+      uvTexture = std::make_shared<ImageTexture>(imageFileName);
+    else
+    {
+      if (face == 1)
+        uvTexture->loadRight(imageFileName);
+      else if (face == 2)
+        uvTexture->loadLeft(imageFileName);
+      else if (face == 3)
+        uvTexture->loadUp(imageFileName);
+      else if (face == 4)
+        uvTexture->loadDown(imageFileName);
+      else if (face == 5)
+        uvTexture->loadFront(imageFileName);
+      else if (face == 6)
+        uvTexture->loadBack(imageFileName);
+    }
+  }
+}
