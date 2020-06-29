@@ -740,10 +740,10 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
     pattern = std::make_shared<BlendedPattern>(patternADefinition.pattern,
                                                patternBDefinition.pattern);
   }
-  // else if (mappedPattern)
-  // {
-  //   pattern = std::make_unique<MappedPattern>(uvTexture, textureMap);
-  // }
+  else if (mappedPattern)
+  {
+    pattern = std::make_unique<MappedPattern>(uvTexture, textureMap);
+  }
 
   if (perturbedCoeff)
   {

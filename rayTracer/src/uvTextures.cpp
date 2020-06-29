@@ -72,13 +72,25 @@ ImageTexture::ImageTexture()
     this->textures.resize(6);
 }
 
+// #include <iostream>
+// #include <filesystem>
 ImageTexture::ImageTexture(std::string const &path)
 {
     unsigned char *rgb;
     int w, h, bpp;
     std::unique_ptr<Surface> surface = std::make_unique<Surface>(rgb, w, h, bpp);
 
+    // std::string p = "./home/web_user";
+    // for (const auto &entry : std::filesystem::directory_iterator(p))
+    //     std::cout << entry.path() << std::endl;
+
     surface->rgb = stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb);
+
+    if (!surface->rgb)
+    {
+        // std::cout << path << std::endl;
+        throw std::invalid_argument("can't find file: " + path);
+    }
 
     this->textures.push_back(std::move(surface));
 }
