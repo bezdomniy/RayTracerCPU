@@ -156,6 +156,11 @@ Model::Model(std::string const &path, bool buildBVH)
 	// }
 }
 
+Model::Model(const Model &model)
+{
+	this->mesh = std::make_shared<Group>(*(model.mesh));
+}
+
 std::shared_ptr<Group> Model::recursiveBuild(std::vector<std::shared_ptr<Shape>> &shapes, uint32_t start, uint32_t end)
 {
 	std::shared_ptr<Group> node = std::make_shared<Group>();

@@ -144,10 +144,15 @@ std::shared_ptr<Group> hexagon()
 
 Model mesh(const std::string &objPath)
 {
-  Model model(objPath);
+  Model model(objPath, false);
   std::shared_ptr<Material> material = std::make_shared<Material>();
   material->colour = glm::dvec3(0.8, 0.8, 0.8);
   model.mesh->setMaterial(material);
+
+  glm::dmat4 scale =
+      glm::scale(glm::dmat4(1.0), glm::dvec3(0.4, 0.4, 0.4));
+  model.mesh->multiplyTransform(scale);
+  model.mesh->calculateInverseTranform();
 
   return model;
 }
@@ -170,15 +175,43 @@ int main(int argc, char const *argv[])
   // renderToPPM("scenes/reflectionScene.yaml");
 
   std::shared_ptr<World> world = std::make_shared<World>();
-  std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(-10., 5., 20., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 400, 0.524);
+  std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(0., 0, 20., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 400, 0.524);
 
   Model model = mesh("models/dragon.obj");
+  Model model2 = model;
+  Model model3 = model;
+  Model model4 = model;
+  Model model5 = model;
 
   std::shared_ptr<PointLight> light = std::make_shared<PointLight>(
       glm::dvec4(glm::dvec4(10., 10., 10., 1.)),
       glm::dvec3(1., 1., 1.));
 
   std::shared_ptr<Shape> mesh = std::dynamic_pointer_cast<Shape>(model.mesh);
+  std::shared_ptr<Shape> mesh2 = std::dynamic_pointer_cast<Shape>(model2.mesh);
+  std::shared_ptr<Shape> mesh3 = std::dynamic_pointer_cast<Shape>(model3.mesh);
+  std::shared_ptr<Shape> mesh4 = std::dynamic_pointer_cast<Shape>(model4.mesh);
+  std::shared_ptr<Shape> mesh5 = std::dynamic_pointer_cast<Shape>(model5.mesh);
+
+  glm::dmat4 translateMesh =
+      glm::translate(glm::dmat4(1.0), glm::dvec3(0., 2, 0.));
+  mesh2->multiplyTransform(translateMesh);
+  mesh2->calculateInverseTranform();
+
+  translateMesh =
+      glm::translate(glm::dmat4(1.0), glm::dvec3(0., -2, 0.));
+  mesh3->multiplyTransform(translateMesh);
+  mesh3->calculateInverseTranform();
+
+  translateMesh =
+      glm::translate(glm::dmat4(1.0), glm::dvec3(2., 2, 0.));
+  mesh4->multiplyTransform(translateMesh);
+  mesh4->calculateInverseTranform();
+
+  translateMesh =
+      glm::translate(glm::dmat4(1.0), glm::dvec3(2., -2, 0.));
+  mesh5->multiplyTransform(translateMesh);
+  mesh5->calculateInverseTranform();
 
   // glm::dmat4 scale =
   //     glm::scale(glm::dmat4(1.0), glm::dvec3(3., 3., 3.));
@@ -198,6 +231,10 @@ int main(int argc, char const *argv[])
   plane->calculateInverseTranform();
 
   world->addShape(mesh);
+  world->addShape(mesh2);
+  world->addShape(mesh3);
+  world->addShape(mesh4);
+  world->addShape(mesh5);
   // world->addShape(plane);
   world->addLight(light);
 

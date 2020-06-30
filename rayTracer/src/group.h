@@ -22,6 +22,7 @@ private:
 public:
     Group();
     Group(std::vector<std::shared_ptr<Shape>> &shapes);
+    Group(const Group &group);
     ~Group();
 
     std::vector<std::shared_ptr<Shape>> children;

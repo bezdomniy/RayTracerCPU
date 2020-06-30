@@ -26,6 +26,22 @@ Material::Material(glm::dvec3 colour, double ambient, double diffuse,
   this->refractiveIndex = 1.0;
 }
 
+Material::Material(const Material &material)
+{
+  this->pattern = material.pattern;
+
+  this->colour = material.colour;
+  this->ambient = material.ambient;
+  this->diffuse = material.diffuse;
+  this->specular = material.specular;
+  this->shininess = material.shininess;
+  this->reflective = material.reflective;
+  this->transparency = material.transparency;
+  this->refractiveIndex = material.refractiveIndex;
+
+  this->shadow = material.shadow;
+}
+
 Material::~Material() {}
 
 void Material::setPattern(std::shared_ptr<Pattern> &pattern)
