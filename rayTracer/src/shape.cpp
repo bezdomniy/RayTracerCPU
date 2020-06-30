@@ -68,4 +68,11 @@ glm::dvec4 Shape::normalToWorld(glm::dvec4 normal)
   return normal;
 }
 
-Shape::~Shape() {}
+glm::dvec4 Shape::boundsCentroid()
+{
+  return .5 * this->bounds().first + .5 * this->bounds().second;
+}
+
+Shape::~Shape()
+{
+}

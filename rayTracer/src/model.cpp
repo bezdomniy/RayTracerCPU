@@ -1,4 +1,5 @@
 #include "model.h"
+#include <chrono>
 #include <iostream>
 
 Model::Model()
@@ -155,110 +156,86 @@ Model::Model(std::string const &path, bool buildBVH)
 	// }
 }
 
-std::shared_ptr<Group> Model::buildBoundingVolumeHierarchy(std::vector<std::shared_ptr<Shape>> &shapes)
+std::shared_ptr<Group> Model::recursiveBuild(std::vector<std::shared_ptr<Shape>> &shapes, uint32_t start, uint32_t end)
 {
-	std::shared_ptr<Group> root = std::make_shared<Group>();
+	std::shared_ptr<Group> node = std::make_shared<Group>();
 
-	std::vector<glm::dvec4> centroids;
-	centroids.reserve(shapes.size());
+	int nShapes = end - start;
 
-	std::shared_ptr<Group> meshLeft = std::make_shared<Group>();
-	std::shared_ptr<Group> meshRight = std::make_shared<Group>();
-	std::shared_ptr<Group> meshLeftUp = std::make_shared<Group>();
-	std::shared_ptr<Group> meshLeftDown = std::make_shared<Group>();
-	std::shared_ptr<Group> meshRightUp = std::make_shared<Group>();
-	std::shared_ptr<Group> meshRightDown = std::make_shared<Group>();
-
-	double avgX, avgY, avgZ;
-	std::for_each(shapes.begin(), shapes.end(), [&](std::shared_ptr<Shape> shape) {
-		glm::dvec4 centroid = .5 * shape->bounds().first + .5 * shape->bounds().second;
-
-		avgX += centroid.x;
-		avgY += centroid.y;
-		avgZ += centroid.z;
-
-		centroids.push_back(centroid);
-	});
-
-	avgX /= centroids.size();
-	avgY /= centroids.size();
-	avgZ /= centroids.size();
-
-	// std::vector<glm::dvec3> temp_sorted_vertices;
-	// temp_sorted_vertices.resize(temp_vertices.size());
-
-	// std::partial_sort_copy(temp_vertices.begin(), temp_vertices.end(), temp_sorted_vertices.begin(), temp_sorted_vertices.end(), [](const auto &lhs, const auto &rhs) {
-	// 	return lhs.x < rhs.x;
-	// });
-
-	// avgX = temp_sorted_vertices.at(temp_vertices.size() / 2).x;
-
-	// std::partial_sort_copy(temp_vertices.begin(), temp_vertices.end(), temp_sorted_vertices.begin(), temp_sorted_vertices.end(), [](const auto &lhs, const auto &rhs) {
-	// 	return lhs.y < rhs.y;
-	// });
-
-	// avgY = temp_sorted_vertices.at(temp_vertices.size() / 2).x;
-
-	// std::partial_sort_copy(temp_vertices.begin(), temp_vertices.end(), temp_sorted_vertices.begin(), temp_sorted_vertices.end(), [](const auto &lhs, const auto &rhs) {
-	// 	return lhs.z < rhs.z;
-	// });
-
-	// avgZ = temp_sorted_vertices.at(temp_vertices.size() / 2).x;
-
-	std::cout << avgX << " " << avgY << " " << avgZ << "\n";
-
-	int index = 0;
-	for (auto &shape : shapes)
+	if (nShapes == 1)
 	{
-		glm::dvec4 centroid = centroids.at(index);
+		for (int i = start; i < end; ++i)
+			node->addChild(shapes.at(i));
+		return node;
+	}
+	else
+	{
+		std::pair<glm::dvec4, glm::dvec4> centroidBounds;
+		for (const auto &shape : shapes)
+			centroidBounds = mergeBounds(centroidBounds, shape->bounds());
 
-		if (centroid.x < avgX)
+		glm::dvec4 diagonal = centroidBounds.second - centroidBounds.first;
+		int splitDimension;
+
+		if (diagonal.x > diagonal.y && diagonal.x > diagonal.z)
+			splitDimension = 0;
+		else if (diagonal.y > diagonal.z)
+			splitDimension = 1;
+		else
+			splitDimension = 2;
+
+		int mid = (start + end) / 2;
+
+		if (centroidBounds.first[splitDimension] == centroidBounds.second[splitDimension])
 		{
-			if (centroid.y < avgY)
-			{
-				meshLeftDown->addChild(shape);
-			}
-			else
-			{
-				meshLeftUp->addChild(shape);
-			}
+			for (int i = start; i < end; ++i)
+				node->addChild(shapes.at(i));
+			return node;
 		}
 		else
 		{
-			if (centroid.y < avgY)
-			{
-				meshRightDown->addChild(shape);
-			}
-			else
-			{
-				meshRightUp->addChild(shape);
-			}
+			mid = (start + end) / 2;
+			std::nth_element(&shapes[start], &shapes[mid],
+							 &shapes[end - 1] + 1,
+							 [splitDimension](const std::shared_ptr<Shape> &a, const std::shared_ptr<Shape> &b) {
+								 return a->boundsCentroid()[splitDimension] < b->boundsCentroid()[splitDimension];
+							 });
+
+			// double pmid = (centroidBounds.first[splitDimension] + centroidBounds.second[splitDimension]) / 2;
+			// std::shared_ptr<Shape> *midPtr =
+			// 	std::partition(&shapes[start], &shapes[end - 1] + 1,
+			// 				   [splitDimension, pmid](const std::shared_ptr<Shape> &pi) {
+			// 					   return pi->boundsCentroid()[splitDimension] < pmid;
+			// 				   });
+			// mid = midPtr - &shapes[0];
+			// if (mid != start && mid != end)
+			// 	break;
+
+			std::shared_ptr<Shape> leftChild = recursiveBuild(shapes, start, mid);
+			std::shared_ptr<Shape> rightChild = recursiveBuild(shapes, mid, end);
+
+			node->addChild(leftChild);
+			node->addChild(rightChild);
 		}
-		index++;
 	}
 
-	std::shared_ptr<Shape> meshLU = std::dynamic_pointer_cast<Shape>(meshLeftUp);
-	std::shared_ptr<Shape> meshLD = std::dynamic_pointer_cast<Shape>(meshLeftDown);
-	std::shared_ptr<Shape> meshRU = std::dynamic_pointer_cast<Shape>(meshRightUp);
-	std::shared_ptr<Shape> meshRD = std::dynamic_pointer_cast<Shape>(meshRightDown);
+	return node;
+}
 
-	meshLeft->addChild(meshLU);
-	meshLeft->addChild(meshLD);
-	meshRight->addChild(meshRU);
-	meshRight->addChild(meshRD);
+std::shared_ptr<Group> Model::buildBoundingVolumeHierarchy(std::vector<std::shared_ptr<Shape>> &shapes)
+{
+	auto start = std::chrono::high_resolution_clock::now();
+	std::shared_ptr<Group> root = recursiveBuild(shapes, 0, shapes.size());
 
-	std::shared_ptr<Shape> meshL = std::dynamic_pointer_cast<Shape>(meshLeft);
-	std::shared_ptr<Shape> meshR = std::dynamic_pointer_cast<Shape>(meshRight);
+	auto stop = std::chrono::high_resolution_clock::now();
 
-	root->addChild(meshL);
-	root->addChild(meshR);
+	std::cout << "Time to build BVH: " << std::chrono::duration_cast<std::chrono::seconds>(stop - start).count() << std::endl;
 
 	return root;
 }
 
 std::pair<glm::dvec4, glm::dvec4> Model::mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const std::pair<glm::dvec4, glm::dvec4> b2)
 {
-
 	return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::min(b1.first.x, b2.first.x),
 														std::min(b1.first.y, b2.first.y),
 														std::min(b1.first.z, b2.first.z), 1.),
