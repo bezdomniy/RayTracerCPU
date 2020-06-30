@@ -172,7 +172,7 @@ int main(int argc, char const *argv[])
   std::shared_ptr<World> world = std::make_shared<World>();
   std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(-10., 5., 20., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 400, 0.524);
 
-  Model model = mesh("models/armadillo.obj");
+  Model model = mesh("models/dragon.obj");
 
   std::shared_ptr<PointLight> light = std::make_shared<PointLight>(
       glm::dvec4(glm::dvec4(10., 10., 10., 1.)),
@@ -203,7 +203,7 @@ int main(int argc, char const *argv[])
 
   Renderer renderer(camera);
   renderer.render(*world);
-  renderer.canvas.writeToPPM("armadillo.ppm", false);
+  renderer.canvas.writeToPPM("dragon.ppm", false);
 
   // renderToSDL(camera, world);
 

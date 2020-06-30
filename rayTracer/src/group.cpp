@@ -9,6 +9,17 @@ Group::~Group()
 {
 }
 
+Group::Group(std::vector<std::shared_ptr<Shape>> &shapes) : Shape()
+{
+  this->boundingBox = std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.), glm::dvec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.));
+
+  for (auto &shape : shapes)
+  {
+    // TODO update this so bounding box is only calculated when all shapes are added
+    this->addChild(shape);
+  }
+}
+
 void Group::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections)
 {
   Ray transformedRay = transformRay(ray);
@@ -108,12 +119,6 @@ void Group::updateBoundingBox(std::shared_ptr<Shape> &shape)
     this->boundingBox.first = glm::min(this->boundingBox.first, transformedPoint);
     this->boundingBox.second = glm::max(this->boundingBox.second, transformedPoint);
   }
-
-  // newBoundingBox.first = shape->transform * newBoundingBox.first;
-  // newBoundingBox.second = shape->transform * newBoundingBox.second;
-
-  // std::cout << "shape bounding box: " << this->boundingBox.first.x << " "  << this->boundingBox.first.y << " "  << this->boundingBox.first.z << " " \
-  //  << this->boundingBox.second.x << " "  << this->boundingBox.second.y << " "  << this->boundingBox.second.z << " " <<std::endl;
 }
 
 std::pair<glm::dvec4, glm::dvec4> Group::bounds()

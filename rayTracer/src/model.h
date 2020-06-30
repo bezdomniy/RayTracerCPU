@@ -7,14 +7,19 @@
 #include <fstream>
 #include <sstream>
 #include <memory>
+#include <utility>
 
 #include "group.h"
 
 class Model
 {
+private:
+	std::shared_ptr<Group> buildBoundingVolumeHierarchy(std::vector<std::shared_ptr<Shape>> &shapes);
+	std::pair<glm::dvec4, glm::dvec4> mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const std::pair<glm::dvec4, glm::dvec4> b2);
+
 public:
 	Model();
-	Model(std::string const &path);
+	Model(std::string const &path, bool buildBVH = true);
 	~Model();
 
 	// std::vector<glm::dvec3> vertices;

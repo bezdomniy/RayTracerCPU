@@ -1,5 +1,5 @@
 #include "model.h"
-// #include <iostream>
+#include <iostream>
 
 Model::Model()
 {
@@ -8,9 +8,9 @@ Model::Model()
 // #include <iostream>
 // TODO use group information in model loading
 // TODO use uvs and normals in model loading
-Model::Model(std::string const &path)
+Model::Model(std::string const &path, bool buildBVH)
 {
-	this->mesh = std::make_shared<Group>();
+	// this->mesh = std::make_shared<Group>();
 	std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
 	std::vector<glm::dvec3> temp_vertices;
 	std::vector<glm::dvec2> temp_uvs;
@@ -106,10 +106,11 @@ Model::Model(std::string const &path)
 		}
 	}
 
+	std::vector<std::shared_ptr<Shape>> triangles;
+	triangles.reserve(vertexIndices.size() / 3);
+
 	for (unsigned int i = 0; i < vertexIndices.size(); i += 3)
 	{
-		// std::cout << vertexIndices[i] - 1 << " " << vertexIndices[i + 1] - 1 << " " << vertexIndices[i + 2] - 1 << "\n";
-
 		std::shared_ptr<Shape> nextTriangle;
 
 		if (temp_normals.empty())
@@ -122,7 +123,16 @@ Model::Model(std::string const &path)
 															temp_normals[normalIndices[i] - 1], temp_normals[normalIndices[i + 1] - 1], temp_normals[normalIndices[i + 2] - 1]);
 		}
 
-		mesh->addChild(nextTriangle);
+		triangles.push_back(nextTriangle);
+	}
+
+	if (buildBVH)
+	{
+		mesh = buildBoundingVolumeHierarchy(triangles);
+	}
+	else
+	{
+		mesh = std::make_shared<Group>(triangles);
 	}
 
 	// for (unsigned int i = 0; i < vertexIndices.size(); i++)
@@ -143,6 +153,118 @@ Model::Model(std::string const &path)
 	// 	glm::dvec3 normal = temp_normals[normalIndex - 1];
 	// 	this->normals.push_back(normal);
 	// }
+}
+
+std::shared_ptr<Group> Model::buildBoundingVolumeHierarchy(std::vector<std::shared_ptr<Shape>> &shapes)
+{
+	std::shared_ptr<Group> root = std::make_shared<Group>();
+
+	std::vector<glm::dvec4> centroids;
+	centroids.reserve(shapes.size());
+
+	std::shared_ptr<Group> meshLeft = std::make_shared<Group>();
+	std::shared_ptr<Group> meshRight = std::make_shared<Group>();
+	std::shared_ptr<Group> meshLeftUp = std::make_shared<Group>();
+	std::shared_ptr<Group> meshLeftDown = std::make_shared<Group>();
+	std::shared_ptr<Group> meshRightUp = std::make_shared<Group>();
+	std::shared_ptr<Group> meshRightDown = std::make_shared<Group>();
+
+	double avgX, avgY, avgZ;
+	std::for_each(shapes.begin(), shapes.end(), [&](std::shared_ptr<Shape> shape) {
+		glm::dvec4 centroid = .5 * shape->bounds().first + .5 * shape->bounds().second;
+
+		avgX += centroid.x;
+		avgY += centroid.y;
+		avgZ += centroid.z;
+
+		centroids.push_back(centroid);
+	});
+
+	avgX /= centroids.size();
+	avgY /= centroids.size();
+	avgZ /= centroids.size();
+
+	// std::vector<glm::dvec3> temp_sorted_vertices;
+	// temp_sorted_vertices.resize(temp_vertices.size());
+
+	// std::partial_sort_copy(temp_vertices.begin(), temp_vertices.end(), temp_sorted_vertices.begin(), temp_sorted_vertices.end(), [](const auto &lhs, const auto &rhs) {
+	// 	return lhs.x < rhs.x;
+	// });
+
+	// avgX = temp_sorted_vertices.at(temp_vertices.size() / 2).x;
+
+	// std::partial_sort_copy(temp_vertices.begin(), temp_vertices.end(), temp_sorted_vertices.begin(), temp_sorted_vertices.end(), [](const auto &lhs, const auto &rhs) {
+	// 	return lhs.y < rhs.y;
+	// });
+
+	// avgY = temp_sorted_vertices.at(temp_vertices.size() / 2).x;
+
+	// std::partial_sort_copy(temp_vertices.begin(), temp_vertices.end(), temp_sorted_vertices.begin(), temp_sorted_vertices.end(), [](const auto &lhs, const auto &rhs) {
+	// 	return lhs.z < rhs.z;
+	// });
+
+	// avgZ = temp_sorted_vertices.at(temp_vertices.size() / 2).x;
+
+	std::cout << avgX << " " << avgY << " " << avgZ << "\n";
+
+	int index = 0;
+	for (auto &shape : shapes)
+	{
+		glm::dvec4 centroid = centroids.at(index);
+
+		if (centroid.x < avgX)
+		{
+			if (centroid.y < avgY)
+			{
+				meshLeftDown->addChild(shape);
+			}
+			else
+			{
+				meshLeftUp->addChild(shape);
+			}
+		}
+		else
+		{
+			if (centroid.y < avgY)
+			{
+				meshRightDown->addChild(shape);
+			}
+			else
+			{
+				meshRightUp->addChild(shape);
+			}
+		}
+		index++;
+	}
+
+	std::shared_ptr<Shape> meshLU = std::dynamic_pointer_cast<Shape>(meshLeftUp);
+	std::shared_ptr<Shape> meshLD = std::dynamic_pointer_cast<Shape>(meshLeftDown);
+	std::shared_ptr<Shape> meshRU = std::dynamic_pointer_cast<Shape>(meshRightUp);
+	std::shared_ptr<Shape> meshRD = std::dynamic_pointer_cast<Shape>(meshRightDown);
+
+	meshLeft->addChild(meshLU);
+	meshLeft->addChild(meshLD);
+	meshRight->addChild(meshRU);
+	meshRight->addChild(meshRD);
+
+	std::shared_ptr<Shape> meshL = std::dynamic_pointer_cast<Shape>(meshLeft);
+	std::shared_ptr<Shape> meshR = std::dynamic_pointer_cast<Shape>(meshRight);
+
+	root->addChild(meshL);
+	root->addChild(meshR);
+
+	return root;
+}
+
+std::pair<glm::dvec4, glm::dvec4> Model::mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const std::pair<glm::dvec4, glm::dvec4> b2)
+{
+
+	return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::min(b1.first.x, b2.first.x),
+														std::min(b1.first.y, b2.first.y),
+														std::min(b1.first.z, b2.first.z), 1.),
+											 glm::dvec4(std::max(b1.second.x, b2.second.x),
+														std::max(b1.second.y, b2.second.y),
+														std::max(b1.second.z, b2.second.z), 1.));
 }
 
 Model::~Model()

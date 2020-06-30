@@ -20,7 +20,8 @@ private:
     bool boundIntersection(Ray &transformedRay);
 
 public:
-    Group(/* args */);
+    Group();
+    Group(std::vector<std::shared_ptr<Shape>> &shapes);
     ~Group();
 
     std::vector<std::shared_ptr<Shape>> children;
