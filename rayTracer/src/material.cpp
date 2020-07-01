@@ -21,8 +21,8 @@ Material::Material(glm::dvec3 colour, double ambient, double diffuse,
   this->diffuse = diffuse;
   this->specular = specular;
   this->shininess = shininess;
-  this->reflective = 0;
-  this->transparency = 0;
+  this->reflective = 0.;
+  this->transparency = 0.;
   this->refractiveIndex = 1.0;
 }
 
