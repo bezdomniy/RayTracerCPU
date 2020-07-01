@@ -176,8 +176,9 @@ std::shared_ptr<Group> Model::recursiveBuild(std::vector<std::shared_ptr<Shape>>
 	else
 	{
 		std::pair<glm::dvec4, glm::dvec4> centroidBounds;
-		for (const auto &shape : shapes)
-			centroidBounds = mergeBounds(centroidBounds, shape->bounds());
+		//for (const auto &shape : shapes)
+		for (auto it = shapes.begin() + start; it != shapes.begin() + end; ++it)
+			centroidBounds = mergeBounds(centroidBounds, (*it)->bounds());
 
 		glm::dvec4 diagonal = centroidBounds.second - centroidBounds.first;
 		int splitDimension;

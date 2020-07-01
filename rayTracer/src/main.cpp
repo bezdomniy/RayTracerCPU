@@ -144,7 +144,7 @@ std::shared_ptr<Group> hexagon()
 
 Model mesh(const std::string &objPath)
 {
-  Model model(objPath, false);
+  Model model(objPath, true);
   std::shared_ptr<Material> material = std::make_shared<Material>();
   material->colour = glm::dvec3(0.8, 0.8, 0.8);
   model.mesh->setMaterial(material);
@@ -177,7 +177,7 @@ int main(int argc, char const *argv[])
   std::shared_ptr<World> world = std::make_shared<World>();
   std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(0., 0, 20., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 400, 0.524);
 
-  Model model = mesh("models/dragon.obj");
+  Model model = mesh("../../../models/dragon.obj");
   Model model2 = model;
   Model model3 = model;
   Model model4 = model;
