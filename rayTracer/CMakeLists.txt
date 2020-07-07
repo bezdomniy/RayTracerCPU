@@ -61,13 +61,19 @@ if(${TO_NATIVE})
 	#add_subdirectory(parallelstl)
 	#add_subdirectory(glfw)
 
+
 	#target_include_directories(RayTracer PRIVATE ${CMAKE_SOURCE_DIR}/glfw/include C:\\VulkanSDK\\1.1.130.0\\Include)
 	#target_compile_definitions(RayTracer PRIVATE VK_USE_PLATFORM_WIN32_KHR)
 	#target_include_directories(RayTracer PRIVATE Vulkan::Vulkan)
 	target_include_directories(RayTracer PRIVATE ${SDL2_INCLUDE_DIRS} )
 	#target_link_libraries(RayTracer PRIVATE $<$<CXX_COMPILER_ID:Clang>:rt>)
-	# target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb SDL2::SDL2main SDL2::SDL2-static)
-	target_link_libraries(RayTracer PRIVATE ${GLM_LIBRARIES} tbb yaml-cpp ${SDL2_LIBRARIES} )
+	if (WIN32)
+		target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb SDL2::SDL2main SDL2::SDL2-static)
+	else()
+		target_link_libraries(RayTracer PRIVATE ${GLM_LIBRARIES} tbb yaml-cpp ${SDL2_LIBRARIES} )
+	endif (WIN32)
+	
+	
 else()
 	message(STATUS "Setting compilation target to WASM")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")

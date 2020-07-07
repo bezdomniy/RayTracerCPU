@@ -9,6 +9,89 @@ Group::~Group()
 {
 }
 
+Group::Group(std::vector<std::shared_ptr<Shape>> &shapes) : Shape()
+{
+  this->boundingBox = std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.), glm::dvec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.));
+
+  for (auto &shape : shapes)
+  {
+    // TODO update this so bounding box is only calculated when all shapes are added
+    this->addChild(shape);
+  }
+}
+
+Group::Group(const Group &group)
+{
+  // TODO maybe make shapetype an enum instead of string
+  for (const auto &child : group.children)
+  {
+    std::shared_ptr<Shape> nextShape;
+    // std::shared_ptr<Material> mat = std::make_shared<Material>(*(child->material));
+
+    if (child->type() == "Sphere")
+    {
+      std::shared_ptr<Sphere> spherePtr = std::dynamic_pointer_cast<Sphere>(child);
+      nextShape = std::make_shared<Sphere>(*spherePtr);
+    }
+    else if (child->type() == "Plane")
+    {
+      std::shared_ptr<Plane> planePtr = std::dynamic_pointer_cast<Plane>(child);
+      nextShape = std::make_shared<Plane>(*planePtr);
+    }
+    else if (child->type() == "Cube")
+    {
+      std::shared_ptr<Cube> cubePtr = std::dynamic_pointer_cast<Cube>(child);
+      nextShape = std::make_shared<Cube>(*cubePtr);
+    }
+    else if (child->type() == "Cylinder")
+    {
+      std::shared_ptr<Cylinder> cylinderPtr = std::dynamic_pointer_cast<Cylinder>(child);
+      nextShape = std::make_shared<Cylinder>(*cylinderPtr);
+    }
+    else if (child->type() == "Cone")
+    {
+      std::shared_ptr<Cone> conePtr = std::dynamic_pointer_cast<Cone>(child);
+      nextShape = std::make_shared<Cone>(*conePtr);
+    }
+    else if (child->type() == "Triangle")
+    {
+      std::shared_ptr<Triangle> trianglePtr = std::dynamic_pointer_cast<Triangle>(child);
+      nextShape = std::make_shared<Triangle>(*trianglePtr);
+    }
+    else if (child->type() == "Group")
+    {
+      std::shared_ptr<Group> groupPtr = std::dynamic_pointer_cast<Group>(child);
+      nextShape = std::make_shared<Group>(*groupPtr);
+    }
+    else
+    {
+      throw std::runtime_error("unexpected shape type");
+    }
+    // else if (child->type() == "fir_branch")
+    // {
+    //   nextShape = std::make_shared<FirBranch>(*child);
+    // }
+
+    // nextShape->setMaterial(mat);
+
+    nextShape->parent = child->parent;
+    nextShape->material = child->material;
+    nextShape->materialSet = child->materialSet;
+    nextShape->transform = child->transform;
+    nextShape->inverseTransform = child->inverseTransform;
+
+    this->parent = group.parent;
+    this->material = group.material;
+    this->materialSet = group.materialSet;
+    this->transform = group.transform;
+    this->inverseTransform = group.inverseTransform;
+
+    this->children.push_back(nextShape);
+  }
+
+  this->boundingBox = group.boundingBox;
+}
+
 void Group::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections)
 {
   Ray transformedRay = transformRay(ray);
@@ -108,12 +191,6 @@ void Group::updateBoundingBox(std::shared_ptr<Shape> &shape)
     this->boundingBox.first = glm::min(this->boundingBox.first, transformedPoint);
     this->boundingBox.second = glm::max(this->boundingBox.second, transformedPoint);
   }
-
-  // newBoundingBox.first = shape->transform * newBoundingBox.first;
-  // newBoundingBox.second = shape->transform * newBoundingBox.second;
-
-  // std::cout << "shape bounding box: " << this->boundingBox.first.x << " "  << this->boundingBox.first.y << " "  << this->boundingBox.first.z << " " \
-  //  << this->boundingBox.second.x << " "  << this->boundingBox.second.y << " "  << this->boundingBox.second.z << " " <<std::endl;
 }
 
 std::pair<glm::dvec4, glm::dvec4> Group::bounds()

@@ -28,6 +28,8 @@ public:
   virtual std::string type() = 0;
   virtual std::pair<glm::dvec4, glm::dvec4> bounds() = 0;
 
+  glm::dvec4 boundsCentroid();
+
   glm::dmat4 transform;
   glm::dmat4 inverseTransform;
 

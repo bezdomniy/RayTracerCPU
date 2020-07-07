@@ -1,5 +1,6 @@
 #include "model.h"
-// #include <iostream>
+#include <chrono>
+#include <iostream>
 
 Model::Model()
 {
@@ -8,9 +9,9 @@ Model::Model()
 // #include <iostream>
 // TODO use group information in model loading
 // TODO use uvs and normals in model loading
-Model::Model(std::string const &path)
+Model::Model(std::string const &path, bool buildBVH)
 {
-	this->mesh = std::make_shared<Group>();
+	// this->mesh = std::make_shared<Group>();
 	std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
 	std::vector<glm::dvec3> temp_vertices;
 	std::vector<glm::dvec2> temp_uvs;
@@ -106,10 +107,11 @@ Model::Model(std::string const &path)
 		}
 	}
 
+	std::vector<std::shared_ptr<Shape>> triangles;
+	triangles.reserve(vertexIndices.size() / 3);
+
 	for (unsigned int i = 0; i < vertexIndices.size(); i += 3)
 	{
-		// std::cout << vertexIndices[i] - 1 << " " << vertexIndices[i + 1] - 1 << " " << vertexIndices[i + 2] - 1 << "\n";
-
 		std::shared_ptr<Shape> nextTriangle;
 
 		if (temp_normals.empty())
@@ -122,7 +124,16 @@ Model::Model(std::string const &path)
 															temp_normals[normalIndices[i] - 1], temp_normals[normalIndices[i + 1] - 1], temp_normals[normalIndices[i + 2] - 1]);
 		}
 
-		mesh->addChild(nextTriangle);
+		triangles.push_back(nextTriangle);
+	}
+
+	if (buildBVH)
+	{
+		mesh = buildBoundingVolumeHierarchy(triangles);
+	}
+	else
+	{
+		mesh = std::make_shared<Group>(triangles);
 	}
 
 	// for (unsigned int i = 0; i < vertexIndices.size(); i++)
@@ -143,6 +154,100 @@ Model::Model(std::string const &path)
 	// 	glm::dvec3 normal = temp_normals[normalIndex - 1];
 	// 	this->normals.push_back(normal);
 	// }
+}
+
+Model::Model(const Model &model)
+{
+	this->mesh = std::make_shared<Group>(*(model.mesh));
+}
+
+std::shared_ptr<Group> Model::recursiveBuild(std::vector<std::shared_ptr<Shape>> &shapes, uint32_t start, uint32_t end)
+{
+	std::shared_ptr<Group> node = std::make_shared<Group>();
+
+	int nShapes = end - start;
+
+	if (nShapes == 1)
+	{
+		for (int i = start; i < end; ++i)
+			node->addChild(shapes.at(i));
+		return node;
+	}
+	else
+	{
+		std::pair<glm::dvec4, glm::dvec4> centroidBounds;
+		//for (const auto &shape : shapes)
+		for (auto it = shapes.begin() + start; it != shapes.begin() + end; ++it)
+			centroidBounds = mergeBounds(centroidBounds, (*it)->bounds());
+
+		glm::dvec4 diagonal = centroidBounds.second - centroidBounds.first;
+		int splitDimension;
+
+		if (diagonal.x > diagonal.y && diagonal.x > diagonal.z)
+			splitDimension = 0;
+		else if (diagonal.y > diagonal.z)
+			splitDimension = 1;
+		else
+			splitDimension = 2;
+
+		int mid = (start + end) / 2;
+
+		if (centroidBounds.first[splitDimension] == centroidBounds.second[splitDimension])
+		{
+			for (int i = start; i < end; ++i)
+				node->addChild(shapes.at(i));
+			return node;
+		}
+		else
+		{
+			mid = (start + end) / 2;
+			std::nth_element(&shapes[start], &shapes[mid],
+							 &shapes[end - 1] + 1,
+							 [splitDimension](const std::shared_ptr<Shape> &a, const std::shared_ptr<Shape> &b) {
+								 return a->boundsCentroid()[splitDimension] < b->boundsCentroid()[splitDimension];
+							 });
+
+			// double pmid = (centroidBounds.first[splitDimension] + centroidBounds.second[splitDimension]) / 2;
+			// std::shared_ptr<Shape> *midPtr =
+			// 	std::partition(&shapes[start], &shapes[end - 1] + 1,
+			// 				   [splitDimension, pmid](const std::shared_ptr<Shape> &pi) {
+			// 					   return pi->boundsCentroid()[splitDimension] < pmid;
+			// 				   });
+			// mid = midPtr - &shapes[0];
+			// if (mid != start && mid != end)
+			// 	break;
+
+			std::shared_ptr<Shape> leftChild = recursiveBuild(shapes, start, mid);
+			std::shared_ptr<Shape> rightChild = recursiveBuild(shapes, mid, end);
+
+			node->addChild(leftChild);
+			node->addChild(rightChild);
+		}
+	}
+
+	return node;
+}
+
+std::shared_ptr<Group> Model::buildBoundingVolumeHierarchy(std::vector<std::shared_ptr<Shape>> &shapes)
+{
+	auto start = std::chrono::high_resolution_clock::now();
+	std::shared_ptr<Group> root = recursiveBuild(shapes, 0, shapes.size());
+
+	auto stop = std::chrono::high_resolution_clock::now();
+
+	std::cout << "Time to build BVH: " << std::chrono::duration_cast<std::chrono::seconds>(stop - start).count() << std::endl;
+
+	return root;
+}
+
+std::pair<glm::dvec4, glm::dvec4> Model::mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const std::pair<glm::dvec4, glm::dvec4> b2)
+{
+	return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::min(b1.first.x, b2.first.x),
+														std::min(b1.first.y, b2.first.y),
+														std::min(b1.first.z, b2.first.z), 1.),
+											 glm::dvec4(std::max(b1.second.x, b2.second.x),
+														std::max(b1.second.y, b2.second.y),
+														std::max(b1.second.z, b2.second.z), 1.));
 }
 
 Model::~Model()
