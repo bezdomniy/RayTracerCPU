@@ -264,11 +264,15 @@ Model mesh(const std::string &objPath)
   model.mesh->setMaterial(material);
 
   glm::dmat4 scale =
-      glm::scale(glm::dmat4(1.0), glm::dvec3(0.012, 0.012, 0.012));
+      glm::scale(glm::dmat4(1.0), glm::dvec3(0.04, 0.04, 0.04));
+  // glm::dmat4 rotationy =
+  //     glm::rotate(glm::dmat4(1.0), 3.8,
+  //                 glm::dvec3(0.0, 1.0, 0.0));
   glm::dmat4 translate =
-      glm::translate(glm::dmat4(1.0), glm::dvec3(0., -5, 0.));
+      glm::translate(glm::dmat4(1.0), glm::dvec3(0., -3, 0.));
 
   model.mesh->multiplyTransform(scale);
+  // model.mesh->multiplyTransform(rotationy);
   model.mesh->multiplyTransform(translate);
   model.mesh->calculateInverseTranform();
 
@@ -312,7 +316,7 @@ int main(int argc, char const *argv[])
   std::shared_ptr<World> world = std::make_shared<World>();
   std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(5., 5, -20., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 400, 0.524);
 
-  Model model = mesh("models/lucy.obj");
+  Model model = mesh("models/armadillo.obj");
   // Model model2 = model;
   // Model model3 = model;
   // Model model4 = model;
@@ -375,7 +379,7 @@ int main(int argc, char const *argv[])
 
   Renderer renderer(camera);
   renderer.render(*world);
-  renderer.canvas.writeToPPM("lucy.ppm", false);
+  renderer.canvas.writeToPPM("armadillo.ppm", false);
 
   // renderToSDL(camera, world);
 
