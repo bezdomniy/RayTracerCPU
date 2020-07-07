@@ -13,6 +13,8 @@ public:
   Material(glm::dvec3 colour, double ambient, double diffuse, double specular,
            double shininess);
 
+  Material(const Material &material);
+
   ~Material();
 
   glm::dvec3 colour;

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(RayTracer VERSION 0.1.0)
-set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -11,6 +11,13 @@ endif()
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
 # set(CMAKE_CXX_FLAGS_RELEASE "/O2")
+
+include(CheckCXXCompilerFlag)
+CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
+if(COMPILER_SUPPORTS_MARCH_NATIVE)
+	message("March native supported.")
+    set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+endif()
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 
@@ -47,7 +54,7 @@ if(${TO_NATIVE})
 	# find_package(ParallelSTL CONFIG REQUIRED)
 	# find_package(glfw3 CONFIG REQUIRED)
 	find_package(SDL2 CONFIG REQUIRED)
-	find_package(SDL2_image REQUIRED)
+	# find_package(SDL2_image REQUIRED)
 	find_package(yaml-cpp CONFIG REQUIRED)
 	find_package(glm CONFIG REQUIRED)
 
@@ -59,13 +66,19 @@ if(${TO_NATIVE})
 	#add_subdirectory(parallelstl)
 	#add_subdirectory(glfw)
 
+
 	#target_include_directories(RayTracer PRIVATE ${CMAKE_SOURCE_DIR}/glfw/include C:\\VulkanSDK\\1.1.130.0\\Include)
 	#target_compile_definitions(RayTracer PRIVATE VK_USE_PLATFORM_WIN32_KHR)
 	#target_include_directories(RayTracer PRIVATE Vulkan::Vulkan)
-	target_include_directories(RayTracer PRIVATE ${SDL2_INCLUDE_DIRS} ${SDL2_IMAGE_INCLUDE_DIR})
+	target_include_directories(RayTracer PRIVATE ${SDL2_INCLUDE_DIRS} )
 	#target_link_libraries(RayTracer PRIVATE $<$<CXX_COMPILER_ID:Clang>:rt>)
-	# target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb SDL2::SDL2main SDL2::SDL2-static)
-	target_link_libraries(RayTracer PRIVATE ${GLM_LIBRARIES} tbb yaml-cpp ${SDL2_LIBRARIES} ${SDL2_IMAGE_LIBRARIES})
+	if (WIN32)
+		target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb SDL2::SDL2main SDL2::SDL2-static)
+	else()
+		target_link_libraries(RayTracer PRIVATE ${GLM_LIBRARIES} tbb yaml-cpp ${SDL2_LIBRARIES} )
+	endif (WIN32)
+	
+	
 else()
 	message(STATUS "Setting compilation target to WASM")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
