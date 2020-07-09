@@ -8,8 +8,8 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 #set(CMAKE_CXX_FLAGS "-openmp-simd")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -s BUILD_AS_WORKER=1")
 
 set(TO_NATIVE OFF)
 
@@ -25,7 +25,7 @@ file(GLOB SOURCES
 # find_package(LibNoise)
 add_subdirectory(yaml-cpp)
 add_subdirectory(glm)
-add_subdirectory(cpp-taskflow)
+# add_subdirectory(cpp-taskflow)
 
 add_executable(RayTracer ${SOURCES})
 
@@ -38,10 +38,6 @@ if(${TO_NATIVE})
 	set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 	set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 	set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-	# set(TBB_DIR /home/ilia/dev/tools/tbb/cmake)
-	#set(TBB_DIR C:\\dev\\tools\\tbb\\cmake)
-	#set(TBB_DIR /home/ilia/vcpkg/installed/x64-linux/share/tbb)
 
 	if (WIN32)
 		#find_package(TBB CONFIG REQUIRED)
@@ -78,14 +74,11 @@ else()
 	message(STATUS "Setting compilation target to WASM")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
 
-	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "--bind -s WASM=1 -s BINARYEN_METHOD='native-wasm' -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"FS\"]' -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=4 -s PROXY_TO_PTHREAD=1")
-	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_DEBUG "--bind -s WASM=1 --use-preload-plugins --preload-file ${CMAKE_SOURCE_DIR}/textures -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s EXTRA_EXPORTED_RUNTIME_METHODS='[\"FS\"]' -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=4 -s PROXY_TO_PTHREAD=1")
+	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "--bind -s WASM=1 -s BUILD_AS_WORKER=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
+	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_DEBUG "--bind -s WASM=1 -s BUILD_AS_WORKER=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
 	target_link_libraries(RayTracer PRIVATE glm yaml-cpp)
 	
 endif()
-
-# target_include_directories(RayTracer PRIVATE ${LIBNOISE_INCLUDE_DIR})
-# target_link_libraries(RayTracer PRIVATE glm yaml-cpp ${LIBNOISE_LIBRARY})
 
 target_include_directories(RayTracer PRIVATE cpp-taskflow)
 target_link_libraries(RayTracer PRIVATE glm yaml-cpp )

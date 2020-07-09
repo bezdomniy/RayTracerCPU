@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <memory>
-#include <random>
+// #include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -17,9 +17,10 @@
 #include "renderer.h"
 #include "world.h"
 
-class EmscriptenRunner {
+class EmscriptenRunner
+{
 private:
-  static const int PIXELS_PER_BATCH = 40000;
+  // static const int PIXELS_PER_BATCH = 40000;
   //   unsigned int startCurrentBatch = 0;
   World world;
   std::shared_ptr<Camera> camera;
@@ -32,8 +33,8 @@ private:
   double halfSubPixelSize;
   const double STEP_SIZE = 0.05f;
 
-  std::random_device rd;
-  std::mt19937 g;
+  // std::random_device rd;
+  // std::mt19937 g;
 
   // void render_(EmscriptenRunner *runnerPtr);
 
@@ -41,15 +42,15 @@ private:
 
 public:
   EmscriptenRunner(/* args */);
-  void init(const std::string &sceneDesc);
+  // void init(const std::string &sceneDesc, const std::string &pixelsToRender);
   ~EmscriptenRunner();
 
-  emscripten::val renderToRGBA();
+  emscripten::val renderToRGBA(const std::string &sceneDesc, const std::string &pixelsToRender);
   int getHeight();
   int getWidth();
   void moveLeft();
   void moveRight();
-  bool done();
+  // bool done();
 };
 
 #endif
