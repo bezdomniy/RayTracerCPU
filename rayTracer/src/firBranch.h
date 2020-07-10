@@ -9,15 +9,12 @@
 
 class FirBranch : public Group
 {
-
-
 private:
-
-    
 public:
     FirBranch(/* args */);
     ~FirBranch();
 
+    void build();
+
     virtual std::string type() override;
 };
-

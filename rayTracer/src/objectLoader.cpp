@@ -135,7 +135,9 @@ std::shared_ptr<Shape> ObjectLoader::shapeFromDefinition(ShapeDefinition &shapeD
   }
   else if (shapeDefinition.shapeType == "fir_branch")
   {
-    ret = std::make_shared<FirBranch>();
+    std::shared_ptr<FirBranch> temp = std::make_shared<FirBranch>();
+    temp->build();
+    ret = std::dynamic_pointer_cast<Shape>(temp);
   }
 
   else
