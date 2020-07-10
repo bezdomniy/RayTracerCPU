@@ -12,7 +12,7 @@
 #include <vector>
 #include <memory>
 
-class Group : public Shape, std::enable_shared_from_this<Group>
+class Group : public Shape, public std::enable_shared_from_this<Group>
 {
 
 private:
