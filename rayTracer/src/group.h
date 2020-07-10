@@ -10,14 +10,16 @@
 #include "cone.h"
 
 #include <vector>
+#include <memory>
 
-class Group : public Shape
+class Group : public Shape, std::enable_shared_from_this<Group>
 {
 
 private:
     /* data */
 
     bool boundIntersection(Ray &transformedRay);
+    std::shared_ptr<Group> getptr();
 
 public:
     Group();

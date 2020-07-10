@@ -12,9 +12,20 @@
 #include <typeinfo>
 #include <vector>
 
-class World {
+#include <cereal/types/vector.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/memory.hpp>
+
+class World
+{
 private:
-  /* data */
+  friend class cereal::access;
+  template <class Archive>
+  void serialize(Archive &archive)
+  {
+    archive(CEREAL_NVP(this->shapes), CEREAL_NVP(this->lights));
+  }
+  // TODO remove this as member, make static
   std::unique_ptr<ObjectLoader> objectLoader;
 
 public:

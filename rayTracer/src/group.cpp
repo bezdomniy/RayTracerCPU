@@ -130,9 +130,14 @@ void Group::setMaterial(std::shared_ptr<Material> &mat)
   }
 }
 
+std::shared_ptr<Group> Group::getptr()
+{
+  return shared_from_this();
+}
+
 void Group::addChild(std::shared_ptr<Shape> &child)
 {
-  child->parent = this;
+  child->parent = getptr();
 
   if (this->material && !child->material)
     child->setMaterial(this->material);

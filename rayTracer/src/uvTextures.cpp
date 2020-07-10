@@ -107,20 +107,23 @@ glm::dvec3 ImageTexture::rgbFromSurface(std::unique_ptr<Surface> &surface, int x
 {
     unsigned char *p = (uint8_t *)surface->rgb + y * surface->w * surface->bpp + x * surface->bpp;
 
-    if (std::endian::native == std::endian::big)
+    // if (std::endian::native == std::endian::big)
+    int n = 1;
+    // Check little endian
+    if (*(char *)&n == 1)
     {
-        double r = (p[2] / 255.);
+        double r = (p[0] / 255.);
         double g = (p[1] / 255.);
-        double b = (p[0] / 255.);
+        double b = (p[2] / 255.);
 
         return glm::dvec3(r, g, b);
     }
 
     else
     {
-        double r = (p[0] / 255.);
+        double r = (p[2] / 255.);
         double g = (p[1] / 255.);
-        double b = (p[2] / 255.);
+        double b = (p[0] / 255.);
 
         return glm::dvec3(r, g, b);
     }

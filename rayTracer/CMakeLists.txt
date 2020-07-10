@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(RayTracer VERSION 0.1.0)
-set (CMAKE_CXX_STANDARD 20)
+set (CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -25,6 +25,7 @@ file(GLOB SOURCES
 # find_package(LibNoise)
 add_subdirectory(yaml-cpp)
 add_subdirectory(glm)
+# add_subdirectory(cereal)
 # add_subdirectory(cpp-taskflow)
 
 add_executable(RayTracer ${SOURCES})
@@ -80,7 +81,8 @@ else()
 	
 endif()
 
-target_include_directories(RayTracer PRIVATE cpp-taskflow)
+
+target_include_directories(RayTracer PRIVATE cpp-taskflow include)
 target_link_libraries(RayTracer PRIVATE glm yaml-cpp )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

@@ -5,6 +5,9 @@
 #include <unordered_map>
 #include <vector>
 
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/memory.hpp>
+
 #include "geometry.h"
 #include "material.h"
 #include "ray.h"
@@ -12,13 +15,18 @@
 class Shape
 {
 private:
-  /* data */
+  friend class cereal::access;
+  template <class Archive>
+  void serialize(Archive &archive)
+  {
+    // archive(CEREAL_NVP(shapes), CEREAL_NVP(lights));
+  }
 
 public:
   Shape();
   virtual ~Shape() = 0;
 
-  Shape *parent = nullptr;
+  std::shared_ptr<Shape> parent = nullptr;
 
   bool materialSet = false;
 
