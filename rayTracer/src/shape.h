@@ -18,7 +18,7 @@ public:
   Shape();
   virtual ~Shape() = 0;
 
-  Shape *parent = nullptr;
+  std::shared_ptr<Shape> parent = nullptr;
 
   bool materialSet = false;
 

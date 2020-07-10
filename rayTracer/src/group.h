@@ -11,12 +11,12 @@
 
 #include <vector>
 
-class Group : public Shape
+class Group : public Shape, public std::enable_shared_from_this<Group>
 {
 
 private:
     /* data */
-
+    std::shared_ptr<Group> getptr();
     bool boundIntersection(Ray &transformedRay);
 
 public:
