@@ -25,7 +25,16 @@ public:
   bool capped;
 
 private:
+  friend class cereal::access;
+  template <class Archive>
+  void serialize(Archive &archive)
+  {
+    archive(cereal::base_class<Shape>(this), minimum, maximum, capped);
+  }
+
   bool checkCap(Ray &ray, double t);
 
   void intersectCaps(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections);
 };
+
+CEREAL_REGISTER_TYPE(Cylinder);

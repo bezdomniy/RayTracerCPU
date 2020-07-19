@@ -76,15 +76,14 @@ ImageTexture::ImageTexture()
 // #include <filesystem>
 ImageTexture::ImageTexture(std::string const &path)
 {
-    unsigned char *rgb;
     int w, h, bpp;
-    std::unique_ptr<Surface> surface = std::make_unique<Surface>(rgb, w, h, bpp);
+    std::unique_ptr<Surface> surface = std::make_unique<Surface>(w, h, bpp);
 
     // std::string p = "./home/web_user";
     // for (const auto &entry : std::filesystem::directory_iterator(p))
     //     std::cout << entry.path() << std::endl;
 
-    surface->rgb = stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb);
+    surface->rgb = std::unique_ptr<unsigned char>(stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb));
 
     if (!surface->rgb)
     {
@@ -97,15 +96,15 @@ ImageTexture::ImageTexture(std::string const &path)
 
 ImageTexture::~ImageTexture()
 {
-    for (auto &surface : this->textures)
-    {
-        stbi_image_free(surface->rgb);
-    }
+    // for (auto &surface : this->textures)
+    // {
+    //     stbi_image_free(surface->rgb.get());
+    // }
 }
 
 glm::dvec3 ImageTexture::rgbFromSurface(std::unique_ptr<Surface> &surface, int x, int y)
 {
-    unsigned char *p = (uint8_t *)surface->rgb + y * surface->w * surface->bpp + x * surface->bpp;
+    unsigned char *p = (uint8_t *)surface->rgb.get() + y * surface->w * surface->bpp + x * surface->bpp;
 
     // if (std::endian::native == std::endian::big)
     int n = 1;
@@ -142,66 +141,60 @@ glm::dvec3 ImageTexture::patternAt(glm::dvec2 uv, int faceIndex)
 
 void ImageTexture::loadRight(std::string const &path)
 {
-    unsigned char *rgb;
     int w, h, bpp;
-    std::unique_ptr<Surface> surface = std::make_unique<Surface>(rgb, w, h, bpp);
+    std::unique_ptr<Surface> surface = std::make_unique<Surface>(w, h, bpp);
 
-    surface->rgb = stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb);
+    surface->rgb = std::unique_ptr<unsigned char>(stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb));
 
     this->textures.at(0) = std::move(surface);
 }
 
 void ImageTexture::loadLeft(std::string const &path)
 {
-    unsigned char *rgb;
     int w, h, bpp;
-    std::unique_ptr<Surface> surface = std::make_unique<Surface>(rgb, w, h, bpp);
+    std::unique_ptr<Surface> surface = std::make_unique<Surface>(w, h, bpp);
 
-    surface->rgb = stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb);
+    surface->rgb = std::unique_ptr<unsigned char>(stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb));
 
     this->textures.at(1) = std::move(surface);
 }
 
 void ImageTexture::loadUp(std::string const &path)
 {
-    unsigned char *rgb;
     int w, h, bpp;
-    std::unique_ptr<Surface> surface = std::make_unique<Surface>(rgb, w, h, bpp);
+    std::unique_ptr<Surface> surface = std::make_unique<Surface>(w, h, bpp);
 
-    surface->rgb = stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb);
+    surface->rgb = std::unique_ptr<unsigned char>(stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb));
 
     this->textures.at(2) = std::move(surface);
 }
 
 void ImageTexture::loadDown(std::string const &path)
 {
-    unsigned char *rgb;
     int w, h, bpp;
-    std::unique_ptr<Surface> surface = std::make_unique<Surface>(rgb, w, h, bpp);
+    std::unique_ptr<Surface> surface = std::make_unique<Surface>(w, h, bpp);
 
-    surface->rgb = stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb);
+    surface->rgb = std::unique_ptr<unsigned char>(stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb));
 
     this->textures.at(3) = std::move(surface);
 }
 
 void ImageTexture::loadFront(std::string const &path)
 {
-    unsigned char *rgb;
     int w, h, bpp;
-    std::unique_ptr<Surface> surface = std::make_unique<Surface>(rgb, w, h, bpp);
+    std::unique_ptr<Surface> surface = std::make_unique<Surface>(w, h, bpp);
 
-    surface->rgb = stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb);
+    surface->rgb = std::unique_ptr<unsigned char>(stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb));
 
     this->textures.at(4) = std::move(surface);
 }
 
 void ImageTexture::loadBack(std::string const &path)
 {
-    unsigned char *rgb;
     int w, h, bpp;
-    std::unique_ptr<Surface> surface = std::make_unique<Surface>(rgb, w, h, bpp);
+    std::unique_ptr<Surface> surface = std::make_unique<Surface>(w, h, bpp);
 
-    surface->rgb = stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb);
+    surface->rgb = std::unique_ptr<unsigned char>(stbi_load(path.c_str(), &surface->w, &surface->h, &surface->bpp, STBI_rgb));
 
     this->textures.at(5) = std::move(surface);
 }

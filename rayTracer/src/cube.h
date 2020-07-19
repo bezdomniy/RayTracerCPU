@@ -19,4 +19,12 @@ public:
     virtual std::string type() override;
 
 private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        archive(cereal::base_class<Shape>(this));
+    }
 };
+
+CEREAL_REGISTER_TYPE(Cube);

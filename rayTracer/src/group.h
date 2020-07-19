@@ -14,9 +14,13 @@
 
 class Group : public Shape, public std::enable_shared_from_this<Group>
 {
-
 private:
-    /* data */
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        archive(cereal::base_class<Shape>(this), children, boundingBox);
+    }
 
     bool boundIntersection(Ray &transformedRay);
     std::shared_ptr<Group> getptr();
@@ -41,3 +45,5 @@ public:
     virtual std::pair<glm::dvec4, glm::dvec4> bounds() override;
     virtual std::string type() override;
 };
+
+CEREAL_REGISTER_TYPE(Group);

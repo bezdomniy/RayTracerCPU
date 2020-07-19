@@ -9,6 +9,14 @@
 
 class Sphere : public Shape
 {
+private:
+  friend class cereal::access;
+  template <class Archive>
+  void serialize(Archive &archive)
+  {
+    archive(cereal::base_class<Shape>(this));
+  }
+
 public:
   Sphere();
   ~Sphere();
@@ -18,6 +26,6 @@ public:
   virtual glm::dvec4 normalAt(glm::dvec4 point, glm::dvec2 uv) override;
   virtual std::pair<glm::dvec4, glm::dvec4> bounds() override;
   virtual std::string type() override;
-
-private:
 };
+
+CEREAL_REGISTER_TYPE(Sphere);

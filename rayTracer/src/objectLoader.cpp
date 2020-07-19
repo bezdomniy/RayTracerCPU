@@ -4,11 +4,15 @@ ObjectLoader::ObjectLoader(/* args */) {}
 
 ObjectLoader::~ObjectLoader() {}
 
-std::pair<std::shared_ptr<Camera>, std::vector<std::shared_ptr<Shape>>>
+std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>>
 ObjectLoader::loadYaml(const std::string &fileName)
 {
-  std::vector<std::shared_ptr<Shape>> ret;
+  // std::vector<std::shared_ptr<Shape>> ret;
   std::shared_ptr<Camera> camera;
+  std::shared_ptr<World> world = std::make_shared<World>();
+
+  // world->shapes.clear();
+  // world->lights.clear();
 
   YAML::Node root;
 
@@ -32,9 +36,15 @@ ObjectLoader::loadYaml(const std::string &fileName)
       {
         camera = std::dynamic_pointer_cast<Camera>(addShape(*it));
       }
+      else if (it->begin()->second.as<std::string>() == "light")
+      {
+        std::shared_ptr<PointLight> light = std::dynamic_pointer_cast<PointLight>(addShape(*it));
+        world->addLight(light);
+      }
       else
       {
-        ret.push_back(addShape(*it));
+        std::shared_ptr<Shape> shape = addShape(*it);
+        world->addShape(shape);
       }
     }
     else if (it->begin()->first.as<std::string>() == "define")
@@ -48,7 +58,7 @@ ObjectLoader::loadYaml(const std::string &fileName)
   }
 
   return std::pair<std::shared_ptr<Camera>,
-                   std::vector<std::shared_ptr<Shape>>>(camera, ret);
+                   std::shared_ptr<World>>(camera, world);
 }
 
 std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)

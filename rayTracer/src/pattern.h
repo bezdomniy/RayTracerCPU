@@ -4,9 +4,22 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <string>
 
-class Pattern {
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/base_class.hpp>
+
+#include "serialisation.h"
+
+class Pattern
+{
 private:
-  /* data */
+  friend class cereal::access;
+  template <class Archive>
+  void serialize(Archive &archive)
+  {
+    archive(transform, inverseTransform);
+  }
+
 public:
   Pattern();
   Pattern(const Pattern &pattern);
@@ -22,9 +35,15 @@ public:
   // virtual std::string type();
 };
 
-class ColourPattern : public Pattern {
+class ColourPattern : public Pattern
+{
 private:
-  /* data */
+  friend class cereal::access;
+  template <class Archive>
+  void serialize(Archive &archive)
+  {
+    archive(cereal::base_class<Pattern>(this), colourA, colourB);
+  }
 
 public:
   ColourPattern();
@@ -35,8 +54,7 @@ public:
   glm::dvec3 colourA;
   glm::dvec3 colourB;
 
-  // virtual glm::dvec3 patternAt(glm::dvec4 point) = 0;
-  // virtual std::string type() override;
-
   void setColour(glm::dvec3 colour, int index);
 };
+
+CEREAL_REGISTER_TYPE(ColourPattern);

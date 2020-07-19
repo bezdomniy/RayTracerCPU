@@ -12,6 +12,8 @@
 #include "material.h"
 #include "ray.h"
 
+#include "serialisation.h"
+
 class Shape
 {
 private:
@@ -19,7 +21,7 @@ private:
   template <class Archive>
   void serialize(Archive &archive)
   {
-    // archive(CEREAL_NVP(shapes), CEREAL_NVP(lights));
+    archive(parent, materialSet, transform, inverseTransform, material);
   }
 
 public:

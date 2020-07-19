@@ -1,6 +1,8 @@
 #include "camera.h"
 #include "renderer.h"
+#include "objectLoader.h"
 #include "world.h"
+#include "serialisation.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
@@ -14,13 +16,33 @@
 using namespace emscripten;
 #endif
 
+#include <sstream>
 void renderToPPM(const std::string &sceneDesc)
 {
-  World world;
-  std::shared_ptr<Camera> camera = world.loadFromFile(sceneDesc);
+  // std::stringstream ss;
 
-  Renderer renderer(camera);
-  renderer.render(world);
+  // {
+  //   ObjectLoader objectLoader;
+  //   std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> ret = objectLoader.loadYaml(sceneDesc);
+
+  //   cereal::BinaryOutputArchive oarchive(ss);
+  //   oarchive(ret.first, ret.second);
+  // }
+
+  // std::shared_ptr<Camera> camera;
+  // std::shared_ptr<World> world;
+
+  // cereal::BinaryInputArchive iarchive(ss);
+  // iarchive(camera, world);
+
+  // Renderer renderer(camera);
+  // renderer.render(*world);
+
+  ObjectLoader objectLoader;
+  std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> ret = objectLoader.loadYaml(sceneDesc);
+  Renderer renderer(ret.first);
+  renderer.render(*ret.second);
+
   renderer.canvas.writeToPPM("out.ppm", false);
 }
 

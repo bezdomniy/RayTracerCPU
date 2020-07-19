@@ -9,8 +9,14 @@
 
 class FirBranch : public Group
 {
-
 private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        archive(cereal::base_class<Group>(this));
+    }
+
 public:
     FirBranch(/* args */);
     ~FirBranch();
@@ -19,3 +25,5 @@ public:
 
     virtual std::string type() override;
 };
+
+CEREAL_REGISTER_TYPE(FirBranch);

@@ -6,10 +6,25 @@
 #include <cmath>
 #include <vector>
 #include <memory>
+
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/base_class.hpp>
+#include <cereal/types/memory.hpp>
+#include <cereal/types/vector.hpp>
+
+#include "serialisation.h"
 // #include <bit>
 
 class UVTexture
 {
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        // archive();
+    }
+
 public:
     UVTexture(/* args */);
     ~UVTexture();
@@ -27,6 +42,13 @@ public:
 class CheckeredTexture : public UVTexture
 {
 private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        archive(cereal::base_class<UVTexture>(this), colourA, colourB, width, height);
+    }
+
     virtual void loadRight(std::string const &path) override;
     virtual void loadLeft(std::string const &path) override;
     virtual void loadUp(std::string const &path) override;
@@ -51,16 +73,45 @@ class ImageTexture : public UVTexture
 private:
     struct Surface
     {
-        Surface(unsigned char *rgb, int w, int h, int bpp)
-            : rgb(rgb), w(w), h(h), bpp(bpp)
+    private:
+        friend class cereal::access;
+        template <class Archive>
+        void serialize(Archive &archive)
         {
+            archive(rgb, w, h, bpp);
         }
 
-        unsigned char *rgb;
+        template <class Archive>
+        static void load_and_construct(Archive &archive, cereal::construct<Surface> &construct)
+        {
+            int w;
+            int h;
+            int bpp;
+
+            archive(w, h, bpp);
+            construct(w, h, bpp);
+        }
+
+    public:
+        Surface(int w, int h, int bpp)
+        {
+            this->w = w;
+            this->h = h;
+            this->bpp = bpp;
+        }
+
+        std::unique_ptr<unsigned char> rgb;
         int w;
         int h;
         int bpp;
     };
+
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        archive(cereal::base_class<UVTexture>(this), textures, width, height);
+    }
 
     glm::dvec3 rgbFromSurface(std::unique_ptr<Surface> &surface, int x, int y);
 
@@ -82,3 +133,6 @@ public:
     int width;
     int height;
 };
+
+CEREAL_REGISTER_TYPE(CheckeredTexture);
+CEREAL_REGISTER_TYPE(ImageTexture);

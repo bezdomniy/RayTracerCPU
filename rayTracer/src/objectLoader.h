@@ -14,6 +14,7 @@
 #include "group.h"
 #include "triangle.h"
 #include "firBranch.h"
+#include "world.h"
 #include "yaml-cpp/yaml.h"
 // #include <filesystem>
 #include <glm/glm.hpp>
@@ -78,7 +79,7 @@ private:
 public:
   ObjectLoader();
   ~ObjectLoader();
-  std::pair<std::shared_ptr<Camera>, std::vector<std::shared_ptr<Shape>>> loadYaml(const std::string &fileName);
+  std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> loadYaml(const std::string &fileName);
   std::shared_ptr<Shape> loadModel(const std::string &fileName);
   std::pair<int, int> getCanvasSize(const std::string &fileName);
 };

@@ -6,6 +6,25 @@
 
 class Triangle : public Shape
 {
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        archive(cereal::base_class<Shape>(this), p1, p2, p3, e1, e2, normal);
+    }
+
+    template <class Archive>
+    static void load_and_construct(Archive &archive, cereal::construct<Triangle> &construct)
+    {
+        glm::dvec3 p1;
+        glm::dvec3 p2;
+        glm::dvec3 p3;
+
+        archive(p1, p2, p3);
+        construct(p1, p2, p3);
+    }
+
 public:
     Triangle(glm::dvec3 p1, glm::dvec3 p2, glm::dvec3 p3);
     ~Triangle();
@@ -24,3 +43,5 @@ protected:
     glm::dvec3 e2;
     glm::dvec4 normal;
 };
+
+CEREAL_REGISTER_TYPE(Triangle);

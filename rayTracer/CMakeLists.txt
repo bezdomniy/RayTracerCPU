@@ -9,9 +9,10 @@ endif()
 
 #set(CMAKE_CXX_FLAGS "-openmp-simd")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -s BUILD_AS_WORKER=1")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 ")
+# set(CMAKE_CXX_FLAGS_RELEASE "-O3 -s BUILD_AS_WORKER=1")
 
-set(TO_NATIVE OFF)
+set(TO_NATIVE ON)
 
 file(GLOB SOURCES
     src/*.h
@@ -23,8 +24,7 @@ file(GLOB SOURCES
 # message("${SOURCES}")
 # add_subdirectory(libnoise)
 # find_package(LibNoise)
-add_subdirectory(yaml-cpp)
-add_subdirectory(glm)
+
 # add_subdirectory(cereal)
 # add_subdirectory(cpp-taskflow)
 
@@ -75,6 +75,9 @@ else()
 	message(STATUS "Setting compilation target to WASM")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
 
+	add_subdirectory(yaml-cpp)
+	add_subdirectory(glm)
+
 	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "--bind -s WASM=1 -s BUILD_AS_WORKER=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
 	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_DEBUG "--bind -s WASM=1 -s BUILD_AS_WORKER=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
 	target_link_libraries(RayTracer PRIVATE glm yaml-cpp)
@@ -82,8 +85,9 @@ else()
 endif()
 
 
-target_include_directories(RayTracer PRIVATE cpp-taskflow include)
-target_link_libraries(RayTracer PRIVATE glm yaml-cpp )
+target_include_directories(RayTracer PRIVATE include)
+# target_include_directories(RayTracer PRIVATE cpp-taskflow include)
+# target_link_libraries(RayTracer PRIVATE glm yaml-cpp )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
