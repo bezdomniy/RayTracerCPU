@@ -7,7 +7,7 @@
 #include <vector>
 #include <memory>
 
-#include <cereal/archives/binary.hpp>
+// #include <cereal/archives/binary.hpp>
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/memory.hpp>
 #include <cereal/types/vector.hpp>
@@ -27,7 +27,7 @@ private:
 
 public:
     UVTexture(/* args */);
-    ~UVTexture();
+    virtual ~UVTexture() = 0;
 
     virtual void loadRight(std::string const &path) = 0;
     virtual void loadLeft(std::string const &path) = 0;
@@ -46,7 +46,7 @@ private:
     template <class Archive>
     void serialize(Archive &archive)
     {
-        archive(cereal::base_class<UVTexture>(this), colourA, colourB, width, height);
+        archive(cereal::virtual_base_class<UVTexture>(this), colourA, colourB, width, height);
     }
 
     virtual void loadRight(std::string const &path) override;
@@ -81,18 +81,8 @@ private:
             archive(rgb, w, h, bpp);
         }
 
-        template <class Archive>
-        static void load_and_construct(Archive &archive, cereal::construct<Surface> &construct)
-        {
-            int w;
-            int h;
-            int bpp;
-
-            archive(w, h, bpp);
-            construct(w, h, bpp);
-        }
-
     public:
+        Surface() {}
         Surface(int w, int h, int bpp)
         {
             this->w = w;
@@ -100,7 +90,7 @@ private:
             this->bpp = bpp;
         }
 
-        std::unique_ptr<unsigned char> rgb;
+        std::vector<unsigned char> rgb;
         int w;
         int h;
         int bpp;
@@ -110,7 +100,7 @@ private:
     template <class Archive>
     void serialize(Archive &archive)
     {
-        archive(cereal::base_class<UVTexture>(this), textures, width, height);
+        archive(cereal::virtual_base_class<UVTexture>(this), textures, width, height);
     }
 
     glm::dvec3 rgbFromSurface(std::unique_ptr<Surface> &surface, int x, int y);
@@ -136,3 +126,6 @@ public:
 
 CEREAL_REGISTER_TYPE(CheckeredTexture);
 CEREAL_REGISTER_TYPE(ImageTexture);
+
+CEREAL_REGISTER_POLYMORPHIC_RELATION(UVTexture, CheckeredTexture)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(UVTexture, ImageTexture)

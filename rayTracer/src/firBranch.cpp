@@ -1,11 +1,9 @@
 #include "firBranch.h"
 
-FirBranch::FirBranch(/* args */) : Group()
+std::shared_ptr<Group> FirBranch::build()
 {
-}
+    std::shared_ptr<Group> root = std::make_shared<Group>();
 
-void FirBranch::build()
-{
     double length = 2.0;
     double radius = 0.025;
     int segments = 20;
@@ -25,7 +23,7 @@ void FirBranch::build()
     branchMaterial->diffuse = 0.6;
 
     branch->setMaterial(branchMaterial);
-    this->addChild(branch);
+    root->addChild(branch);
 
     double segSize = length / (segments - 1);
     double theta = 2.1 * glm::pi<double>() / (double)perSegment;
@@ -71,12 +69,8 @@ void FirBranch::build()
             subgroup->addChild(triangle);
         }
         std::shared_ptr<Shape> subgroupShape = std::dynamic_pointer_cast<Shape>(subgroup);
-        this->addChild(subgroupShape);
+        root->addChild(subgroupShape);
     }
-}
 
-FirBranch::~FirBranch()
-{
+    return root;
 }
-
-std::string FirBranch::type() { return "FirBranch"; }

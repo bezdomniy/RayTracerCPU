@@ -7,23 +7,7 @@
 #include <vector>
 // #include <iostream>
 
-class FirBranch : public Group
+namespace FirBranch
 {
-private:
-    friend class cereal::access;
-    template <class Archive>
-    void serialize(Archive &archive)
-    {
-        archive(cereal::base_class<Group>(this));
-    }
-
-public:
-    FirBranch(/* args */);
-    ~FirBranch();
-
-    void build();
-
-    virtual std::string type() override;
+    std::shared_ptr<Group> build();
 };
-
-CEREAL_REGISTER_TYPE(FirBranch);

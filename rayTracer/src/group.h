@@ -12,6 +12,8 @@
 #include <vector>
 #include <memory>
 
+#include <cereal/types/utility.hpp>
+
 class Group : public Shape, public std::enable_shared_from_this<Group>
 {
 private:
@@ -19,7 +21,7 @@ private:
     template <class Archive>
     void serialize(Archive &archive)
     {
-        archive(cereal::base_class<Shape>(this), children, boundingBox);
+        archive(cereal::virtual_base_class<Shape>(this), children, boundingBox);
     }
 
     bool boundIntersection(Ray &transformedRay);

@@ -32,6 +32,7 @@ private:
     glm::dvec3 n3;
 
 public:
+    // SmoothTriangle() {}
     SmoothTriangle(glm::dvec3 p1, glm::dvec3 p2, glm::dvec3 p3, glm::dvec3 n1, glm::dvec3 n2, glm::dvec3 n3);
     ~SmoothTriangle();
 

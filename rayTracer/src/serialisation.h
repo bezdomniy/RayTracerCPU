@@ -1,21 +1,17 @@
 #pragma once
 
 #include <glm/glm.hpp>
-#include <utility>
 #include <cereal/cereal.hpp>
-#include <cereal/archives/binary.hpp>
 
-namespace std
-{
-    template <typename Archive>
-    void serialize(Archive &archive, pair<glm::dvec4, glm::dvec4> &p)
-    {
-        archive(p.first, p.second);
-    }
-} // namespace std
+// TODO try to define load_and_construct for none-default constructor types here
 
 namespace glm
 {
+    template <typename Archive>
+    void serialize(Archive &archive, glm::dvec2 &v2)
+    {
+        archive(v2.x, v2.y);
+    }
     template <typename Archive>
     void serialize(Archive &archive, glm::dvec3 &v3)
     {

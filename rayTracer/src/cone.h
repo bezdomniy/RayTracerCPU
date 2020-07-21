@@ -30,7 +30,7 @@ private:
   template <class Archive>
   void serialize(Archive &archive)
   {
-    archive(cereal::base_class<Shape>(this), minimum, maximum, capped);
+    archive(cereal::virtual_base_class<Shape>(this), minimum, maximum, capped);
   }
 
   bool checkCap(Ray &ray, double t, double y);

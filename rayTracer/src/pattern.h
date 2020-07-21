@@ -4,7 +4,7 @@
 #include <glm/gtc/matrix_inverse.hpp>
 #include <string>
 
-#include <cereal/archives/binary.hpp>
+// #include <cereal/archives/binary.hpp>
 #include <cereal/types/memory.hpp>
 #include <cereal/types/base_class.hpp>
 
@@ -23,7 +23,7 @@ private:
 public:
   Pattern();
   Pattern(const Pattern &pattern);
-  virtual ~Pattern();
+  virtual ~Pattern() = 0;
 
   virtual glm::dvec3 patternAt(glm::dvec4 point) = 0;
   void setTransform(glm::dmat4 transform);
@@ -42,14 +42,14 @@ private:
   template <class Archive>
   void serialize(Archive &archive)
   {
-    archive(cereal::base_class<Pattern>(this), colourA, colourB);
+    archive(cereal::virtual_base_class<Pattern>(this), colourA, colourB);
   }
 
 public:
   ColourPattern();
   ColourPattern(const ColourPattern &colouredPattern);
   ColourPattern(glm::dvec3 colourA, glm::dvec3 colourB);
-  virtual ~ColourPattern();
+  virtual ~ColourPattern() = 0;
 
   glm::dvec3 colourA;
   glm::dvec3 colourB;

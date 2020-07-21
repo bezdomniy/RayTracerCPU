@@ -6,12 +6,23 @@
 #include <vector>
 #include <utility>
 
+#include <cereal/cereal.hpp>
+#include <cereal/types/polymorphic.hpp>
+
 class TextureMap
 {
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        // archive();
+    }
+
 public:
     TextureMap(/* args */);
     TextureMap(const TextureMap &textureMap);
-    virtual ~TextureMap();
+    virtual ~TextureMap() = 0;
     virtual int faceFromPoint(glm::dvec4 point) = 0;
 
     virtual std::pair<glm::dvec2, int> uv_map(glm::dvec4 point) = 0;
@@ -19,6 +30,14 @@ public:
 
 class SphericalMap : public TextureMap
 {
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        archive(cereal::virtual_base_class<TextureMap>(this));
+    }
+
 public:
     SphericalMap(/* args */);
     ~SphericalMap();
@@ -28,6 +47,14 @@ public:
 
 class PlanarMap : public TextureMap
 {
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        archive(cereal::virtual_base_class<TextureMap>(this));
+    }
+
 public:
     PlanarMap(/* args */);
     ~PlanarMap();
@@ -37,6 +64,14 @@ public:
 
 class CylinderMap : public TextureMap
 {
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        archive(cereal::virtual_base_class<TextureMap>(this));
+    }
+
 public:
     CylinderMap(/* args */);
     ~CylinderMap();
@@ -46,6 +81,14 @@ public:
 
 class CubeMap : public TextureMap
 {
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        archive(cereal::virtual_base_class<TextureMap>(this));
+    }
+
 public:
     CubeMap(/* args */);
     ~CubeMap();
@@ -59,3 +102,14 @@ public:
     glm::dvec2 cubeUVFront(glm::dvec4 point);
     glm::dvec2 cubeUVBack(glm::dvec4 point);
 };
+
+// CEREAL_REGISTER_TYPE(TextureMap);
+CEREAL_REGISTER_TYPE(SphericalMap);
+CEREAL_REGISTER_TYPE(PlanarMap);
+CEREAL_REGISTER_TYPE(CylinderMap);
+CEREAL_REGISTER_TYPE(CubeMap);
+
+CEREAL_REGISTER_POLYMORPHIC_RELATION(TextureMap, SphericalMap)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(TextureMap, PlanarMap)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(TextureMap, CylinderMap)
+CEREAL_REGISTER_POLYMORPHIC_RELATION(TextureMap, CubeMap)

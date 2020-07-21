@@ -5,7 +5,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include <cereal/archives/binary.hpp>
+// #include <cereal/archives/binary.hpp>
 #include <cereal/types/memory.hpp>
 
 #include "geometry.h"

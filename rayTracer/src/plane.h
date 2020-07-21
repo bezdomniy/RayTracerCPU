@@ -22,7 +22,7 @@ private:
     template <class Archive>
     void serialize(Archive &archive)
     {
-        archive(cereal::base_class<Shape>(this));
+        archive(cereal::virtual_base_class<Shape>(this));
     }
 };
 

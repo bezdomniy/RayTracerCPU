@@ -9,18 +9,18 @@ private:
   template <class Archive>
   void serialize(Archive &archive)
   {
-    archive(cereal::base_class<Shape>(this), position, intensity);
+    archive(cereal::virtual_base_class<Shape>(this), position, intensity);
   }
 
-  template <class Archive>
-  static void load_and_construct(Archive &archive, cereal::construct<PointLight> &construct)
-  {
-    glm::dvec4 position;
-    glm::dvec3 intensity;
+  // template <class Archive>
+  // static void load_and_construct(Archive &archive, cereal::construct<PointLight> &construct)
+  // {
+  //   glm::dvec4 position;
+  //   glm::dvec3 intensity;
 
-    archive(position, intensity);
-    construct(position, intensity);
-  }
+  //   archive(position, intensity);
+  //   construct(position, intensity);
+  // }
 
   virtual glm::dvec4 normalAt(glm::dvec4 point) override;
   virtual glm::dvec4 normalAt(glm::dvec4 point, glm::dvec2 uv) override;
@@ -29,6 +29,9 @@ private:
   virtual std::string type() override;
 
 public:
+  PointLight()
+  {
+  }
   PointLight(glm::dvec4 position, glm::dvec3 intensity);
   ~PointLight();
 

@@ -12,7 +12,7 @@
 #include <vector>
 
 #include <cereal/types/vector.hpp>
-#include <cereal/archives/binary.hpp>
+// #include <cereal/archives/binary.hpp>
 #include <cereal/types/memory.hpp>
 #include "serialisation.h"
 
@@ -23,7 +23,7 @@ private:
   template <class Archive>
   void serialize(Archive &archive)
   {
-    archive(this->shapes, this->lights);
+    archive(shapes, lights);
   }
 
 public:
