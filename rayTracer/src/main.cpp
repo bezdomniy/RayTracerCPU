@@ -21,21 +21,45 @@ using namespace emscripten;
 #include <sstream>
 void renderToPPM(const std::string &sceneDesc)
 {
-  std::stringstream ss;
-
+  int size;
+  std::string processedScene;
   {
+    std::stringstream ss;
     ObjectLoader objectLoader;
     std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> ret = objectLoader.loadYaml(sceneDesc);
 
     cereal::BinaryOutputArchive oarchive(ss);
     oarchive(ret.first, ret.second);
+
+    // ss << std::flush;
+
+    processedScene = ss.str();
+    // ss.seekg(0, std::ios::end);
+    // size = ss.tellg();
+    // ss.seekg(0, std::ios::beg);
+
+    // std::cout << "Processed size: " << size << std::endl;
+    // std::cout << processedScene << std::endl;
+    // size_t length = tmp.length();
+    // cstr = tmp.c_str();
   }
 
   {
+    std::istringstream iss(processedScene);
+
+    // iss.seekg(0, std::ios::end);
+    // int size = iss.tellg();
+    // iss.seekg(0, std::ios::beg);
+
+    // std::cout << "Loaded size: " << size << std::endl;
+
+    // const std::string &tmp = iss.str();
+    // std::cout << tmp << std::endl;
+
     std::shared_ptr<Camera> camera;
     std::shared_ptr<World> world;
 
-    cereal::BinaryInputArchive iarchive(ss);
+    cereal::BinaryInputArchive iarchive(iss);
     iarchive(camera, world);
 
     Renderer renderer(camera);
@@ -57,17 +81,26 @@ EMSCRIPTEN_BINDINGS(Module)
       .constructor()
       // .function("init", &EmscriptenRunner::init)
       .function("renderToRGBA", &EmscriptenRunner::renderToRGBA)
+      .function("renderProcessedToRGBA", &EmscriptenRunner::renderProcessedToRGBA)
+      // .function("processScene", &EmscriptenRunner::processScene)
       // .function("done", &EmscriptenRunner::done)
       .function("moveLeft", &EmscriptenRunner::moveLeft)
       .function("moveRight", &EmscriptenRunner::moveRight)
       .function("getHeight", &EmscriptenRunner::getHeight)
       .function("getWidth", &EmscriptenRunner::getWidth);
 }
+
+EMSCRIPTEN_BINDINGS(SceneLoader)
+{
+  class_<EmscriptenScene>("EmscriptenScene")
+      .constructor()
+      .function("processScene", &EmscriptenScene::processScene);
+}
 #else
 
 int main(int argc, char const *argv[])
 {
-  renderToPPM("scenes/christmas.yaml");
+  renderToPPM("scenes/coverScene.yaml");
 
   return 0;
 }

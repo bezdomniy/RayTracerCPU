@@ -94,7 +94,10 @@ void EmscriptenRunner::moveCamera(double posChange)
 // #include <iostream>
 emscripten::val EmscriptenRunner::renderToRGBA(const std::string &sceneDesc, const std::string &pixelsToRender)
 {
-  this->camera = this->world.loadFromFile(sceneDesc);
+  ObjectLoader objectLoader;
+  std::tie(this->camera, this->world) = objectLoader.loadYaml(sceneDesc);
+
+  // this->camera = this->world.loadFromFile(sceneDesc);
 
   this->renderer = Renderer(this->camera);
   // this->renderer.canvas.clear(glm::dvec3(0.0, 0.0, 0.0));
@@ -124,7 +127,7 @@ emscripten::val EmscriptenRunner::renderToRGBA(const std::string &sceneDesc, con
   for (auto &pixel : this->pixelsToRender)
   {
 
-    this->renderer.renderPixel(this->world,
+    this->renderer.renderPixel(*this->world,
                                pixel,
                                this->sqrtRaysPerPixel,
                                this->halfSubPixelSize);
@@ -175,7 +178,86 @@ emscripten::val EmscriptenRunner::renderToRGBA(const std::string &sceneDesc, con
       emscripten::typed_memory_view(bufferLength, &byteBuffer[0]));
 }
 
-void EmscriptenRunner::moveLeft() { moveCamera(STEP_SIZE); }
+emscripten::val EmscriptenRunner::renderProcessedToRGBA(const std::string &processedScene, const std::string &pixelsToRender)
+{
+  std::istringstream iss(processedScene);
+
+  // iss.seekg(0, std::ios::end);
+  // int size = iss.tellg();
+  // iss.seekg(0, std::ios::beg);
+
+  // std::cout << "Loaded size: " << size << std::endl;
+
+  cereal::BinaryInputArchive iarchive(iss);
+  iarchive(this->camera, this->world);
+
+  this->renderer = Renderer(this->camera);
+
+  this->pixelsToRender.clear();
+
+  this->pixelsToRender.reserve(pixelsToRender.length());
+
+  // TODO change to iterate over pixelstorender array
+  for (int y = 0; y < this->camera->vsize; y++)
+  {
+    for (int x = 0; x < this->camera->hsize; x++)
+    {
+      if (pixelsToRender.at((y * this->camera->hsize) + x) != '0')
+      {
+        this->pixelsToRender.push_back(std::make_pair(x, y));
+      }
+    }
+  }
+
+  std::vector<uint8_t> byteBuffer;
+  size_t bufferLength;
+
+  for (auto &pixel : this->pixelsToRender)
+  {
+
+    this->renderer.renderPixel(*this->world,
+                               pixel,
+                               this->sqrtRaysPerPixel,
+                               this->halfSubPixelSize);
+  }
+
+  std::tie(byteBuffer, bufferLength) = this->renderer.canvas.writeToRGBA(false);
+
+  return emscripten::val(
+      emscripten::typed_memory_view(bufferLength, &byteBuffer[0]));
+}
+
+emscripten::val EmscriptenScene::processScene(const std::string &sceneDesc)
+{
+  std::stringstream ss;
+
+  ObjectLoader objectLoader;
+  std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> ret = objectLoader.loadYaml(sceneDesc);
+
+  cereal::BinaryOutputArchive oarchive(ss);
+  oarchive(ret.first, ret.second);
+
+  // std::string out = ss.str();
+  // return emscripten::val(out);
+
+  // const std::string &tmp = ss.str();
+  this->scene = ss.str();
+  ss.seekg(0, std::ios::end);
+  int size = ss.tellg();
+  ss.seekg(0, std::ios::beg);
+
+  // std::cout << "Processed size: " << size << std::endl;
+  // size_t length = tmp.length();
+  const char *cstr = this->scene.c_str();
+
+  return emscripten::val(
+      emscripten::typed_memory_view(size, cstr));
+}
+
+void EmscriptenRunner::moveLeft()
+{
+  moveCamera(STEP_SIZE);
+}
 
 void EmscriptenRunner::moveRight() { moveCamera(-STEP_SIZE); }
 
