@@ -12,27 +12,27 @@ private:
         archive(cereal::base_class<Triangle>(this), n1, n2, n3);
     }
 
-    template <class Archive>
-    static void load_and_construct(Archive &archive, cereal::construct<SmoothTriangle> &construct)
-    {
-        glm::dvec3 p1;
-        glm::dvec3 p2;
-        glm::dvec3 p3;
+    // template <class Archive>
+    // static void load_and_construct(Archive &archive, cereal::construct<SmoothTriangle> &construct)
+    // {
+    //     glm::dvec3 p1;
+    //     glm::dvec3 p2;
+    //     glm::dvec3 p3;
 
-        glm::dvec3 n1;
-        glm::dvec3 n2;
-        glm::dvec3 n3;
+    //     glm::dvec3 n1;
+    //     glm::dvec3 n2;
+    //     glm::dvec3 n3;
 
-        archive(p1, p2, p3, n1, n2, n3);
-        construct(p1, p2, p3, n1, n2, n3);
-    }
+    //     archive(p1, p2, p3, n1, n2, n3);
+    //     construct(p1, p2, p3, n1, n2, n3);
+    // }
 
     glm::dvec3 n1;
     glm::dvec3 n2;
     glm::dvec3 n3;
 
 public:
-    // SmoothTriangle() {}
+    SmoothTriangle() {}
     SmoothTriangle(glm::dvec3 p1, glm::dvec3 p2, glm::dvec3 p3, glm::dvec3 n1, glm::dvec3 n2, glm::dvec3 n3);
     ~SmoothTriangle();
 
