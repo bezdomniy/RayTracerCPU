@@ -11,10 +11,10 @@ endif()
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 # set(CMAKE_CXX_FLAGS_DEBUG "-g -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1")
 # set(CMAKE_CXX_FLAGS_DEBUG "-g -s BUILD_AS_WORKER=1")
-# set(CMAKE_CXX_FLAGS_RELEASE "-O3 ")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -s USE_PTHREADS=1")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math")
+# set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -s USE_PTHREADS=1")
 
-set(TO_NATIVE OFF)
+set(TO_NATIVE ON)
 
 file(GLOB SOURCES
     src/*.h
@@ -52,7 +52,7 @@ if(${TO_NATIVE})
 	find_package(yaml-cpp CONFIG REQUIRED)
 	find_package(glm CONFIG REQUIRED)
 
-	find_package(TBB CONFIG REQUIRED)
+	# find_package(TBB CONFIG REQUIRED)
 
 	# find_package(CUDA)
 	# find_package(assimp CONFIG REQUIRED)
@@ -67,9 +67,9 @@ if(${TO_NATIVE})
 	target_include_directories(RayTracer PRIVATE ${SDL2_INCLUDE_DIRS} )
 	#target_link_libraries(RayTracer PRIVATE $<$<CXX_COMPILER_ID:Clang>:rt>)
 	if (WIN32)
-		target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb SDL2::SDL2main SDL2::SDL2-static)
+		target_link_libraries(RayTracer PRIVATE glm yaml-cpp SDL2::SDL2main SDL2::SDL2-static)
 	else()
-		target_link_libraries(RayTracer PRIVATE ${GLM_LIBRARIES} tbb yaml-cpp ${SDL2_LIBRARIES} )
+		target_link_libraries(RayTracer PRIVATE ${GLM_LIBRARIES} yaml-cpp ${SDL2_LIBRARIES} )
 	endif (WIN32)
 	
 	
@@ -81,8 +81,10 @@ else()
 	add_subdirectory(glm)
 	add_subdirectory(cpp-taskflow)
 
-	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "--bind -s WASM=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
-	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_DEBUG "--bind -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=4")
+	# TODO try -s USE_SDL=2 to render instead of current approach
+
+	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "--bind -s WASM=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
+	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_DEBUG "--bind -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
 	target_link_libraries(RayTracer PRIVATE glm yaml-cpp)
 	
 endif()
