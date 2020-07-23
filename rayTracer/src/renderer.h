@@ -10,7 +10,7 @@
 #include "ray.h"
 #include "world.h"
 
-// #include <taskflow/taskflow.hpp>
+#include <taskflow/taskflow.hpp>
 
 #include <algorithm>
 #include <glm/glm.hpp>

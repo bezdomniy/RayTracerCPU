@@ -2,7 +2,7 @@
 
 #include <algorithm>
 #include <memory>
-// #include <random>
+#include <random>
 #include <string>
 #include <utility>
 #include <vector>
@@ -24,7 +24,7 @@
 class EmscriptenRunner
 {
 private:
-  // static const int PIXELS_PER_BATCH = 40000;
+  static const int PIXELS_PER_BATCH = 40000;
   //   unsigned int startCurrentBatch = 0;
   // World world;
   std::shared_ptr<World> world;
@@ -38,33 +38,25 @@ private:
   double halfSubPixelSize;
   const double STEP_SIZE = 0.05f;
 
-  // std::random_device rd;
-  // std::mt19937 g;
-
-  // void render_(EmscriptenRunner *runnerPtr);
+  std::string scene;
+  std::random_device rd;
+  std::mt19937 g;
 
   void moveCamera(double posChange);
 
 public:
   EmscriptenRunner(/* args */);
-  // void init(const std::string &sceneDesc, const std::string &pixelsToRender);
   ~EmscriptenRunner();
 
-  emscripten::val renderToRGBA(const std::string &sceneDesc, const std::string &pixelsToRender);
+  emscripten::val processScene(const std::string &sceneDesc, bool returnArchive = true);
+  emscripten::val renderToRGBA(const std::string &pixelsToRender);
+  emscripten::val renderToRGBAThreaded();
   emscripten::val renderProcessedToRGBA(const std::string &processedScene, const std::string &pixelsToRender);
-  // std::string processScene(const std::string &sceneDesc);
   int getHeight();
   int getWidth();
   void moveLeft();
   void moveRight();
-  // bool done();
-};
-
-class EmscriptenScene
-{
-public:
-  std::string scene;
-  emscripten::val processScene(const std::string &sceneDesc);
+  bool done();
 };
 
 #endif

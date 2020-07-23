@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../include/SimplexNoise.h"
+// #include "../include/SimplexNoise.h"
+#include "../simplexNoise/SimplexNoise.h"
 #include "pattern.h"
 #include "textureMap.h"
 #include "uvTextures.h"

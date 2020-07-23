@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 project(RayTracer VERSION 0.1.0)
-set (CMAKE_CXX_STANDARD 14)
+set (CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -9,16 +9,18 @@ endif()
 
 #set(CMAKE_CXX_FLAGS "-openmp-simd")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 ")
-# set(CMAKE_CXX_FLAGS_RELEASE "-O3 -s BUILD_AS_WORKER=1")
+# set(CMAKE_CXX_FLAGS_DEBUG "-g -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1")
+# set(CMAKE_CXX_FLAGS_DEBUG "-g -s BUILD_AS_WORKER=1")
+# set(CMAKE_CXX_FLAGS_RELEASE "-O3 ")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -s USE_PTHREADS=1")
 
-set(TO_NATIVE ON)
+set(TO_NATIVE OFF)
 
 file(GLOB SOURCES
     src/*.h
     src/*.cpp
-	include/*.h
-	include/*.cpp
+	simplexNoise/*.h
+	simplexNoise/*.cpp
 )
 
 # message("${SOURCES}")
@@ -77,16 +79,17 @@ else()
 
 	add_subdirectory(yaml-cpp)
 	add_subdirectory(glm)
+	add_subdirectory(cpp-taskflow)
 
-	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "--bind -s WASM=1 -s BUILD_AS_WORKER=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
-	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_DEBUG "--bind -s WASM=1 -s BUILD_AS_WORKER=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
+	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "--bind -s WASM=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
+	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_DEBUG "--bind -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=4")
 	target_link_libraries(RayTracer PRIVATE glm yaml-cpp)
 	
 endif()
 
 
-target_include_directories(RayTracer PRIVATE include)
-# target_include_directories(RayTracer PRIVATE cpp-taskflow include)
+# target_include_directories(RayTracer PRIVATE include)
+target_include_directories(RayTracer PRIVATE cpp-taskflow include)
 # target_link_libraries(RayTracer PRIVATE glm yaml-cpp )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

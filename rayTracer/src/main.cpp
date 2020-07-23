@@ -81,21 +81,16 @@ EMSCRIPTEN_BINDINGS(Module)
       .constructor()
       // .function("init", &EmscriptenRunner::init)
       .function("renderToRGBA", &EmscriptenRunner::renderToRGBA)
+      .function("renderToRGBAThreaded", &EmscriptenRunner::renderToRGBAThreaded)
       .function("renderProcessedToRGBA", &EmscriptenRunner::renderProcessedToRGBA)
-      // .function("processScene", &EmscriptenRunner::processScene)
-      // .function("done", &EmscriptenRunner::done)
+      .function("processScene", &EmscriptenRunner::processScene)
+      .function("done", &EmscriptenRunner::done)
       .function("moveLeft", &EmscriptenRunner::moveLeft)
       .function("moveRight", &EmscriptenRunner::moveRight)
       .function("getHeight", &EmscriptenRunner::getHeight)
       .function("getWidth", &EmscriptenRunner::getWidth);
 }
 
-EMSCRIPTEN_BINDINGS(SceneLoader)
-{
-  class_<EmscriptenScene>("EmscriptenScene")
-      .constructor()
-      .function("processScene", &EmscriptenScene::processScene);
-}
 #else
 
 int main(int argc, char const *argv[])
