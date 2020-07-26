@@ -31,6 +31,7 @@ void Renderer::render(World &world)
 
   std::shuffle(pixels.begin(), pixels.end(), g);
 
+#ifdef __EMSCRIPTEN__
   tf::Executor executor(std::thread::hardware_concurrency());
   tf::Taskflow taskflow;
 
@@ -41,11 +42,18 @@ void Renderer::render(World &world)
       });
   executor.run(taskflow);
   executor.wait_for_all();
-  // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
-  //      it != pixels.end(); ++it)
-  // {
-  //   renderPixel(world, *it, sqrtRaysPerPixel, halfSubPixelSize);
-  // }
+// for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
+//      it != pixels.end(); ++it)
+// {
+//   renderPixel(world, *it, sqrtRaysPerPixel, halfSubPixelSize);
+// }
+#else
+  std::for_each(
+      std::execution::par_unseq, pixels.begin(), pixels.end(),
+      [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &&pixel) {
+        renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
+      });
+#endif
 }
 
 void Renderer::renderPixel(World &world, std::pair<int, int> &pixel,

@@ -10,7 +10,13 @@
 #include "ray.h"
 #include "world.h"
 
+#ifdef __EMSCRIPTEN__
 #include <taskflow/taskflow.hpp>
+#else
+#include <algorithm>
+#endif
+
+#include <execution>
 
 #include <algorithm>
 #include <glm/glm.hpp>
