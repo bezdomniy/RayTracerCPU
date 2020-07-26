@@ -16,13 +16,9 @@
 #include "firBranch.h"
 #include "world.h"
 #include "yaml-cpp/yaml.h"
-// #include <filesystem>
+#include <filesystem>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-// #include <assimp/Importer.hpp>
-// #include <assimp/scene.h>
-// #include <assimp/postprocess.h>
 
 #include <string>
 #include <unordered_map>

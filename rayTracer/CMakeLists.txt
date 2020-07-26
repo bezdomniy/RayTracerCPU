@@ -8,14 +8,15 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 #set(CMAKE_CXX_FLAGS "-openmp-simd")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_DEBUG "-g -s USE_PTHREADS=1 ")
 # set(CMAKE_CXX_FLAGS_DEBUG "-g -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1")
 # set(CMAKE_CXX_FLAGS_DEBUG "-g -s BUILD_AS_WORKER=1")
 # set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math")
-set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
+# set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
+set(CMAKE_CXX_FLAGS_RELEASE "-O2 -s USE_PTHREADS=1")
 # set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -s USE_PTHREADS=1")
 
-set(TO_NATIVE ON)
+# set(TO_NATIVE OFF)
 
 file(GLOB SOURCES
     src/*.h
@@ -33,8 +34,23 @@ file(GLOB SOURCES
 
 add_executable(RayTracer ${SOURCES})
 
+# if(${TO_NATIVE})
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+	message(STATUS "Setting compilation target to WASM")
+	# set(CMAKE_EXECUTABLE_SUFFIX ".html")
+	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
 
-if(${TO_NATIVE})
+	add_subdirectory(yaml-cpp)
+	add_subdirectory(glm)
+	add_subdirectory(cpp-taskflow)
+
+	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "--bind -s WASM=1 -s USE_SDL=2 --preload-file ../scenes@/ --use-preload-plugins -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
+	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_DEBUG "--bind -s WASM=1 -s USE_SDL=2 --preload-file ../scenes@/ --use-preload-plugins -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
+	target_link_libraries(RayTracer PRIVATE glm yaml-cpp)
+
+	target_include_directories(RayTracer PRIVATE cpp-taskflow include)
+	
+else()
 	message(STATUS "Setting compilation target to native binary")
 
 	set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
@@ -54,32 +70,14 @@ if(${TO_NATIVE})
 	find_package(glm CONFIG REQUIRED)
 
 	find_package(TBB CONFIG REQUIRED)
-	target_include_directories(RayTracer PRIVATE ${SDL2_INCLUDE_DIRS} )
+	target_include_directories(RayTracer PRIVATE ${SDL2_INCLUDE_DIRS} include)
 	if (WIN32)
 		target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb SDL2::SDL2main SDL2::SDL2-static)
 	else()
 		target_link_libraries(RayTracer PRIVATE ${GLM_LIBRARIES} tbb yaml-cpp ${SDL2_LIBRARIES} )
 	endif (WIN32)	
-else()
-	message(STATUS "Setting compilation target to WASM")
-	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
-
-	add_subdirectory(yaml-cpp)
-	add_subdirectory(glm)
-	add_subdirectory(cpp-taskflow)
-
-	# TODO try -s USE_SDL=2 to render instead of current approach
-
-	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "--bind -s WASM=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
-	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_DEBUG "--bind -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
-	target_link_libraries(RayTracer PRIVATE glm yaml-cpp)
-	
 endif()
 
-
-# target_include_directories(RayTracer PRIVATE include)
-target_include_directories(RayTracer PRIVATE cpp-taskflow include)
-# target_link_libraries(RayTracer PRIVATE glm yaml-cpp )
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})

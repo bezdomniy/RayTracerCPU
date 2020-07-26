@@ -2,12 +2,12 @@
 #include "renderer.h"
 #include "world.h"
 #include "window.h"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "model.h"
 #include "plane.h"
-
-// #include "VulkanInitialiser.h"
+#include "window.h"
 
 #include <iostream>
 
@@ -24,11 +24,14 @@ using namespace emscripten;
 
 void renderToPPM(const std::string &sceneDesc)
 {
-  World world;
-  std::shared_ptr<Camera> camera = world.loadFromFile(sceneDesc);
+  std::shared_ptr<World> world;
+  std::shared_ptr<Camera> camera;
+
+  ObjectLoader objectLoader;
+  std::tie(camera, world) = objectLoader.loadYaml(sceneDesc);
 
   Renderer renderer(camera);
-  renderer.render(world);
+  renderer.render(*world);
   renderer.canvas.writeToPPM("out.ppm", false);
 }
 
@@ -60,7 +63,7 @@ EMSCRIPTEN_BINDINGS(Module)
       .function("getHeight", &EmscriptenRunner::getHeight)
       .function("getWidth", &EmscriptenRunner::getWidth);
 }
-#else
+#endif
 
 std::shared_ptr<Shape> hexagonCorner()
 {
@@ -146,7 +149,7 @@ std::shared_ptr<Group> hexagon()
 }
 
 #include <cmath>
-void rayTracerInOneWeekendCover()
+std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> rayTracerInOneWeekendCover()
 {
   std::vector<std::shared_ptr<Shape>> shapes;
   shapes.reserve((22 * 22) + 4);
@@ -256,7 +259,7 @@ void rayTracerInOneWeekendCover()
   // renderer.render(*world);
   // renderer.canvas.writeToPPM("rtiow.ppm", false);
 
-  renderToSDL(camera, world);
+  return std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>>(camera, world);
 }
 
 Model mesh(const std::string &objPath)
@@ -282,44 +285,12 @@ Model mesh(const std::string &objPath)
   return model;
 }
 
-int main(int argc, char const *argv[])
+std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> draw3Dmodel(std::string modelFile)
 {
-  // rayTracerInOneWeekendCover();
-
-  // std::shared_ptr<World> world = std::make_shared<World>();
-  // std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(10., 5., -10., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 200, 0.524);
-
-  // std::shared_ptr<Group> group = hexagon();
-  // std::shared_ptr<PointLight> light = std::make_shared<PointLight>(
-  //     glm::dvec4(glm::dvec4(10., 10., 10., 1.)),
-  //     glm::dvec3(1., 1., 1.));
-
-  // std::shared_ptr<Shape> groupShape = std::move(std::dynamic_pointer_cast<Shape>(group));
-
-  // world->addShape(groupShape);
-  // world->addLight(light);
-
-  // renderToSDL(camera, world);
-
-  // renderToSDL("scenes/reflectionScene.yaml");
-  // renderToSDL("scenes/coverScene.yaml");
-  // renderToSDL("scenes/groups.yaml");
-  // renderToSDL("scenes/hippy.yaml");
-  // renderToSDL("../../../scenes/hippy.yaml");
-  // renderToSDL("scenes/globe.yaml");
-  // renderToSDL("scenes/skybox.yaml");
-  // renderToSDL("scenes/checkers.yaml");
-  // renderToSDL("scenes/christmas.yaml");
-  // renderToSDL("scenes/reflectionScene.yaml");
-  // renderToSDL("scenes/reflectionScene.yaml");
-
-  // renderToPPM("scenes/christmas.yaml");
-  // renderToPPM("scenes/reflectionScene.yaml");
-
   std::shared_ptr<World> world = std::make_shared<World>();
   std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(5., 5, -20., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 400, 0.524);
 
-  Model model = mesh("models/armadillo.obj");
+  Model model = mesh(modelFile);
   // Model model2 = model;
   // Model model3 = model;
   // Model model4 = model;
@@ -380,6 +351,74 @@ int main(int argc, char const *argv[])
   // world->addShape(plane);
   world->addLight(light);
 
+  return std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>>(camera, world);
+}
+
+void run(void *arg)
+{
+  Window *window = static_cast<Window *>(arg);
+  window->step();
+}
+
+// bool fileExists(const std::string &name)
+// {
+//   ifstream f(name.c_str());
+//   return f.good();
+// }
+
+// #include <filesystem>
+int main(int argc, char const *argv[])
+{
+#ifdef __EMSCRIPTEN__
+  // std::shared_ptr<World> world;
+  // std::shared_ptr<Camera> camera;
+  // std::tie(camera, world) = rayTracerInOneWeekendCover();
+  // Window window(camera, world);
+
+  // std::string path = "/";
+  // for (const auto &entry : std::filesystem::directory_iterator(path))
+  //   std::cout << entry.path() << std::endl;
+
+  Window window("/groups.yaml");
+  emscripten_set_main_loop_arg(run, &window, 0, 1);
+#else
+  // rayTracerInOneWeekendCover();
+
+  // std::shared_ptr<World> world = std::make_shared<World>();
+  // std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(10., 5., -10., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 200, 0.524);
+
+  // std::shared_ptr<Group> group = hexagon();
+  // std::shared_ptr<PointLight> light = std::make_shared<PointLight>(
+  //     glm::dvec4(glm::dvec4(10., 10., 10., 1.)),
+  //     glm::dvec3(1., 1., 1.));
+
+  // std::shared_ptr<Shape> groupShape = std::move(std::dynamic_pointer_cast<Shape>(group));
+
+  // world->addShape(groupShape);
+  // world->addLight(light);
+
+  // renderToSDL(camera, world);
+
+  // renderToSDL("scenes/reflectionScene.yaml");
+  // renderToSDL("scenes/coverScene.yaml");
+  // renderToSDL("scenes/groups.yaml");
+  // renderToSDL("scenes/hippy.yaml");
+  // renderToSDL("../../../scenes/hippy.yaml");
+  // renderToSDL("scenes/globe.yaml");
+  // renderToSDL("scenes/skybox.yaml");
+  // renderToSDL("scenes/checkers.yaml");
+  // renderToSDL("scenes/christmas.yaml");
+  // renderToSDL("scenes/reflectionScene.yaml");
+  // renderToSDL("scenes/reflectionScene.yaml");
+
+  // renderToPPM("scenes/christmas.yaml");
+  // renderToPPM("scenes/reflectionScene.yaml");
+
+  std::shared_ptr<World> world;
+  std::shared_ptr<Camera> camera;
+
+  std::tie(camera, world) = draw3Dmodel("models/armadillo.obj");
+
   Renderer renderer(camera);
   renderer.render(*world);
   renderer.canvas.writeToPPM("armadillo.ppm", false);
@@ -387,5 +426,6 @@ int main(int argc, char const *argv[])
   // renderToSDL(camera, world);
 
   return 0;
-}
 #endif
+}
+// #endif

@@ -16,19 +16,20 @@ ObjectLoader::loadYaml(const std::string &fileName)
 
   YAML::Node root;
 
-  // if (std::filesystem::exists(fileName))
-
-  std::ifstream checkFile(fileName, std::ifstream::in);
-  if (checkFile)
+  if (std::filesystem::exists(fileName))
   {
-    checkFile.close();
+    std::cout << "Found found: " << fileName << std::endl;
     root = YAML::LoadFile(fileName);
   }
   else
+  {
+    std::cout << "Found not found: " << fileName << std::endl;
     root = YAML::Load(fileName);
+  }
 
   for (YAML::const_iterator it = root.begin(); it != root.end(); ++it)
   {
+    // std::cout << "Node: " << it->begin()->first.as<std::string>() << std::endl;
     assert((*it).Type() == YAML::NodeType::Map);
     if (it->begin()->first.as<std::string>() == "add")
     {
