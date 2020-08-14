@@ -42,6 +42,7 @@ void Renderer::render(World &world)
       });
   executor.run(taskflow);
   executor.wait_for_all();
+  
 // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
 //      it != pixels.end(); ++it)
 // {
@@ -53,7 +54,14 @@ void Renderer::render(World &world)
       [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &&pixel) {
         renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
       });
-#endif
+
+  // #pragma omp parallel for
+  // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
+  //     it < pixels.end(); ++it)
+  // {
+  //     renderPixel(world, *it, sqrtRaysPerPixel, halfSubPixelSize);
+  // }
+  // #endif
 }
 
 void Renderer::renderPixel(World &world, std::pair<int, int> &pixel,

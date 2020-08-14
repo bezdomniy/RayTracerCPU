@@ -40,8 +40,9 @@ void Cone::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &in
              (2 * transformedRay.origin.z * transformedRay.direction.z);
 
   if (std::abs(a) < Geometry::EPSILON)
-    if (std::abs(b) < Geometry::EPSILON)
+    if (std::abs(b) < Geometry::EPSILON) {
       return;
+    }
     else
     {
       singleIntersection = false;

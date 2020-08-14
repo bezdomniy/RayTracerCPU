@@ -11,12 +11,19 @@ endif()
 set(CMAKE_CXX_FLAGS_DEBUG "-g -s USE_PTHREADS=1 ")
 # set(CMAKE_CXX_FLAGS_DEBUG "-g -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1")
 # set(CMAKE_CXX_FLAGS_DEBUG "-g -s BUILD_AS_WORKER=1")
-# set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math")
+# set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -ffast-math -fopenmp")
+set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -ffast-math")
 # set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
-set(CMAKE_CXX_FLAGS_RELEASE "-O2 -s USE_PTHREADS=1")
+# set(CMAKE_CXX_FLAGS_RELEASE "-O2 -s USE_PTHREADS=1")
 # set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -s USE_PTHREADS=1")
 
 # set(TO_NATIVE OFF)
+# include(CheckCXXCompilerFlag)
+# CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
+# if(COMPILER_SUPPORTS_MARCH_NATIVE)
+# 	message("March native supported.")
+#     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
+# endif()
 
 file(GLOB SOURCES
     src/*.h
