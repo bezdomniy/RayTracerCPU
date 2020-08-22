@@ -3,7 +3,6 @@
 #include "camera.h"
 #include "cube.h"
 #include "cylinder.h"
-#include "fstream"
 #include "material.h"
 #include "pattern.h"
 #include "plane.h"
@@ -15,7 +14,9 @@
 #include "triangle.h"
 #include "firBranch.h"
 #include "world.h"
+
 #include "yaml-cpp/yaml.h"
+#include "fstream"
 #include <filesystem>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

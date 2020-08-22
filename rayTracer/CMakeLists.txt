@@ -8,55 +8,21 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 #set(CMAKE_CXX_FLAGS "-openmp-simd")
-set(CMAKE_CXX_FLAGS_DEBUG "-g -s USE_PTHREADS=1 ")
-# set(CMAKE_CXX_FLAGS_DEBUG "-g -s USE_PTHREADS=1 -s PROXY_TO_PTHREAD=1")
-# set(CMAKE_CXX_FLAGS_DEBUG "-g -s BUILD_AS_WORKER=1")
-# set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -ffast-math -fopenmp")
-set(CMAKE_CXX_FLAGS_RELEASE "-Ofast -ffast-math")
-# set(CMAKE_CXX_FLAGS_RELEASE "-Ofast")
-# set(CMAKE_CXX_FLAGS_RELEASE "-O2 -s USE_PTHREADS=1")
-# set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -s USE_PTHREADS=1")
+set(CMAKE_CXX_FLAGS_DEBUG "-g ")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math ")
 
-# set(TO_NATIVE OFF)
-# include(CheckCXXCompilerFlag)
-# CHECK_CXX_COMPILER_FLAG("-march=native" COMPILER_SUPPORTS_MARCH_NATIVE)
-# if(COMPILER_SUPPORTS_MARCH_NATIVE)
-# 	message("March native supported.")
-#     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -march=native")
-# endif()
-
-file(GLOB SOURCES
-    src/*.h
-    src/*.cpp
-	simplexNoise/*.h
-	simplexNoise/*.cpp
-)
-
-# message("${SOURCES}")
-# add_subdirectory(libnoise)
-# find_package(LibNoise)
-
-# add_subdirectory(cereal)
-# add_subdirectory(cpp-taskflow)
-
-add_executable(RayTracer ${SOURCES})
+add_subdirectory("src/raytracer")
+add_subdirectory("src/runner")
 
 # if(${TO_NATIVE})
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 	message(STATUS "Setting compilation target to WASM")
 	# set(CMAKE_EXECUTABLE_SUFFIX ".html")
-	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
+	# set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
 
 	add_subdirectory(yaml-cpp)
 	add_subdirectory(glm)
 	add_subdirectory(cpp-taskflow)
-
-	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "--bind -s WASM=1 -s USE_SDL=2 --preload-file ../scenes@/ --use-preload-plugins -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
-	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_DEBUG "--bind -s WASM=1 -s USE_SDL=2 --preload-file ../scenes@/ --use-preload-plugins -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1 -s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency")
-	target_link_libraries(RayTracer PRIVATE glm yaml-cpp)
-
-	target_include_directories(RayTracer PRIVATE cpp-taskflow include)
-	
 else()
 	message(STATUS "Setting compilation target to native binary")
 
@@ -72,17 +38,9 @@ else()
 		#find_package(TBB CONFIG REQUIRED)
 	endif (WIN32)
 	find_package(SDL2 CONFIG REQUIRED)
-	# find_package(SDL2_image REQUIRED)
 	find_package(yaml-cpp CONFIG REQUIRED)
 	find_package(glm CONFIG REQUIRED)
-
 	find_package(TBB CONFIG REQUIRED)
-	target_include_directories(RayTracer PRIVATE ${SDL2_INCLUDE_DIRS} include)
-	if (WIN32)
-		target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb SDL2::SDL2main SDL2::SDL2-static)
-	else()
-		target_link_libraries(RayTracer PRIVATE ${GLM_LIBRARIES} tbb yaml-cpp ${SDL2_LIBRARIES} )
-	endif (WIN32)	
 endif()
 
 
