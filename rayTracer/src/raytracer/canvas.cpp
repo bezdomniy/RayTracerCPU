@@ -41,20 +41,20 @@ void Canvas::clear(glm::dvec3 colour)
   }
 }
 
-char Canvas::rbgdoubleToInt(double f)
+uint8_t Canvas::rbgdoubleToInt(double f)
 {
-  char c;
+  uint8_t c;
   if (f < 0.0)
   {
-    c = (char)0;
+    c = (uint8_t)0;
   }
   else if (f > 1.0)
   {
-    c = (char)255;
+    c = (uint8_t)255;
   }
   else
   {
-    c = (char)(f * 255);
+    c = (uint8_t)(f * 255);
   }
 
   return c;
@@ -148,7 +148,7 @@ std::pair<std::vector<char>, size_t> Canvas::writeToRGBA(bool invertY)
         bytes[bytesIndex] = rbgdoubleToInt(getPixel(j, i).x);
         bytes[bytesIndex + 1] = rbgdoubleToInt(getPixel(j, i).y);
         bytes[bytesIndex + 2] = rbgdoubleToInt(getPixel(j, i).z);
-        bytes[bytesIndex + 3] = 1;
+        bytes[bytesIndex + 3] = 127;
 
         bytesIndex += 4;
       }
@@ -163,7 +163,7 @@ std::pair<std::vector<char>, size_t> Canvas::writeToRGBA(bool invertY)
         bytes[bytesIndex] = rbgdoubleToInt(getPixel(j, i).x);
         bytes[bytesIndex + 1] = rbgdoubleToInt(getPixel(j, i).y);
         bytes[bytesIndex + 2] = rbgdoubleToInt(getPixel(j, i).z);
-        bytes[bytesIndex + 3] = 1;
+        bytes[bytesIndex + 3] = 127;
 
         bytesIndex += 4;
       }

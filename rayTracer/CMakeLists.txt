@@ -22,7 +22,7 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 
 	add_subdirectory(yaml-cpp)
 	add_subdirectory(glm)
-	add_subdirectory(cpp-taskflow)
+	# add_subdirectory(cpp-taskflow)
 else()
 	message(STATUS "Setting compilation target to native binary")
 

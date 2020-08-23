@@ -11,7 +11,8 @@ private:
   std::vector<glm::dvec3> pixels;
   void _writeRgbString(double f, bool &newLine, int &charsInLine,
                        std::ofstream *streamPtr);
-  char rbgdoubleToInt(double f);
+  uint8_t rbgdoubleToInt(double f);
+  char rbgdoubleToChar(double f);
 
 public:
   Canvas();

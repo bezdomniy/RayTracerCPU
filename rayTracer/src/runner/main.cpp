@@ -8,21 +8,33 @@ void processCback(char *data, int size, void *arg)
 {
   std::cout << "Process Callback" << std::endl;
 
-  window.sceneBinary = (char *)malloc(size + 1);
-  strcpy(window.sceneBinary, data);
-  window.sceneSize = size;
+  window.sceneBinary = std::vector<char>(data, data + size - 4);
+
+  window.width = *(data + size - 3) | uint16_t(*(data + size - 4)) << 8;
+  window.height = *(data + size - 1) | uint16_t(*(data + size - 2)) << 8;
+  window.initWindow();
+
+  // std::cout << "p1: ";
+  // for (auto &c : window.sceneBinary)
+  //   std::cout << c;
+  // std::cout << std::endl;
+
+  window.destroyProcessorWorker();
   window.somethingChanged = true;
+
+  window.update();
   // std::cout << size << std::endl;
 }
 
 void renderCback(char *data, int size, void *arg)
 {
-  std::cout << "Render Callback" << std::endl;
+  std::cout << "Render Callback: " << size << std::endl;
 
-  window.pixelsBinary = (char *)malloc(size + 1);
-  strcpy(window.pixelsBinary, data);
-  window.pixelsSize = size;
+  window.pixelsBinary = std::vector<char>(data, data + size);
 
+  window.draw();
+  window.somethingChanged = false;
+  window.running = false;
   // std::cout << size << std::endl;
 }
 
@@ -33,10 +45,10 @@ void loop()
 
 int main(int argc, char const *argv[])
 {
-  window = Window("/groups.yaml");
+  window.processScene("/groups.yaml");
 
   // loop();
-  emscripten_set_main_loop(loop, 2, true);
+  // emscripten_set_main_loop(loop, 2, true);
 }
 
 // #include "camera.h"

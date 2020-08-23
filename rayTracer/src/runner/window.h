@@ -9,6 +9,9 @@
 #include <vector>
 #include <cmath>
 
+#include <emscripten.h>
+#include <iostream>
+
 // #include "camera.h"
 // #include "renderer.h"
 // #include "world.h"
@@ -27,15 +30,12 @@ private:
 
     SDL_Event event;
 
-    int width = 300;
-    int height = 100;
-
-    // worker_handle sceneProcessWorker;
+    worker_handle sceneProcessWorker;
 
     // std::string sceneDesc;
     // std::shared_ptr<Camera> camera;
 
-        // Renderer rayTraceRenderer;
+    // Renderer rayTraceRenderer;
 
     // std::shared_ptr<World> world;
     // std::vector<uint8_t> byteBuffer;
@@ -49,23 +49,25 @@ private:
 
 public:
     Window();
-    Window(const std::string &sceneDesc);
+    void processScene(const std::string &sceneDesc);
     // Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<World> &world);
     ~Window();
 
     bool running = false;
     bool somethingChanged = false;
 
+    int width;
+    int height;
+
+    void destroyProcessorWorker();
+
     // void moveLeft();
     // void moveRight();
     // void moveUp();
     // void moveDown();
 
-    char *sceneBinary;
-    int sceneSize = 0;
-
-    char *pixelsBinary;
-    int pixelsSize = 0;
+    std::vector<char> sceneBinary;
+    std::vector<char> pixelsBinary;
 
     void initWindow();
     void update();
