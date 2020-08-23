@@ -145,14 +145,26 @@ void Window::update()
     // std::cout << "update?" << std::endl;
     // if (somethingChanged && !running)
     // {
-    std::cout << "update" << std::endl;
-    this->running = true;
-    worker_handle renderWorker = emscripten_create_worker("RayTracer.wasm.js");
 
-    emscripten_call_worker(renderWorker, "renderScene", &this->sceneBinary[0], this->sceneBinary.size(), renderCback, (void *)42);
-    // }
+    int nWorkers = 1;
+    const auto processor_count = std::thread::hardware_concurrency();
 
-    // this->somethingChanged = false;
+    if (processor_count > 0)
+        nWorkers = processor_count;
+
+    for (int i = 0; i < nWorkers; ++i)
+    {
+        std::cout << "update" << std::endl;
+        this->running = true;
+        worker_handle renderWorker = emscripten_create_worker("RayTracer.wasm.js");
+
+        this->sceneBinary.push_back((char)i);
+        this->sceneBinary.push_back((char)nWorkers);
+
+        emscripten_call_worker(renderWorker, "renderScene", &this->sceneBinary[0], this->sceneBinary.size(), renderCback, (void *)42);
+
+        // this->somethingChanged = false;
+    }
 }
 
 void Window::draw()

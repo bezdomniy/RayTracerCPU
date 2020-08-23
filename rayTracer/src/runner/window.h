@@ -12,6 +12,8 @@
 #include <emscripten.h>
 #include <iostream>
 
+#include <thread>
+
 // #include "camera.h"
 // #include "renderer.h"
 // #include "world.h"

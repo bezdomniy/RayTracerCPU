@@ -14,21 +14,16 @@ void processCback(char *data, int size, void *arg)
   window.height = *(data + size - 1) | uint16_t(*(data + size - 2)) << 8;
   window.initWindow();
 
-  // std::cout << "p1: ";
-  // for (auto &c : window.sceneBinary)
-  //   std::cout << c;
-  // std::cout << std::endl;
-
   window.destroyProcessorWorker();
   window.somethingChanged = true;
 
   window.update();
-  // std::cout << size << std::endl;
 }
 
 void renderCback(char *data, int size, void *arg)
 {
   std::cout << "Render Callback: " << size << std::endl;
+  // TODO fix this with workers - you are just overwriting the previous workers outputs...
 
   window.pixelsBinary = std::vector<char>(data, data + size);
 
@@ -45,7 +40,7 @@ void loop()
 
 int main(int argc, char const *argv[])
 {
-  window.processScene("/groups.yaml");
+  window.processScene("/christmas.yaml");
 
   // loop();
   // emscripten_set_main_loop(loop, 2, true);

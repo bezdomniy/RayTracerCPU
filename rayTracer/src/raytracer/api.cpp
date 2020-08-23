@@ -28,24 +28,6 @@ extern "C"
 
         std::vector<char> byteBuffer(scene.begin(), scene.end());
 
-        // fprintf(stdout, "p-1: %-10.10s\n", ss.str().data());
-
-        // ss.seekg(0, std::ios::end);
-        // int ss_size = ss.tellg();
-        // ss.seekg(0, std::ios::beg);
-
-        // char *cstr = const_cast<char *>(scene.c_str());
-        // char *cstr = (char *)malloc(ss_size + 1);
-        // scene.copy(cstr, ss_size, 0);
-
-        // int ss_size = ss.str().size();
-        // char *cstr = new char[ss_size];
-        // memcpy(cstr, ss.str().data(), ss_size);
-
-        // // char *cstr = ss.str().data();
-
-        // fprintf(stdout, "p0: %-10.10s\n", cstr);
-
         // add width as 2 bytes to returned array
         uint16_t width = camera->hsize;
         char widthLo = width & 0xFF;
@@ -66,8 +48,11 @@ extern "C"
 
     void renderScene(char *data, int size)
     {
-        std::string processedScene(data, size);
+        std::string processedScene(data, size - 2);
         std::istringstream iss(processedScene);
+
+        uint8_t *workerId = reinterpret_cast<uint8_t *>(data + size - 2);
+        uint8_t *nWorkers = reinterpret_cast<uint8_t *>(data + size - 1);
 
         std::vector<std::pair<int, int>> pixelsToRender;
 
@@ -83,16 +68,20 @@ extern "C"
         double halfSubPixelSize = 1.0 / (double)(sqrtRaysPerPixel) / 2.0;
 
         pixelsToRender.clear();
-        pixelsToRender.reserve(camera->vsize * camera->hsize);
+        pixelsToRender.reserve((camera->vsize * camera->hsize) / (*nWorkers + 1));
         // TODO change to iterate over pixelstorender array
         for (int y = 0; y < camera->vsize; y++)
         {
-            for (int x = 0; x < camera->hsize; x++)
+            if (y % *nWorkers == *workerId)
             {
-                // if (pixelsToRender.at((y * camera->hsize) + x) != '0')
-                // {
-                pixelsToRender.push_back(std::make_pair(x, y));
-                // }
+                for (int x = 0; x < camera->hsize; x++)
+                {
+
+                    // if (pixelsToRender.at((y * camera->hsize) + x) != '0')
+                    // {
+                    pixelsToRender.push_back(std::make_pair(x, y));
+                    // }
+                }
             }
         }
 
