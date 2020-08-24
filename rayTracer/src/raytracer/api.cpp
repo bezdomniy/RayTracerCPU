@@ -48,11 +48,28 @@ extern "C"
 
     void renderScene(char *data, int size)
     {
-        std::string processedScene(data, size - 2);
-        std::istringstream iss(processedScene);
-
         uint8_t *workerId = reinterpret_cast<uint8_t *>(data + size - 2);
         uint8_t *nWorkers = reinterpret_cast<uint8_t *>(data + size - 1);
+
+        union
+        {
+            double d;
+            int32_t i;
+        } xRotation;
+
+        union
+        {
+            double d;
+            int32_t i;
+        } yRotation;
+
+        xRotation.i = *(data + size - 10) | uint32_t(*(data + size - 9)) << 8 | uint32_t(*(data + size - 8)) << 16 | uint32_t(*(data + size - 7)) << 24;
+        yRotation.i = *(data + size - 6) | uint32_t(*(data + size - 5)) << 8 | uint32_t(*(data + size - 4)) << 16 | uint32_t(*(data + size - 3)) << 24;
+
+        std::cout << "Rotations: " << xRotation.d << " " << yRotation.d << std::endl;
+
+        std::string processedScene(data, size - 10);
+        std::istringstream iss(processedScene);
 
         std::vector<std::pair<int, int>> pixelsToRender;
 
@@ -69,6 +86,7 @@ extern "C"
 
         pixelsToRender.clear();
         pixelsToRender.reserve((camera->vsize * camera->hsize) / (*nWorkers + 1));
+
         // TODO change to iterate over pixelstorender array
         for (int y = 0; y < camera->vsize; y++)
         {
@@ -76,11 +94,7 @@ extern "C"
             {
                 for (int x = 0; x < camera->hsize; x++)
                 {
-
-                    // if (pixelsToRender.at((y * camera->hsize) + x) != '0')
-                    // {
                     pixelsToRender.push_back(std::make_pair(x, y));
-                    // }
                 }
             }
         }
@@ -98,6 +112,8 @@ extern "C"
 
         std::tie(byteBuffer, bufferLength) = renderer.canvas.writeToRGBA(false);
 
-        emscripten_worker_respond(&byteBuffer[0], bufferLength);
+        byteBuffer.push_back(*(data + size - 2));
+
+        emscripten_worker_respond(&byteBuffer[0], bufferLength + 1);
     }
 }

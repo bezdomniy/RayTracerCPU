@@ -5,6 +5,12 @@
 
 Window::Window()
 {
+    this->nWorkers = 1;
+
+    const auto processor_count = std::thread::hardware_concurrency();
+
+    if (processor_count > 0)
+        this->nWorkers = processor_count;
 }
 
 void Window::processScene(const std::string &sceneDesc)
@@ -55,14 +61,22 @@ void Window::initWindow()
 {
     SDL_SetMainReady();
     SDL_Init(SDL_INIT_VIDEO);
-    SDL_CreateWindowAndRenderer(this->width, this->height, 0, &this->window, &this->renderer);
+    // SDL_CreateWindowAndRenderer(this->width, this->height, 0, &this->window, &this->renderer);
+
+    this->window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
+                                    SDL_WINDOWPOS_UNDEFINED, this->width, this->height, 0);
+    this->renderer = SDL_CreateRenderer(this->window, -1,
+                                        SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+
+    this->texTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+                                        SDL_TEXTUREACCESS_TARGET, this->width, this->height);
 
     // this->running = true;
 }
 
 void Window::step()
 {
-    // handleEvents();
+    handleEvents();
 
     if (this->somethingChanged)
     {
@@ -80,7 +94,6 @@ void Window::run()
 
 void Window::handleEvents()
 {
-
     SDL_WaitEvent(&event);
     switch (event.type)
     {
@@ -94,19 +107,19 @@ void Window::handleEvents()
             this->running = false;
             break;
         case SDLK_LEFT:
-            // moveLeft();
+            moveLeft();
             this->somethingChanged = true;
             break;
         case SDLK_RIGHT:
-            // moveRight();
+            moveRight();
             this->somethingChanged = true;
             break;
         case SDLK_UP:
-            // moveUp();
+            moveUp();
             this->somethingChanged = true;
             break;
         case SDLK_DOWN:
-            // moveDown();
+            moveDown();
             this->somethingChanged = true;
             break;
             // cases for other keypresses
@@ -117,27 +130,59 @@ void Window::handleEvents()
     }
 }
 
-// void Window::moveLeft() { moveCamera(STEP_SIZE, glm::dvec3(0.0, 1.0, 0.0)); }
-// void Window::moveRight() { moveCamera(-STEP_SIZE, glm::dvec3(0.0, 1.0, 0.0)); }
-// void Window::moveUp() { moveCamera(-STEP_SIZE, glm::dvec3(1.0, 0.0, 0.0)); }
-// void Window::moveDown() { moveCamera(STEP_SIZE, glm::dvec3(1.0, 0.0, 0.0)); }
+void Window::moveLeft() { moveCamera(STEP_SIZE, 1); }
+void Window::moveRight() { moveCamera(-STEP_SIZE, 1); }
+void Window::moveUp() { moveCamera(-STEP_SIZE, 0); }
+void Window::moveDown() { moveCamera(STEP_SIZE, 0); }
 
-// void Window::moveCamera(double posChange, glm::dvec3 axis)
-// {
-//     glm::dmat4 rotationY =
-//         glm::rotate(glm::dmat4(1.0), posChange, axis);
+void Window::moveCamera(float posChange, uint8_t axis)
+{
+    union
+    {
+        double d;
+        int32_t i;
+    } n;
 
-//     // glm::dmat4 rotationZ =
-//     //     glm::rotate(glm::dmat4(1.0), posChange,
-//     //                 glm::dvec3(0.0, 0.0, 1.0));
+    if (axis == 0)
+    {
+        n.d = this->xRotation;
+        this->xRotation += n.i;
+    }
+    else if (axis == 1)
+    {
+        n.d = this->yRotation;
+        this->yRotation += n.i;
+    }
 
-//     this->camera->position = rotationY * this->camera->position;
+    this->update();
 
-//     // matrix.makeRotationY(clock.getDelta() * 2 * Math.PI / period);
+    // // old from here - move to raytracer module
+    // glm::dmat4 rotationY =
+    //     glm::rotate(glm::dmat4(1.0), posChange, axis);
 
-//     // this->camera->position.x += posChange;
-//     this->camera->updateTransform();
-// }
+    // // glm::dmat4 rotationZ =
+    // //     glm::rotate(glm::dmat4(1.0), posChange,
+    // //                 glm::dvec3(0.0, 0.0, 1.0));
+
+    // this->camera->position = rotationY * this->camera->position;
+
+    // // matrix.makeRotationY(clock.getDelta() * 2 * Math.PI / period);
+
+    // // this->camera->position.x += posChange;
+    // this->camera->updateTransform();
+}
+
+std::vector<uint8_t> integerToByteArray(uint32_t n)
+{
+    std::vector<uint8_t> bytes(4);
+
+    bytes[0] = (n >> 24) & 0xFF;
+    bytes[1] = (n >> 16) & 0xFF;
+    bytes[2] = (n >> 8) & 0xFF;
+    bytes[3] = n & 0xFF;
+
+    return bytes;
+}
 
 void Window::update()
 {
@@ -146,20 +191,34 @@ void Window::update()
     // if (somethingChanged && !running)
     // {
 
-    int nWorkers = 1;
-    const auto processor_count = std::thread::hardware_concurrency();
+    SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
+    SDL_RenderClear(this->renderer);
 
-    if (processor_count > 0)
-        nWorkers = processor_count;
-
-    for (int i = 0; i < nWorkers; ++i)
+    for (int i = 0; i < this->nWorkers; ++i)
     {
         std::cout << "update" << std::endl;
         this->running = true;
-        worker_handle renderWorker = emscripten_create_worker("RayTracer.wasm.js");
+
+        worker_handle renderWorker;
+
+        if (i == 0)
+            renderWorker = this->sceneProcessWorker;
+        else
+            renderWorker = emscripten_create_worker("RayTracer.wasm.js");
+
+        // rotation info
+        std::vector<uint8_t> xRotationBytes = integerToByteArray(this->xRotation);
+        std::vector<uint8_t> yRotationBytes = integerToByteArray(this->yRotation);
+
+        // TODO implement rotation based on this in the renderer api
+        for (auto &byte : xRotationBytes)
+            this->sceneBinary.push_back(byte);
+
+        for (auto &byte : yRotationBytes)
+            this->sceneBinary.push_back(byte);
 
         this->sceneBinary.push_back((char)i);
-        this->sceneBinary.push_back((char)nWorkers);
+        this->sceneBinary.push_back((char)this->nWorkers);
 
         emscripten_call_worker(renderWorker, "renderScene", &this->sceneBinary[0], this->sceneBinary.size(), renderCback, (void *)42);
 
@@ -167,40 +226,50 @@ void Window::update()
     }
 }
 
-void Window::draw()
+void Window::draw(uint8_t workerId)
 {
-    SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
-    SDL_RenderClear(this->renderer);
     int pixelsOffset;
 
-    for (int i = 0; i < this->width; i++)
+    SDL_SetRenderTarget(this->renderer, this->texTarget);
+
+    // std::cout << workerId << " " << this->nWorkers << std::endl;
+
+    for (int j = 0; j < this->height; j++)
     {
-        for (int j = 0; j < this->height; j++)
+        if (j % this->nWorkers == workerId)
         {
-            // glm::ivec3 colour(this->rayTraceRenderer.canvas.getPixelInt(i, j));
-            // if (this->height >= this->width)
-            pixelsOffset = (j * this->width + i) * 4;
-            // else
-            //     pixelsOffset = (i * this->height + j) * 4;
+            // std::cout << "Writing row: " << j << std::endl;
+            for (int i = 0; i < this->width; i++)
+            {
+                // glm::ivec3 colour(this->rayTraceRenderer.canvas.getPixelInt(i, j));
+                // if (this->height >= this->width)
+                pixelsOffset = (j * this->width + i) * 4;
+                // else
+                //     pixelsOffset = (i * this->height + j) * 4;
 
-            // SDL_SetRenderDrawColor(this->renderer,
-            //                        this->pixelsBinary.at(pixelsOffset),
-            //                        this->pixelsBinary.at(pixelsOffset + 1),
-            //                        this->pixelsBinary.at(pixelsOffset + 2),
-            //                        255);
+                // SDL_SetRenderDrawColor(this->renderer,
+                //                        this->pixelsBinary.at(pixelsOffset),
+                //                        this->pixelsBinary.at(pixelsOffset + 1),
+                //                        this->pixelsBinary.at(pixelsOffset + 2),
+                //                        255);
 
-            uint8_t *x = reinterpret_cast<uint8_t *>(&(this->pixelsBinary.at(pixelsOffset)));
-            uint8_t *y = reinterpret_cast<uint8_t *>(&(this->pixelsBinary.at(pixelsOffset + 1)));
-            uint8_t *z = reinterpret_cast<uint8_t *>(&(this->pixelsBinary.at(pixelsOffset + 2)));
-            uint8_t *w = reinterpret_cast<uint8_t *>(&(this->pixelsBinary.at(pixelsOffset + 3)));
+                uint8_t *x = reinterpret_cast<uint8_t *>(&(this->pixelsBinary.at(workerId).at(pixelsOffset)));
+                uint8_t *y = reinterpret_cast<uint8_t *>(&(this->pixelsBinary.at(workerId).at(pixelsOffset + 1)));
+                uint8_t *z = reinterpret_cast<uint8_t *>(&(this->pixelsBinary.at(workerId).at(pixelsOffset + 2)));
+                uint8_t *w = reinterpret_cast<uint8_t *>(&(this->pixelsBinary.at(workerId).at(pixelsOffset + 3)));
 
-            SDL_SetRenderDrawColor(this->renderer, *x, *y, *z, *w);
+                SDL_SetRenderDrawColor(this->renderer, *x, *y, *z, *w);
+                // SDL_SetRenderDrawColor(this->renderer, 255, 0, 0, 255);
 
-            SDL_RenderDrawPoint(this->renderer, i, j);
+                SDL_RenderDrawPoint(this->renderer, i, j);
+            }
         }
     }
 
-    SDL_RenderPresent(renderer);
+    SDL_SetRenderTarget(this->renderer, NULL);
+    SDL_RenderCopy(this->renderer, this->texTarget, NULL, NULL);
+
+    SDL_RenderPresent(this->renderer);
 
     // SDL_Delay(1000/30);
 }

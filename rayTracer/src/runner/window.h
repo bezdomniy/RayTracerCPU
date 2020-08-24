@@ -12,6 +12,8 @@
 #include <emscripten.h>
 #include <iostream>
 
+#include <unordered_map>
+
 #include <thread>
 
 // #include "camera.h"
@@ -27,12 +29,18 @@ class Window
 private:
     SDL_Window *window;
     SDL_Renderer *renderer;
+    SDL_Texture *texTarget;
     // static const int PIXELS_PER_BATCH = 20000;
-    // const double STEP_SIZE = 0.05f;
+    const double STEP_SIZE = 0.05f;
 
     SDL_Event event;
 
     worker_handle sceneProcessWorker;
+
+    int nWorkers;
+
+    int32_t xRotation = 0;
+    int32_t yRotation = 0;
 
     // std::string sceneDesc;
     // std::shared_ptr<Camera> camera;
@@ -45,7 +53,7 @@ private:
 
     void handleEvents();
 
-    // void moveCamera(double posChange, glm::dvec3 axis);
+    void moveCamera(float posChange, uint8_t axis);
 
     // void _drawTest();
 
@@ -63,17 +71,18 @@ public:
 
     void destroyProcessorWorker();
 
-    // void moveLeft();
-    // void moveRight();
-    // void moveUp();
-    // void moveDown();
+    void moveLeft();
+    void moveRight();
+    void moveUp();
+    void moveDown();
 
     std::vector<char> sceneBinary;
-    std::vector<char> pixelsBinary;
+
+    std::unordered_map<uint8_t, std::vector<char>> pixelsBinary;
 
     void initWindow();
     void update();
-    void draw();
+    void draw(uint8_t workerId);
     void step();
     void run();
 };
