@@ -1,11 +1,14 @@
 
 #include <iostream>
-#include <emscripten.h>
+#include <memory>
 
 #include "camera.h"
 #include "objectLoader.h"
 #include "renderer.h"
 #include "world.h"
+
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
 
 extern "C"
 {
@@ -51,22 +54,10 @@ extern "C"
         uint8_t *workerId = reinterpret_cast<uint8_t *>(data + size - 2);
         uint8_t *nWorkers = reinterpret_cast<uint8_t *>(data + size - 1);
 
-        union
-        {
-            double d;
-            int32_t i;
-        } xRotation;
+        float *xRotation = reinterpret_cast<float *>(data + size - 10);
+        float *yRotation = reinterpret_cast<float *>(data + size - 6);
 
-        union
-        {
-            double d;
-            int32_t i;
-        } yRotation;
-
-        xRotation.i = *(data + size - 10) | uint32_t(*(data + size - 9)) << 8 | uint32_t(*(data + size - 8)) << 16 | uint32_t(*(data + size - 7)) << 24;
-        yRotation.i = *(data + size - 6) | uint32_t(*(data + size - 5)) << 8 | uint32_t(*(data + size - 4)) << 16 | uint32_t(*(data + size - 3)) << 24;
-
-        std::cout << "Rotations: " << xRotation.d << " " << yRotation.d << std::endl;
+        std::cout << "Rotations: " << *xRotation << " " << *yRotation << std::endl;
 
         std::string processedScene(data, size - 10);
         std::istringstream iss(processedScene);
@@ -78,6 +69,20 @@ extern "C"
 
         cereal::BinaryInputArchive iarchive(iss);
         iarchive(camera, world);
+
+        glm::dmat4 rotationY =
+            glm::rotate(glm::dmat4(1.0), (double)*yRotation, glm::dvec3(0.0, 1.0, 0.0));
+
+        // glm::dmat4 rotationZ =
+        //     glm::rotate(glm::dmat4(1.0), posChange,
+        //                 glm::dvec3(0.0, 0.0, 1.0));
+
+        camera->position = rotationY * camera->position;
+
+        // matrix.makeRotationY(clock.getDelta() * 2 * Math.PI / period);
+
+        // this->camera->position.x += posChange;
+        camera->updateTransform();
 
         Renderer renderer(camera);
 
@@ -117,3 +122,18 @@ extern "C"
         emscripten_worker_respond(&byteBuffer[0], bufferLength + 1);
     }
 }
+#else
+
+Canvas renderScene(const std::string &sceneDesc)
+{
+    std::shared_ptr<World> world;
+    std::shared_ptr<Camera> camera;
+
+    ObjectLoader objectLoader;
+    std::tie(camera, world) = objectLoader.loadYaml(sceneDesc);
+    Renderer rayTraceRenderer = Renderer(camera);
+    rayTraceRenderer.render(*world);
+
+    return rayTraceRenderer.canvas;
+}
+#endif

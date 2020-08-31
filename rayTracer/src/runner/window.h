@@ -9,7 +9,6 @@
 #include <vector>
 #include <cmath>
 
-#include <emscripten.h>
 #include <iostream>
 
 #include <unordered_map>
@@ -21,8 +20,11 @@
 // #include "world.h"
 // #include "objectLoader.h"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
 void processCback(char *data, int size, void *arg);
 void renderCback(char *data, int size, void *arg);
+#endif
 
 class Window
 {
@@ -31,16 +33,14 @@ private:
     SDL_Renderer *renderer;
     SDL_Texture *texTarget;
     // static const int PIXELS_PER_BATCH = 20000;
-    const double STEP_SIZE = 0.05f;
+    const float STEP_SIZE = 0.05f;
 
     SDL_Event event;
 
-    worker_handle sceneProcessWorker;
+    std::vector<worker_handle> workers;
 
-    int nWorkers;
-
-    int32_t xRotation = 0;
-    int32_t yRotation = 0;
+    float xRotation = 0.0f;
+    float yRotation = 0.0f;
 
     // std::string sceneDesc;
     // std::shared_ptr<Camera> camera;
@@ -59,26 +59,29 @@ private:
 
 public:
     Window();
-    void processScene(const std::string &sceneDesc);
+
     // Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<World> &world);
     ~Window();
 
     bool running = false;
     bool somethingChanged = false;
 
+    int nWorkers;
+
     int width;
     int height;
 
+#ifdef __EMSCRIPTEN__
+    void processScene(const std::string &sceneDesc);
     void destroyProcessorWorker();
+    std::vector<char> sceneBinary;
+    std::unordered_map<uint8_t, std::vector<char>> pixelsBinary;
+#endif
 
     void moveLeft();
     void moveRight();
     void moveUp();
     void moveDown();
-
-    std::vector<char> sceneBinary;
-
-    std::unordered_map<uint8_t, std::vector<char>> pixelsBinary;
 
     void initWindow();
     void update();

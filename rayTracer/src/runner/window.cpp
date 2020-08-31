@@ -13,10 +13,15 @@ Window::Window()
         this->nWorkers = processor_count;
 }
 
+#ifdef __EMSCRIPTEN__
 void Window::processScene(const std::string &sceneDesc)
 {
-    this->sceneProcessWorker = emscripten_create_worker("RayTracer.wasm.js");
-    emscripten_call_worker(this->sceneProcessWorker, "processScene", const_cast<char *>(sceneDesc.c_str()), sceneDesc.length(), processCback, (void *)42);
+    for (int i = 0; i < this->nWorkers; ++i)
+    {
+        this->workers.push_back(emscripten_create_worker("RayTracer.wasm.js"));
+    }
+
+    emscripten_call_worker(this->workers.at(0), "processScene", const_cast<char *>(sceneDesc.c_str()), sceneDesc.length(), processCback, (void *)42);
 
     // this->sceneDesc = sceneDesc;
 
@@ -30,8 +35,9 @@ void Window::processScene(const std::string &sceneDesc)
 
 void Window::destroyProcessorWorker()
 {
-    emscripten_destroy_worker(this->sceneProcessWorker);
+    emscripten_destroy_worker(this->workers.at(0));
 }
+#endif
 
 // Window::Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<World> &world)
 // {
@@ -78,8 +84,10 @@ void Window::step()
 {
     handleEvents();
 
-    if (this->somethingChanged)
+    if (somethingChanged)
     {
+        somethingChanged = false;
+        running = true;
         update();
     }
 }
@@ -94,39 +102,38 @@ void Window::run()
 
 void Window::handleEvents()
 {
-    SDL_WaitEvent(&event);
-    switch (event.type)
+    while (SDL_PollEvent(&event))
     {
-    case SDL_QUIT:
-        this->running = false;
-        break;
-    case SDL_KEYDOWN:
-        switch (event.key.keysym.sym)
+        // SDL_WaitEvent(&event);
+        switch (event.type)
         {
-        case SDLK_ESCAPE:
+        case SDL_QUIT:
             this->running = false;
             break;
-        case SDLK_LEFT:
-            moveLeft();
-            this->somethingChanged = true;
+        case SDL_KEYDOWN:
+            switch (event.key.keysym.sym)
+            {
+            case SDLK_ESCAPE:
+                this->running = false;
+                break;
+            case SDLK_LEFT:
+                moveLeft();
+                break;
+            case SDLK_RIGHT:
+                moveRight();
+                break;
+            case SDLK_UP:
+                moveUp();
+                break;
+            case SDLK_DOWN:
+                moveDown();
+                break;
+                // cases for other keypresses
+            }
             break;
-        case SDLK_RIGHT:
-            moveRight();
-            this->somethingChanged = true;
+        default:
             break;
-        case SDLK_UP:
-            moveUp();
-            this->somethingChanged = true;
-            break;
-        case SDLK_DOWN:
-            moveDown();
-            this->somethingChanged = true;
-            break;
-            // cases for other keypresses
         }
-        break;
-    default:
-        break;
     }
 }
 
@@ -137,24 +144,16 @@ void Window::moveDown() { moveCamera(STEP_SIZE, 0); }
 
 void Window::moveCamera(float posChange, uint8_t axis)
 {
-    union
-    {
-        double d;
-        int32_t i;
-    } n;
-
     if (axis == 0)
     {
-        n.d = this->xRotation;
-        this->xRotation += n.i;
+        this->xRotation += posChange;
     }
     else if (axis == 1)
     {
-        n.d = this->yRotation;
-        this->yRotation += n.i;
+        this->yRotation += posChange;
     }
 
-    this->update();
+    this->somethingChanged = true;
 
     // // old from here - move to raytracer module
     // glm::dmat4 rotationY =
@@ -172,16 +171,25 @@ void Window::moveCamera(float posChange, uint8_t axis)
     // this->camera->updateTransform();
 }
 
-std::vector<uint8_t> integerToByteArray(uint32_t n)
+std::vector<uint8_t> floatToByteArray(float d)
 {
-    std::vector<uint8_t> bytes(4);
+    uint8_t *bytePointer = reinterpret_cast<uint8_t *>(&d);
+    return std::vector<uint8_t>(bytePointer, bytePointer + sizeof(float));
 
-    bytes[0] = (n >> 24) & 0xFF;
-    bytes[1] = (n >> 16) & 0xFF;
-    bytes[2] = (n >> 8) & 0xFF;
-    bytes[3] = n & 0xFF;
+    // union {
+    //     float d;
+    //     int32_t i;
+    // } n;
 
-    return bytes;
+    // n.d = d;
+
+    // std::vector<uint8_t> bytes(4);
+    // bytes[0] = (n.i >> 24) & 0xFF;
+    // bytes[1] = (n.i >> 16) & 0xFF;
+    // bytes[2] = (n.i >> 8) & 0xFF;
+    // bytes[3] = n.i & 0xFF;
+
+    // return bytes;
 }
 
 void Window::update()
@@ -194,21 +202,18 @@ void Window::update()
     SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
     SDL_RenderClear(this->renderer);
 
-    for (int i = 0; i < this->nWorkers; ++i)
+    std::cout << "update" << std::endl;
+    this->running = true;
+
+    int i = 0;
+    for (auto &renderWorker : this->workers)
     {
-        std::cout << "update" << std::endl;
-        this->running = true;
-
-        worker_handle renderWorker;
-
-        if (i == 0)
-            renderWorker = this->sceneProcessWorker;
-        else
-            renderWorker = emscripten_create_worker("RayTracer.wasm.js");
-
         // rotation info
-        std::vector<uint8_t> xRotationBytes = integerToByteArray(this->xRotation);
-        std::vector<uint8_t> yRotationBytes = integerToByteArray(this->yRotation);
+
+        std::cout << "Send rotations: " << this->xRotation << " " << this->yRotation << std::endl;
+
+        std::vector<uint8_t> xRotationBytes = floatToByteArray(this->xRotation);
+        std::vector<uint8_t> yRotationBytes = floatToByteArray(this->yRotation);
 
         // TODO implement rotation based on this in the renderer api
         for (auto &byte : xRotationBytes)
@@ -220,7 +225,14 @@ void Window::update()
         this->sceneBinary.push_back((char)i);
         this->sceneBinary.push_back((char)this->nWorkers);
 
+        float *xRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 10);
+        float *yRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 6);
+
+        std::cout << "Receive Rotations: " << *xRotationp << " " << *yRotationp << std::endl;
+
         emscripten_call_worker(renderWorker, "renderScene", &this->sceneBinary[0], this->sceneBinary.size(), renderCback, (void *)42);
+
+        i++;
 
         // this->somethingChanged = false;
     }
