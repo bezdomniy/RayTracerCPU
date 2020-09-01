@@ -60,6 +60,8 @@ private:
 public:
     Window();
 
+    std::vector<bool> busyWorkers;
+
     // Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<World> &world);
     ~Window();
 

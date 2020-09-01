@@ -18,7 +18,8 @@ void Window::processScene(const std::string &sceneDesc)
 {
     for (int i = 0; i < this->nWorkers; ++i)
     {
-        this->workers.push_back(emscripten_create_worker("RayTracer.wasm.js"));
+        this->workers.push_back(emscripten_create_worker("/js/RayTracer.wasm.js"));
+        this->busyWorkers.push_back(false);
     }
 
     emscripten_call_worker(this->workers.at(0), "processScene", const_cast<char *>(sceneDesc.c_str()), sceneDesc.length(), processCback, (void *)42);
@@ -85,7 +86,7 @@ void Window::step()
     handleEvents();
 
     // TODO only start updating if not already running - otherwise you will get runtime errors
-    if (somethingChanged)
+    if (somethingChanged && !running)
     {
         somethingChanged = false;
         running = true;
@@ -210,6 +211,8 @@ void Window::update()
     for (auto &renderWorker : this->workers)
     {
         // rotation info
+
+        this->busyWorkers.at(i) = true;
 
         std::cout << "Send rotations: " << this->xRotation << " " << this->yRotation << std::endl;
 
