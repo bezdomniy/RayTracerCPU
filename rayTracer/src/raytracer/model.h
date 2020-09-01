@@ -23,6 +23,8 @@ public:
 	Model(const Model &model);
 	~Model();
 
+	void build(std::string const &path, bool buildBVH);
+
 	static std::shared_ptr<Group> buildBoundingVolumeHierarchy(std::vector<std::shared_ptr<Shape>> &shapes);
 
 	// std::vector<glm::dvec3> vertices;

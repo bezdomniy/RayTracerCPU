@@ -11,6 +11,15 @@ Model::Model()
 // TODO use uvs and normals in model loading
 Model::Model(std::string const &path, bool buildBVH)
 {
+	build(path,buildBVH);
+}
+
+Model::Model(const Model &model)
+{
+	this->mesh = std::make_shared<Group>(*(model.mesh));
+}
+
+void Model::build(std::string const &path, bool buildBVH) {
 	// this->mesh = std::make_shared<Group>();
 	std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
 	std::vector<glm::dvec3> temp_vertices;
@@ -154,11 +163,6 @@ Model::Model(std::string const &path, bool buildBVH)
 	// 	glm::dvec3 normal = temp_normals[normalIndex - 1];
 	// 	this->normals.push_back(normal);
 	// }
-}
-
-Model::Model(const Model &model)
-{
-	this->mesh = std::make_shared<Group>(*(model.mesh));
 }
 
 std::shared_ptr<Group> Model::recursiveBuild(std::vector<std::shared_ptr<Shape>> &shapes, uint32_t start, uint32_t end)

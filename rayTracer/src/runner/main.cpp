@@ -10,10 +10,15 @@ void processCback(char *data, int size, void *arg)
 {
   std::cout << "Process Callback" << std::endl;
 
-  window.sceneBinary = std::vector<char>(data, data + size - 4);
+  window.sceneBinary = std::vector<char>(data, data + size - (sizeof(int)*2));
 
-  window.width = *(data + size - 3) | uint16_t(*(data + size - 4)) << 8;
-  window.height = *(data + size - 1) | uint16_t(*(data + size - 2)) << 8;
+  window.width = *reinterpret_cast<int *>(data + size - (sizeof(int)*2));
+  window.height = *reinterpret_cast<int *>(data + size - sizeof(int));
+
+  // window.width = *(data + size - 3) | uint16_t(*(data + size - 4)) << 8;
+  // window.height = *(data + size - 1) | uint16_t(*(data + size - 2)) << 8;
+
+  // std::cout << "width, height: " << window.width << ", " << window.height << std::endl;
   window.initWindow();
 
   // window.destroyProcessorWorker();
@@ -27,9 +32,9 @@ void renderCback(char *data, int size, void *arg)
   std::cout << "Render Callback: " << size << std::endl;
 
   // window.pixelsBinary = std::vector<char>(data, data + size - 1);
-  uint8_t *workerId = reinterpret_cast<uint8_t *>(data + size - 1);
+  uint8_t *workerId = reinterpret_cast<uint8_t *>(data + size - sizeof(uint8_t));
 
-  window.pixelsBinary[*workerId] = std::vector<char>(data, data + size - 1);
+  window.pixelsBinary[*workerId] = std::vector<char>(data, data + size - sizeof(uint8_t));
 
   window.draw(*workerId);
   // window.somethingChanged = false;
@@ -46,7 +51,7 @@ void loop()
 
 int main(int argc, char const *argv[])
 {
-  window.processScene("/groups.yaml");
+  window.processScene("/scenes/skybox.yaml");
 
   // window.step();
   emscripten_set_main_loop(loop, 2, true);

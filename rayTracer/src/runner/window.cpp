@@ -84,6 +84,7 @@ void Window::step()
 {
     handleEvents();
 
+    // TODO only start updating if not already running - otherwise you will get runtime errors
     if (somethingChanged)
     {
         somethingChanged = false;
@@ -225,6 +226,7 @@ void Window::update()
         this->sceneBinary.push_back((char)i);
         this->sceneBinary.push_back((char)this->nWorkers);
 
+        // TODO fix ints to sizes of floats
         float *xRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 10);
         float *yRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 6);
 

@@ -128,6 +128,13 @@ std::shared_ptr<Shape> ObjectLoader::shapeFromDefinition(ShapeDefinition &shapeD
     }
     ret = group;
   }
+  else if (shapeDefinition.shapeType == "obj")
+  {
+    Model model;
+    model.build(shapeDefinition.filePath,true);
+
+    ret = model.mesh;
+  }
   else if (shapeDefinition.shapeType == "camera")
   {
     ret = std::make_shared<Camera>(
@@ -202,6 +209,10 @@ void ObjectLoader::parseShape(const YAML::Node &node, ShapeDefinition &shapeDefi
     else if (nextKey == "args")
     {
       parseArgs(it->second, shapeDefinition.args);
+    }
+    else if (nextKey == "file")
+    {
+      shapeDefinition.filePath = it->second.as<std::string>();
     }
     else if (nextKey == "material")
     {

@@ -1,0 +1,48 @@
+- add: camera
+  width: 800
+  height: 400
+  field-of-view: 0.8
+  from: [1, 2, -10]
+  to: [0, 1.1, 0]
+  up: [0, 1, 0]
+
+- add: light
+  at: [-100, 100, -100]
+  intensity: [1, 1, 1]
+
+- add: plane
+  material:
+    color: [1, 1, 1]
+    diffuse: 0.1
+    specular: 0
+    ambient: 0
+    reflective: 0.4
+
+- add: cylinder
+  args: [0, 0.1, 1]
+  material:
+    color: [1, 1, 1]
+    diffuse: 0.2
+    specular: 0
+    ambient: 0
+    reflective: 0.1
+
+- define: dragon
+  value:
+    add: obj
+    file: /models/dragon.obj
+    transform:
+      - [scale, 0.4, 0.4, 0.4]
+      # - [translate, 0, 1.1, 0]
+
+- add: dragon
+  shadow: false
+  transform:
+    - [rotate-y, 1.9]
+    - [translate, 0, 0.3, 0]
+  material:
+    color: [0.9, 0.2, 0.4]
+    ambient: 0.2
+    diffuse: 0.8
+    specular: 0.7
+    shininess: 20

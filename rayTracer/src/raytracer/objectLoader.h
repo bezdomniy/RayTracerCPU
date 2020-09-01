@@ -13,6 +13,7 @@
 #include "group.h"
 #include "triangle.h"
 #include "firBranch.h"
+#include "model.h"
 #include "world.h"
 
 #include "yaml-cpp/yaml.h"
@@ -54,6 +55,7 @@ private:
     Definition transformDefinition;
     std::vector<Value> args;
     std::vector<ShapeDefinition> children;
+    std::string filePath;
   };
 
   std::unordered_map<std::string, std::shared_ptr<Definition>> definitions;

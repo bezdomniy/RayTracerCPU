@@ -26,25 +26,33 @@ extern "C"
         {
             cereal::BinaryOutputArchive oarchive(ss);
             oarchive(camera, world);
-        }
+        } 
         std::string scene = ss.str();
 
         std::vector<char> byteBuffer(scene.begin(), scene.end());
 
         // add width as 2 bytes to returned array
-        uint16_t width = camera->hsize;
-        char widthLo = width & 0xFF;
-        char widthHi = width >> 8;
+        // uint16_t width = camera->hsize;
+        // char widthLo = width & 0xFF;
+        // char widthHi = width >> 8;
 
-        uint16_t height = camera->vsize;
-        char heightLo = height & 0xFF;
-        char heightHi = height >> 8;
+        // uint16_t height = camera->vsize;
+        // char heightLo = height & 0xFF;
+        // char heightHi = height >> 8;
 
-        byteBuffer.push_back(widthHi);
-        byteBuffer.push_back(widthLo);
+        // byteBuffer.push_back(widthHi);
+        // byteBuffer.push_back(widthLo);
 
-        byteBuffer.push_back(heightHi);
-        byteBuffer.push_back(heightLo);
+        // byteBuffer.push_back(heightHi);
+        // byteBuffer.push_back(heightLo);
+
+        uint8_t *widthBytePointer = reinterpret_cast<uint8_t *>(&(camera->hsize));
+        std::vector<uint8_t> widthBytes(widthBytePointer, widthBytePointer + sizeof(int));
+        byteBuffer.insert(byteBuffer.end(), widthBytes.begin(), widthBytes.end());
+
+        uint8_t *heightBytePointer = reinterpret_cast<uint8_t *>(&(camera->vsize)); 
+        std::vector<uint8_t> heightBytes(heightBytePointer, heightBytePointer + sizeof(int));
+        byteBuffer.insert(byteBuffer.end(), heightBytes.begin(), heightBytes.end()); 
 
         emscripten_worker_respond(&byteBuffer[0], byteBuffer.size());
     }
@@ -70,6 +78,9 @@ extern "C"
         cereal::BinaryInputArchive iarchive(iss);
         iarchive(camera, world);
 
+        glm::dmat4 rotationX = 
+            glm::rotate(glm::dmat4(1.0), (double)*xRotation, glm::dvec3(1.0, 0.0, 0.0));
+
         glm::dmat4 rotationY =
             glm::rotate(glm::dmat4(1.0), (double)*yRotation, glm::dvec3(0.0, 1.0, 0.0));
 
@@ -77,12 +88,13 @@ extern "C"
         //     glm::rotate(glm::dmat4(1.0), posChange,
         //                 glm::dvec3(0.0, 0.0, 1.0));
 
+        camera->position = rotationX * camera->position;
         camera->position = rotationY * camera->position;
 
         // matrix.makeRotationY(clock.getDelta() * 2 * Math.PI / period);
 
         // this->camera->position.x += posChange;
-        camera->updateTransform();
+        camera->updateTransform(); 
 
         Renderer renderer(camera);
 
@@ -99,7 +111,7 @@ extern "C"
             {
                 for (int x = 0; x < camera->hsize; x++)
                 {
-                    pixelsToRender.push_back(std::make_pair(x, y));
+                    pixelsToRender.push_back(std::make_pair(x, y)); 
                 }
             }
         }
