@@ -16,7 +16,7 @@ ObjectLoader::loadYaml(const std::string &fileName)
 
   YAML::Node root;
 
-  if (std::filesystem::exists(fileName))
+  if (std::__fs::filesystem::exists(fileName))
   {
     std::cout << "Found found: " << fileName << std::endl;
     root = YAML::LoadFile(fileName);
@@ -131,7 +131,7 @@ std::shared_ptr<Shape> ObjectLoader::shapeFromDefinition(ShapeDefinition &shapeD
   else if (shapeDefinition.shapeType == "obj")
   {
     Model model;
-    model.build(shapeDefinition.filePath,true);
+    model.build(shapeDefinition.filePath, true);
 
     ret = model.mesh;
   }
