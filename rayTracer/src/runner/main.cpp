@@ -10,9 +10,9 @@ void processCback(char *data, int size, void *arg)
 {
   std::cout << "Process Callback" << std::endl;
 
-  window.sceneBinary = std::vector<char>(data, data + size - (sizeof(int)*2));
+  window.sceneBinary = std::vector<char>(data, data + size - (sizeof(int) * 2));
 
-  window.width = *reinterpret_cast<int *>(data + size - (sizeof(int)*2));
+  window.width = *reinterpret_cast<int *>(data + size - (sizeof(int) * 2));
   window.height = *reinterpret_cast<int *>(data + size - sizeof(int));
 
   // window.width = *(data + size - 3) | uint16_t(*(data + size - 4)) << 8;
@@ -39,7 +39,9 @@ void renderCback(char *data, int size, void *arg)
   window.draw(*workerId);
   // window.somethingChanged = false;
 
-  if (*workerId == window.nWorkers - 1) //TODO fix - wont work if finish in wrong order
+  window.busyWorkers.at(*workerId) = false;
+
+  if (std::all_of(window.busyWorkers.begin(), window.busyWorkers.end(), [](bool v) { return !v; }))
     window.running = false;
   // std::cout << size << std::endl;
 }
@@ -49,13 +51,28 @@ void loop()
   window.step();
 }
 
-int main(int argc, char const *argv[])
-{
-  window.processScene("/scenes/skybox.yaml");
+// int EMSCRIPTEN_KEEPALIVE main(int argc, char const *argv[])
+// {
+//   window.processScene("/scenes/christmas.yaml");
 
-  // window.step();
-  emscripten_set_main_loop(loop, 2, true);
+//   // window.step();
+//   emscripten_set_main_loop(loop, 2, true);
+// }
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+  void EMSCRIPTEN_KEEPALIVE mainf()
+  {
+    window.processScene("/scenes/skybox.yaml");
+
+    // window.step();
+    emscripten_set_main_loop(loop, 2, true);
+  }
+#ifdef __cplusplus
 }
+#endif
 
 #else
 
