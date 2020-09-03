@@ -1,15 +1,19 @@
 cmake_minimum_required(VERSION 3.10)
 project(RayTracer VERSION 0.1.0)
-set (CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# set (CMAKE_CXX_STANDARD 17)
+# set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT CMAKE_BUILD_TYPE)
-  set(CMAKE_BUILD_TYPE Release)
+#   set(CMAKE_BUILD_TYPE Release)
 endif()
 
 #set(CMAKE_CXX_FLAGS "-openmp-simd")
-set(CMAKE_CXX_FLAGS_DEBUG "-g ")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math ")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math")
+set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "")
+set(CMAKE_EXE_LINKER_FLAGS_RELEASE "")
+set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "")
+# CMAKE_EXE_LINKER_FLAGS_RELEASE
 
 add_subdirectory("src/raytracer")
 add_subdirectory("src/runner")
@@ -18,11 +22,11 @@ add_subdirectory("src/runner")
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 	message(STATUS "Setting compilation target to WASM")
 	# set(CMAKE_EXECUTABLE_SUFFIX ".html")
-	# set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
+	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
 
 	add_subdirectory(yaml-cpp)
 	add_subdirectory(glm)
-	# add_subdirectory(cpp-taskflow)
+	add_subdirectory(cpp-taskflow)
 else()
 	message(STATUS "Setting compilation target to native binary")
 
