@@ -1,4 +1,5 @@
 #include "window.h"
+#include <fstream>
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
@@ -6,9 +7,12 @@
 
 Window window;
 
+// TODO .obj files should only be downloaded by the processing worker, not the render workers
+// TODO texture files can be set to the url path on iliathoughts, rather than being put into the .data file
+// TODO maybe even the obj files can just be downloaded ad-hoc from the server
 void processCback(char *data, int size, void *arg)
 {
-  std::cout << "Process Callback" << std::endl;
+  // std::cout << "Process Callback" << std::endl;
 
   window.sceneBinary = std::vector<char>(data, data + size - (sizeof(int) * 2));
 
@@ -19,7 +23,10 @@ void processCback(char *data, int size, void *arg)
   // window.height = *(data + size - 1) | uint16_t(*(data + size - 2)) << 8;
 
   // std::cout << "width, height: " << window.width << ", " << window.height << std::endl;
-  window.initWindow();
+  if (!window.initialised)
+    window.initWindow();
+  else
+    window.updateSize();
 
   // window.destroyProcessorWorker();
   window.somethingChanged = true;
@@ -29,7 +36,7 @@ void processCback(char *data, int size, void *arg)
 
 void renderCback(char *data, int size, void *arg)
 {
-  std::cout << "Render Callback: " << size << std::endl;
+  // std::cout << "Render Callback: " << size << std::endl;
 
   // window.pixelsBinary = std::vector<char>(data, data + size - 1);
   uint8_t *workerId = reinterpret_cast<uint8_t *>(data + size - sizeof(uint8_t));
@@ -63,13 +70,70 @@ void loop()
 extern "C"
 {
 #endif
-  void EMSCRIPTEN_KEEPALIVE mainf()
+  // #include <emscripten/fetch.h>
+  //   void downloadSucceeded(emscripten_fetch_t *fetch)
+  //   {
+  //     printf("Finished downloading %llu bytes from URL %s.\n", fetch->numBytes, fetch->url);
+  //     // The data is now available at fetch->data[0] through fetch->data[fetch->numBytes-1];
+  //     emscripten_fetch_close(fetch); // Free data associated with the fetch.
+  //   }
+
+  //   void downloadFailed(emscripten_fetch_t *fetch)
+  //   {
+  //     printf("Downloading %s failed, HTTP failure status code: %d.\n", fetch->url, fetch->status);
+  //     emscripten_fetch_close(fetch); // Also free data on failure.
+  //   }
+
+  //   // TODO used fetch instead of preloading to download models and textures
+  //   void EMSCRIPTEN_KEEPALIVE test()
+  //   {
+  //     emscripten_fetch_attr_t attr;
+  //     emscripten_fetch_attr_init(&attr);
+  //     strcpy(attr.requestMethod, "GET");
+  //     attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
+  //     attr.onsuccess = downloadSucceeded;
+  //     attr.onerror = downloadFailed;
+  //     emscripten_fetch(&attr, "/rayTracerScenes/hippy.yaml");
+  // }
+
+  void EMSCRIPTEN_KEEPALIVE draw(const char *s)
   {
-    window.processScene("/scenes/skybox.yaml");
+    std::string sceneDesc(s);
+    window.processScene(sceneDesc);
+    window.xRotation = 0.0f;
+    window.yRotation = 0.0f;
 
     // window.step();
-    emscripten_set_main_loop(loop, 2, true);
+    if (!window.initialised)
+    {
+      std::cout << "starting loop" << std::endl;
+      emscripten_set_main_loop(loop, 0, true);
+    }
   }
+
+  void EMSCRIPTEN_KEEPALIVE moveLeft()
+  {
+    window.moveLeft();
+  }
+
+  void EMSCRIPTEN_KEEPALIVE moveRight()
+  {
+    window.moveRight();
+  }
+
+// void EMSCRIPTEN_KEEPALIVE getModel(const char *url)
+// {
+//   std::string urlText(url);
+
+//   std::cout << "url: : " << urlText << '\n';
+
+//   std::size_t found = urlText.find_last_of("/\\");
+//   std::string newPath = "/models/" + urlText.substr(found + 1);
+
+//   emscripten_wget(url, newPath.c_str());
+//   std::cout << " loaded to: "
+//             << newPath << std::endl;
+// }
 #ifdef __cplusplus
 }
 #endif

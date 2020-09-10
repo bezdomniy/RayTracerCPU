@@ -7,7 +7,7 @@ add_executable(Runner ${RUNNERSOURCES})
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(CMAKE_EXECUTABLE_SUFFIX ".js")
-    set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2" )
+    set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2 " )
     
 
 # # TODO change all to target_compile_options() and target_link_options()

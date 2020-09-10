@@ -26,6 +26,11 @@
 #include <unordered_map>
 #include <vector>
 
+#ifdef __EMSCRIPTEN__
+// #include <emscripten.h>
+#include <emscripten/fetch.h>
+#endif
+
 class ObjectLoader
 {
 private:
@@ -74,6 +79,12 @@ private:
   void parseArgs(const YAML::Node &node, std::vector<Value> &args);
   void parseShape(const YAML::Node &node, ShapeDefinition &shapeDefinition);
   void parseUV(const YAML::Node &node, std::shared_ptr<UVTexture> &uvTexture, int face = 0);
+
+#ifdef __EMSCRIPTEN__
+  static void downloadAsset(const std::string &assetPath, const std::string &targetPath);
+  static void downloadSucceeded(emscripten_fetch_t *fetch);
+  static void downloadFailed(emscripten_fetch_t *fetch);
+#endif
 
 public:
   ObjectLoader();

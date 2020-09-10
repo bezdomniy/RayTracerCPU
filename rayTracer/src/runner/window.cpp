@@ -16,10 +16,13 @@ Window::Window()
 #ifdef __EMSCRIPTEN__
 void Window::processScene(const std::string &sceneDesc)
 {
-    for (int i = 0; i < this->nWorkers; ++i)
+    if (workers.empty())
     {
-        this->workers.push_back(emscripten_create_worker("/js/RayTracer.wasm.js"));
-        this->busyWorkers.push_back(false);
+        for (int i = 0; i < this->nWorkers; ++i)
+        {
+            this->workers.push_back(emscripten_create_worker("/js/RayTracer.wasm.js"));
+            this->busyWorkers.push_back(false);
+        }
     }
 
     emscripten_call_worker(this->workers.at(0), "processScene", const_cast<char *>(sceneDesc.c_str()), sceneDesc.length(), processCback, (void *)42);
@@ -66,19 +69,34 @@ Window::~Window()
 
 void Window::initWindow()
 {
+
+    SDL_SetHint(SDL_HINT_EMSCRIPTEN_KEYBOARD_ELEMENT, "#canvas");
     SDL_SetMainReady();
     SDL_Init(SDL_INIT_VIDEO);
-    // SDL_CreateWindowAndRenderer(this->width, this->height, 0, &this->window, &this->renderer);
-
     this->window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
                                     SDL_WINDOWPOS_UNDEFINED, this->width, this->height, 0);
     this->renderer = SDL_CreateRenderer(this->window, -1,
                                         SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
 
-    this->texTarget = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888,
+    this->texTarget = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888,
                                         SDL_TEXTUREACCESS_TARGET, this->width, this->height);
 
     // this->running = true;
+    this->initialised = true;
+
+    std::cout << "Created window." << std::endl;
+}
+
+void Window::updateSize()
+{
+    SDL_SetRenderDrawColor(this->renderer, 255, 255, 255, 255);
+    SDL_RenderClear(this->renderer);
+    SDL_RenderPresent(this->renderer);
+
+    SDL_SetWindowSize(window, this->width, this->height);
+    SDL_DestroyTexture(this->texTarget);
+    this->texTarget = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888,
+                                        SDL_TEXTUREACCESS_TARGET, this->width, this->height);
 }
 
 void Window::step()
@@ -203,8 +221,7 @@ void Window::update()
 
     SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
     SDL_RenderClear(this->renderer);
-
-    std::cout << "update" << std::endl;
+    // std::cout << "update" << std::endl;
     this->running = true;
 
     int i = 0;
@@ -214,7 +231,7 @@ void Window::update()
 
         this->busyWorkers.at(i) = true;
 
-        std::cout << "Send rotations: " << this->xRotation << " " << this->yRotation << std::endl;
+        // std::cout << "Send rotations: " << this->xRotation << " " << this->yRotation << std::endl;
 
         std::vector<uint8_t> xRotationBytes = floatToByteArray(this->xRotation);
         std::vector<uint8_t> yRotationBytes = floatToByteArray(this->yRotation);
@@ -233,7 +250,7 @@ void Window::update()
         float *xRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 10);
         float *yRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 6);
 
-        std::cout << "Receive Rotations: " << *xRotationp << " " << *yRotationp << std::endl;
+        // std::cout << "Receive Rotations: " << *xRotationp << " " << *yRotationp << std::endl;
 
         emscripten_call_worker(renderWorker, "renderScene", &this->sceneBinary[0], this->sceneBinary.size(), renderCback, (void *)42);
 

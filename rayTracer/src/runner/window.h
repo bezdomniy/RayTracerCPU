@@ -39,9 +39,6 @@ private:
 
     std::vector<worker_handle> workers;
 
-    float xRotation = 0.0f;
-    float yRotation = 0.0f;
-
     // std::string sceneDesc;
     // std::shared_ptr<Camera> camera;
 
@@ -61,6 +58,10 @@ public:
     Window();
 
     std::vector<bool> busyWorkers;
+
+    bool initialised = false;
+    float xRotation = 0.0f;
+    float yRotation = 0.0f;
 
     // Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<World> &world);
     ~Window();
@@ -86,6 +87,7 @@ public:
     void moveDown();
 
     void initWindow();
+    void updateSize();
     void update();
     void draw(uint8_t workerId);
     void step();

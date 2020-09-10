@@ -18,12 +18,12 @@ ObjectLoader::loadYaml(const std::string &fileName)
 
   if (std::__fs::filesystem::exists(fileName))
   {
-    std::cout << "Found found: " << fileName << std::endl;
+    // std::cout << "Found found: " << fileName << std::endl;
     root = YAML::LoadFile(fileName);
   }
   else
   {
-    std::cout << "Found not found: " << fileName << std::endl;
+    // std::cout << "Found not found: " << fileName << std::endl;
     root = YAML::Load(fileName);
   }
 
@@ -130,6 +130,16 @@ std::shared_ptr<Shape> ObjectLoader::shapeFromDefinition(ShapeDefinition &shapeD
   }
   else if (shapeDefinition.shapeType == "obj")
   {
+    if (!std::__fs::filesystem::exists(shapeDefinition.filePath))
+      downloadAsset(shapeDefinition.filePath, shapeDefinition.filePath);
+
+    // std::ifstream infile1;
+    // infile1.open(shapeDefinition.filePath);
+    // while (infile1.good())
+    //   std::cout << (char)infile1.get();
+
+    // exit(0);
+
     Model model;
     model.build(shapeDefinition.filePath, true);
 
@@ -865,6 +875,9 @@ void ObjectLoader::parseUV(const YAML::Node &node, std::shared_ptr<UVTexture> &u
   }
   else if (uvPatternType == "image")
   {
+    if (!std::__fs::filesystem::exists(imageFileName))
+      downloadAsset(imageFileName, imageFileName);
+
     if (!face)
       uvTexture = std::make_shared<ImageTexture>(imageFileName);
     else
@@ -884,3 +897,39 @@ void ObjectLoader::parseUV(const YAML::Node &node, std::shared_ptr<UVTexture> &u
     }
   }
 }
+
+#ifdef __EMSCRIPTEN__
+void ObjectLoader::downloadSucceeded(emscripten_fetch_t *fetch)
+{
+  printf("Finished downloading %llu bytes from URL %s.\n", fetch->numBytes, fetch->url);
+
+  std::__fs::filesystem::path p(fetch->url);
+  std::__fs::filesystem::path dir = p.parent_path();
+
+  if (!std::__fs::filesystem::exists(dir))
+    std::__fs::filesystem::create_directories(dir);
+
+  std::ofstream outfile(fetch->url, std::ios::out);
+  outfile.write(fetch->data, fetch->numBytes);
+  // The data is now available at fetch->data[0] through fetch->data[fetch->numBytes-1];
+  emscripten_fetch_close(fetch); // Free data associated with the fetch.
+}
+
+void ObjectLoader::downloadFailed(emscripten_fetch_t *fetch)
+{
+  printf("Downloading %s failed, HTTP failure status code: %d.\n", fetch->url, fetch->status);
+  emscripten_fetch_close(fetch); // Also free data on failure.
+}
+
+void ObjectLoader::downloadAsset(const std::string &assetPath, const std::string &targetPath)
+{
+  emscripten_fetch_attr_t attr;
+  emscripten_fetch_attr_init(&attr);
+  strcpy(attr.requestMethod, "GET");
+  attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY | EMSCRIPTEN_FETCH_SYNCHRONOUS | EMSCRIPTEN_FETCH_REPLACE;
+  attr.onsuccess = downloadSucceeded;
+  attr.destinationPath = targetPath.c_str();
+  attr.onerror = downloadFailed;
+  emscripten_fetch(&attr, assetPath.c_str());
+}
+#endif

@@ -26,7 +26,7 @@ extern "C"
         {
             cereal::BinaryOutputArchive oarchive(ss);
             oarchive(camera, world);
-        } 
+        }
         std::string scene = ss.str();
 
         std::vector<char> byteBuffer(scene.begin(), scene.end());
@@ -50,9 +50,9 @@ extern "C"
         std::vector<uint8_t> widthBytes(widthBytePointer, widthBytePointer + sizeof(int));
         byteBuffer.insert(byteBuffer.end(), widthBytes.begin(), widthBytes.end());
 
-        uint8_t *heightBytePointer = reinterpret_cast<uint8_t *>(&(camera->vsize)); 
+        uint8_t *heightBytePointer = reinterpret_cast<uint8_t *>(&(camera->vsize));
         std::vector<uint8_t> heightBytes(heightBytePointer, heightBytePointer + sizeof(int));
-        byteBuffer.insert(byteBuffer.end(), heightBytes.begin(), heightBytes.end()); 
+        byteBuffer.insert(byteBuffer.end(), heightBytes.begin(), heightBytes.end());
 
         emscripten_worker_respond(&byteBuffer[0], byteBuffer.size());
     }
@@ -65,7 +65,7 @@ extern "C"
         float *xRotation = reinterpret_cast<float *>(data + size - 10);
         float *yRotation = reinterpret_cast<float *>(data + size - 6);
 
-        std::cout << "Rotations: " << *xRotation << " " << *yRotation << std::endl;
+        // std::cout << "Rotations: " << *xRotation << " " << *yRotation << std::endl;
 
         std::string processedScene(data, size - 10);
         std::istringstream iss(processedScene);
@@ -78,7 +78,7 @@ extern "C"
         cereal::BinaryInputArchive iarchive(iss);
         iarchive(camera, world);
 
-        glm::dmat4 rotationX = 
+        glm::dmat4 rotationX =
             glm::rotate(glm::dmat4(1.0), (double)*xRotation, glm::dvec3(1.0, 0.0, 0.0));
 
         glm::dmat4 rotationY =
@@ -94,7 +94,7 @@ extern "C"
         // matrix.makeRotationY(clock.getDelta() * 2 * Math.PI / period);
 
         // this->camera->position.x += posChange;
-        camera->updateTransform(); 
+        camera->updateTransform();
 
         Renderer renderer(camera);
 
@@ -111,7 +111,7 @@ extern "C"
             {
                 for (int x = 0; x < camera->hsize; x++)
                 {
-                    pixelsToRender.push_back(std::make_pair(x, y)); 
+                    pixelsToRender.push_back(std::make_pair(x, y));
                 }
             }
         }
