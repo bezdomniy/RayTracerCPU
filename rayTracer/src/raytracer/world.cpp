@@ -2,7 +2,10 @@
 
 World::World() {}
 
-World::~World() {}
+World::~World()
+{
+  std::cout << "World destroyed." << std::endl;
+}
 
 void World::addLight(std::shared_ptr<PointLight> &light)
 {

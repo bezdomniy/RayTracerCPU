@@ -10,7 +10,12 @@ Window::Window()
     const auto processor_count = std::thread::hardware_concurrency();
 
     if (processor_count > 0)
+    {
+        // if (processor_count > 6)
+        //     this->nWorkers = 6;
+        // else
         this->nWorkers = processor_count;
+    }
 }
 
 #ifdef __EMSCRIPTEN__
@@ -195,21 +200,6 @@ std::vector<uint8_t> floatToByteArray(float d)
 {
     uint8_t *bytePointer = reinterpret_cast<uint8_t *>(&d);
     return std::vector<uint8_t>(bytePointer, bytePointer + sizeof(float));
-
-    // union {
-    //     float d;
-    //     int32_t i;
-    // } n;
-
-    // n.d = d;
-
-    // std::vector<uint8_t> bytes(4);
-    // bytes[0] = (n.i >> 24) & 0xFF;
-    // bytes[1] = (n.i >> 16) & 0xFF;
-    // bytes[2] = (n.i >> 8) & 0xFF;
-    // bytes[3] = n.i & 0xFF;
-
-    // return bytes;
 }
 
 void Window::update()
@@ -306,4 +296,18 @@ void Window::draw(uint8_t workerId)
     SDL_RenderPresent(this->renderer);
 
     // SDL_Delay(1000/30);
+}
+
+void Window::killWorker()
+{
+    if (auto &worker = workers.back())
+    {
+        emscripten_destroy_worker(worker);
+        workers.pop_back();
+    }
+}
+
+void Window::addWorker()
+{
+    this->workers.push_back(emscripten_create_worker("/js/RayTracer.wasm.js"));
 }

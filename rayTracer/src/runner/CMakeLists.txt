@@ -18,8 +18,8 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 # target_link_options(Runner PUBLIC "$<$<CONFIG:DEBUG>:${MY_DEBUG_OPTIONS}>")
 # target_link_options(Runner PUBLIC "$<$<CONFIG:RELEASE>:${MY_RELEASE_OPTIONS}>")
 
-    set_target_properties(Runner PROPERTIES LINK_FLAGS_RELEASE "-s WASM=1 -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
-    set_target_properties(Runner PROPERTIES LINK_FLAGS_DEBUG "-s WASM=1 -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
+    set_target_properties(Runner PROPERTIES LINK_FLAGS_RELEASE "-s WASM=1 -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -flto -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
+    set_target_properties(Runner PROPERTIES LINK_FLAGS_DEBUG "-s WASM=1 -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -flto -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
 
 else()
     target_include_directories(RayTracer PRIVATE ${SDL2_INCLUDE_DIRS})

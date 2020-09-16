@@ -26,29 +26,30 @@ void Renderer::render(World &world)
     }
   }
 
-  std::random_device rd;
-  std::mt19937 g(rd());
+  // std::random_device rd;
+  // std::mt19937 g(rd());
 
-  std::shuffle(pixels.begin(), pixels.end(), g);
+  // std::shuffle(pixels.begin(), pixels.end(), g);
 
 #ifdef __EMSCRIPTEN__
-  // tf::Executor executor(std::thread::hardware_concurrency());
-  // tf::Taskflow taskflow;
+#ifdef WITH_THREADS
+  tf::Executor executor(std::thread::hardware_concurrency());
+  tf::Taskflow taskflow;
 
-  // taskflow.parallel_for(
-  //     pixels.begin(), pixels.end(),
-  //     [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &pixel) {
-  //       renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
-  //     });
-  // executor.run(taskflow);
-  // executor.wait_for_all();
-  
+  taskflow.parallel_for(
+      pixels.begin(), pixels.end(),
+      [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &pixel) {
+        renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
+      });
+  executor.run(taskflow);
+  executor.wait_for_all();
+#else
   for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
-      it != pixels.end(); ++it)
+       it != pixels.end(); ++it)
   {
     renderPixel(world, *it, sqrtRaysPerPixel, halfSubPixelSize);
   }
-  
+#endif // WITH_THREADS
 #else
   std::for_each(
       std::execution::par_unseq, pixels.begin(), pixels.end(),

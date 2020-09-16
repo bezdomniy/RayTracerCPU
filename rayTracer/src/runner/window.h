@@ -92,4 +92,6 @@ public:
     void draw(uint8_t workerId);
     void step();
     void run();
+    void killWorker();
+    void addWorker();
 };

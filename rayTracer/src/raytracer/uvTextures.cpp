@@ -97,10 +97,14 @@ ImageTexture::ImageTexture(std::string const &path)
 
 ImageTexture::~ImageTexture()
 {
-    // for (auto &surface : this->textures)
-    // {
-    //     stbi_image_free(surface->rgb.get());
-    // }
+    for (auto &surface : this->textures)
+    {
+        // stbi_image_free(&surface->rgb[0]);
+        // printf("freeing texture.");
+
+        stbi_image_free(surface->rgb.data());
+        std::cout << "freed texture." << std::endl;
+    }
 }
 
 glm::dvec3 ImageTexture::rgbFromSurface(std::unique_ptr<Surface> &surface, int x, int y)

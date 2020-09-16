@@ -4,12 +4,12 @@ ObjectLoader::ObjectLoader(/* args */) {}
 
 ObjectLoader::~ObjectLoader() {}
 
-std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>>
+std::pair<std::shared_ptr<Camera>, std::unique_ptr<World>>
 ObjectLoader::loadYaml(const std::string &fileName)
 {
   // std::vector<std::shared_ptr<Shape>> ret;
   std::shared_ptr<Camera> camera;
-  std::shared_ptr<World> world = std::make_shared<World>();
+  std::unique_ptr<World> world = std::make_unique<World>();
 
   // world->shapes.clear();
   // world->lights.clear();
@@ -59,7 +59,7 @@ ObjectLoader::loadYaml(const std::string &fileName)
   }
 
   return std::pair<std::shared_ptr<Camera>,
-                   std::shared_ptr<World>>(camera, world);
+                   std::unique_ptr<World>>(camera, std::move(world));
 }
 
 std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)

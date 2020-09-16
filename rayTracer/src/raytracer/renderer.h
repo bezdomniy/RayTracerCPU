@@ -11,12 +11,12 @@
 #include "world.h"
 
 #ifdef __EMSCRIPTEN__
-// #include <taskflow/taskflow.hpp>
+#ifdef WITH_THREADS
+#include <taskflow/taskflow.hpp>
+#endif //WITH_THREADS
 #else
 #include <execution>
 #endif
-
-
 
 #include <algorithm>
 #include <glm/glm.hpp>
@@ -35,7 +35,7 @@ public:
   Renderer(std::shared_ptr<Camera> &c);
   ~Renderer();
 
-  static const int RAY_BOUNCE_LIMIT = 3;
+  static const int RAY_BOUNCE_LIMIT = 4;
   static const int RAYS_PER_PIXEL = 1;
   Canvas canvas;
 

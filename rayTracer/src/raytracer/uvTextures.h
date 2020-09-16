@@ -7,6 +7,8 @@
 #include <vector>
 #include <memory>
 
+#include <iostream>
+
 // #include <cereal/archives/binary.hpp>
 #include <cereal/types/base_class.hpp>
 #include <cereal/types/memory.hpp>
@@ -90,6 +92,11 @@ private:
             this->bpp = bpp;
         }
 
+        // TODO use zlib to compress rgb array and uncompress on read.
+        // https://github.com/emscripten-ports/zlib
+        // maybe that wont work ... we need to decompress to use
+        // TODO 2 try replacing stb with sdl_image and load to
+        // sdl surface
         std::vector<unsigned char> rgb;
         int w;
         int h;

@@ -24,7 +24,7 @@ void Model::build(std::string const &path, bool buildBVH)
 	// this->mesh = std::make_shared<Group>();
 	std::vector<unsigned int> vertexIndices, uvIndices, normalIndices;
 	std::vector<glm::dvec3> temp_vertices;
-	std::vector<glm::dvec2> temp_uvs;
+	// std::vector<glm::dvec2> temp_uvs;
 	std::vector<glm::dvec3> temp_normals;
 
 	std::string line;
@@ -51,16 +51,6 @@ void Model::build(std::string const &path, bool buildBVH)
 
 			vertex = glm::dvec3(x, y, z);
 			temp_vertices.push_back(vertex);
-		}
-		else if (line.substr(0, 2) == "vt")
-		{
-			std::istringstream vt(line.substr(3));
-			glm::dvec2 uv;
-			int U, V;
-			vt >> U;
-			vt >> V;
-			uv = glm::dvec2(U, V);
-			temp_uvs.push_back(uv);
 		}
 		else if (line.substr(0, 2) == "vn")
 		{
@@ -90,7 +80,7 @@ void Model::build(std::string const &path, bool buildBVH)
 					std::getline(f, vnStr, ' ');
 
 					vertexIndex[i] = atoi(vStr.c_str());
-					uvIndex[i] = atoi(vtStr.c_str());
+					// uvIndex[i] = atoi(vtStr.c_str());
 					normalIndex[i] = atoi(vnStr.c_str());
 				}
 			}
@@ -108,12 +98,22 @@ void Model::build(std::string const &path, bool buildBVH)
 			vertexIndices.push_back(vertexIndex[0]);
 			vertexIndices.push_back(vertexIndex[1]);
 			vertexIndices.push_back(vertexIndex[2]);
-			uvIndices.push_back(uvIndex[0]);
-			uvIndices.push_back(uvIndex[1]);
-			uvIndices.push_back(uvIndex[2]);
+			// uvIndices.push_back(uvIndex[0]);
+			// uvIndices.push_back(uvIndex[1]);
+			// uvIndices.push_back(uvIndex[2]);
 			normalIndices.push_back(normalIndex[0]);
 			normalIndices.push_back(normalIndex[1]);
 			normalIndices.push_back(normalIndex[2]);
+		}
+		else if (line.substr(0, 2) == "vt")
+		{
+			// std::istringstream vt(line.substr(3));
+			// glm::dvec2 uv;
+			// int U, V;
+			// vt >> U;
+			// vt >> V;
+			// uv = glm::dvec2(U, V);
+			// temp_uvs.push_back(uv);
 		}
 	}
 

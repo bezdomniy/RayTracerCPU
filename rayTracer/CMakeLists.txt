@@ -1,15 +1,18 @@
 cmake_minimum_required(VERSION 3.10)
 project(RayTracer VERSION 0.1.0)
-# set (CMAKE_CXX_STANDARD 17)
-# set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set (CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(NOT CMAKE_BUILD_TYPE)
 #   set(CMAKE_BUILD_TYPE Release)
 endif()
 
+set(USE_THREADS ON)
+
+
 #set(CMAKE_CXX_FLAGS "-openmp-simd")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math")
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -flto")
 # set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -msimd128")
 set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "")
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "")
@@ -27,7 +30,9 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 
 	add_subdirectory(yaml-cpp)
 	add_subdirectory(glm)
-	# add_subdirectory(cpp-taskflow)
+	if (${USE_THREADS})
+		add_subdirectory(cpp-taskflow)
+	endif()
 else()
 	message(STATUS "Setting compilation target to native binary")
 

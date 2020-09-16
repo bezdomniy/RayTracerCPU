@@ -3,7 +3,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
-#include <iostream>
+// #include <iostream>
 
 Window window;
 
@@ -12,17 +12,13 @@ Window window;
 // TODO maybe even the obj files can just be downloaded ad-hoc from the server
 void processCback(char *data, int size, void *arg)
 {
-  // std::cout << "Process Callback" << std::endl;
-
   window.sceneBinary = std::vector<char>(data, data + size - (sizeof(int) * 2));
+
+  std::cout << "Scene binary size: " << window.sceneBinary.size() << std::endl;
 
   window.width = *reinterpret_cast<int *>(data + size - (sizeof(int) * 2));
   window.height = *reinterpret_cast<int *>(data + size - sizeof(int));
 
-  // window.width = *(data + size - 3) | uint16_t(*(data + size - 4)) << 8;
-  // window.height = *(data + size - 1) | uint16_t(*(data + size - 2)) << 8;
-
-  // std::cout << "width, height: " << window.width << ", " << window.height << std::endl;
   if (!window.initialised)
     window.initWindow();
   else
@@ -30,6 +26,9 @@ void processCback(char *data, int size, void *arg)
 
   // window.destroyProcessorWorker();
   window.somethingChanged = true;
+
+  // window.killWorker();
+  // window.addWorker();
 
   // window.update();
 }
@@ -70,31 +69,10 @@ void loop()
 extern "C"
 {
 #endif
-  // #include <emscripten/fetch.h>
-  //   void downloadSucceeded(emscripten_fetch_t *fetch)
-  //   {
-  //     printf("Finished downloading %llu bytes from URL %s.\n", fetch->numBytes, fetch->url);
-  //     // The data is now available at fetch->data[0] through fetch->data[fetch->numBytes-1];
-  //     emscripten_fetch_close(fetch); // Free data associated with the fetch.
-  //   }
-
-  //   void downloadFailed(emscripten_fetch_t *fetch)
-  //   {
-  //     printf("Downloading %s failed, HTTP failure status code: %d.\n", fetch->url, fetch->status);
-  //     emscripten_fetch_close(fetch); // Also free data on failure.
-  //   }
-
-  //   // TODO used fetch instead of preloading to download models and textures
-  //   void EMSCRIPTEN_KEEPALIVE test()
-  //   {
-  //     emscripten_fetch_attr_t attr;
-  //     emscripten_fetch_attr_init(&attr);
-  //     strcpy(attr.requestMethod, "GET");
-  //     attr.attributes = EMSCRIPTEN_FETCH_LOAD_TO_MEMORY;
-  //     attr.onsuccess = downloadSucceeded;
-  //     attr.onerror = downloadFailed;
-  //     emscripten_fetch(&attr, "/rayTracerScenes/hippy.yaml");
-  // }
+  void EMSCRIPTEN_KEEPALIVE killWorker()
+  {
+    window.killWorker();
+  }
 
   void EMSCRIPTEN_KEEPALIVE draw(const char *s)
   {
