@@ -3,10 +3,12 @@
 // #include <chrono>
 // #include <thread>
 
+#ifdef __EMSCRIPTEN__
 Window::Window()
 {
     this->nWorkers = 1;
 
+#ifndef WITH_THREADS
     const auto processor_count = std::thread::hardware_concurrency();
 
     if (processor_count > 0)
@@ -16,9 +18,9 @@ Window::Window()
         // else
         this->nWorkers = processor_count;
     }
+#endif //WITH_THREADS
 }
 
-#ifdef __EMSCRIPTEN__
 void Window::processScene(const std::string &sceneDesc)
 {
     if (workers.empty())
@@ -42,54 +44,18 @@ void Window::processScene(const std::string &sceneDesc)
     // _drawTest();
 }
 
-void Window::destroyProcessorWorker()
+void Window::killWorker()
 {
-    emscripten_destroy_worker(this->workers.at(0));
-}
-#endif
-
-// Window::Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<World> &world)
-// {
-//     this->camera = camera;
-//     this->world = world;
-//     this->rayTraceRenderer = Renderer(this->camera);
-
-//     initWindow();
-// }
-
-Window::~Window()
-{
+    if (auto &worker = workers.back())
+    {
+        emscripten_destroy_worker(worker);
+        workers.pop_back();
+    }
 }
 
-// void Window::_drawTest()
-// {
-//     std::shared_ptr<World> world;
-//     std::shared_ptr<Camera> camera;
-
-//     ObjectLoader objectLoader;
-//     std::tie(camera, world) = objectLoader.loadYaml(sceneDesc);
-//     this->rayTraceRenderer = Renderer(this->camera);
-//     update();
-// }
-
-void Window::initWindow()
+void Window::addWorker()
 {
-
-    SDL_SetHint(SDL_HINT_EMSCRIPTEN_KEYBOARD_ELEMENT, "#canvas");
-    SDL_SetMainReady();
-    SDL_Init(SDL_INIT_VIDEO);
-    this->window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
-                                    SDL_WINDOWPOS_UNDEFINED, this->width, this->height, 0);
-    this->renderer = SDL_CreateRenderer(this->window, -1,
-                                        SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
-
-    this->texTarget = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888,
-                                        SDL_TEXTUREACCESS_TARGET, this->width, this->height);
-
-    // this->running = true;
-    this->initialised = true;
-
-    std::cout << "Created window." << std::endl;
+    this->workers.push_back(emscripten_create_worker("/js/RayTracer.wasm.js"));
 }
 
 void Window::updateSize()
@@ -102,152 +68,6 @@ void Window::updateSize()
     SDL_DestroyTexture(this->texTarget);
     this->texTarget = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888,
                                         SDL_TEXTUREACCESS_TARGET, this->width, this->height);
-}
-
-void Window::step()
-{
-    handleEvents();
-
-    // TODO only start updating if not already running - otherwise you will get runtime errors
-    if (somethingChanged && !running)
-    {
-        somethingChanged = false;
-        running = true;
-        update();
-    }
-}
-
-void Window::run()
-{
-    while (this->running)
-    {
-        step();
-    }
-}
-
-void Window::handleEvents()
-{
-    while (SDL_PollEvent(&event))
-    {
-        // SDL_WaitEvent(&event);
-        switch (event.type)
-        {
-        case SDL_QUIT:
-            this->running = false;
-            break;
-        case SDL_KEYDOWN:
-            switch (event.key.keysym.sym)
-            {
-            case SDLK_ESCAPE:
-                this->running = false;
-                break;
-            case SDLK_LEFT:
-                moveLeft();
-                break;
-            case SDLK_RIGHT:
-                moveRight();
-                break;
-            case SDLK_UP:
-                moveUp();
-                break;
-            case SDLK_DOWN:
-                moveDown();
-                break;
-                // cases for other keypresses
-            }
-            break;
-        default:
-            break;
-        }
-    }
-}
-
-void Window::moveLeft() { moveCamera(STEP_SIZE, 1); }
-void Window::moveRight() { moveCamera(-STEP_SIZE, 1); }
-void Window::moveUp() { moveCamera(-STEP_SIZE, 0); }
-void Window::moveDown() { moveCamera(STEP_SIZE, 0); }
-
-void Window::moveCamera(float posChange, uint8_t axis)
-{
-    if (axis == 0)
-    {
-        this->xRotation += posChange;
-    }
-    else if (axis == 1)
-    {
-        this->yRotation += posChange;
-    }
-
-    this->somethingChanged = true;
-
-    // // old from here - move to raytracer module
-    // glm::dmat4 rotationY =
-    //     glm::rotate(glm::dmat4(1.0), posChange, axis);
-
-    // // glm::dmat4 rotationZ =
-    // //     glm::rotate(glm::dmat4(1.0), posChange,
-    // //                 glm::dvec3(0.0, 0.0, 1.0));
-
-    // this->camera->position = rotationY * this->camera->position;
-
-    // // matrix.makeRotationY(clock.getDelta() * 2 * Math.PI / period);
-
-    // // this->camera->position.x += posChange;
-    // this->camera->updateTransform();
-}
-
-std::vector<uint8_t> floatToByteArray(float d)
-{
-    uint8_t *bytePointer = reinterpret_cast<uint8_t *>(&d);
-    return std::vector<uint8_t>(bytePointer, bytePointer + sizeof(float));
-}
-
-void Window::update()
-{
-    // this->rayTraceRenderer.render(*world);
-    // std::cout << "update?" << std::endl;
-    // if (somethingChanged && !running)
-    // {
-
-    SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
-    SDL_RenderClear(this->renderer);
-    // std::cout << "update" << std::endl;
-    this->running = true;
-
-    int i = 0;
-    for (auto &renderWorker : this->workers)
-    {
-        // rotation info
-
-        this->busyWorkers.at(i) = true;
-
-        // std::cout << "Send rotations: " << this->xRotation << " " << this->yRotation << std::endl;
-
-        std::vector<uint8_t> xRotationBytes = floatToByteArray(this->xRotation);
-        std::vector<uint8_t> yRotationBytes = floatToByteArray(this->yRotation);
-
-        // TODO implement rotation based on this in the renderer api
-        for (auto &byte : xRotationBytes)
-            this->sceneBinary.push_back(byte);
-
-        for (auto &byte : yRotationBytes)
-            this->sceneBinary.push_back(byte);
-
-        this->sceneBinary.push_back((char)i);
-        this->sceneBinary.push_back((char)this->nWorkers);
-
-        // TODO fix ints to sizes of floats
-        float *xRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 10);
-        float *yRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 6);
-
-        // std::cout << "Receive Rotations: " << *xRotationp << " " << *yRotationp << std::endl;
-
-        emscripten_call_worker(renderWorker, "renderScene", &this->sceneBinary[0], this->sceneBinary.size(), renderCback, (void *)42);
-
-        i++;
-
-        // this->somethingChanged = false;
-    }
 }
 
 void Window::draw(uint8_t workerId)
@@ -297,17 +117,266 @@ void Window::draw(uint8_t workerId)
 
     // SDL_Delay(1000/30);
 }
-
-void Window::killWorker()
+#else
+Window::Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<World> &world)
 {
-    if (auto &worker = workers.back())
+    this->camera = camera;
+    this->world = world;
+    this->rayTraceRenderer = Renderer(this->camera);
+
+    this->originalCameraPosition = this->camera->position;
+
+    initWindow();
+}
+
+Window::Window(const std::string &sceneDesc)
+{
+    ObjectLoader objectLoader;
+    std::tie(this->camera, this->world) = objectLoader.loadYaml(sceneDesc);
+    this->rayTraceRenderer = Renderer(this->camera);
+
+    this->originalCameraPosition = this->camera->position;
+
+    initWindow();
+}
+#endif
+Window::~Window()
+{
+}
+
+// void Window::_drawTest()
+// {
+//     std::shared_ptr<World> world;
+//     std::shared_ptr<Camera> camera;
+
+//     ObjectLoader objectLoader;
+//     std::tie(camera, world) = objectLoader.loadYaml(sceneDesc);
+//     this->rayTraceRenderer = Renderer(this->camera);
+//     update();
+// }
+
+void Window::initWindow()
+{
+
+#ifdef __EMSCRIPTEN__
+    SDL_SetHint(SDL_HINT_EMSCRIPTEN_KEYBOARD_ELEMENT, "#canvas");
+#endif
+    SDL_SetMainReady();
+    SDL_Init(SDL_INIT_VIDEO);
+#ifdef __EMSCRIPTEN__
+    this->window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
+                                    SDL_WINDOWPOS_UNDEFINED, this->width, this->height, 0);
+#else
+    this->window = SDL_CreateWindow("", SDL_WINDOWPOS_UNDEFINED,
+                                    SDL_WINDOWPOS_UNDEFINED, this->camera->hsize, this->camera->vsize, 0);
+#endif
+    this->renderer = SDL_CreateRenderer(this->window, -1,
+                                        SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+
+    // SDL_CreateWindowAndRenderer(this->camera->hsize, this->camera->vsize, 0, &this->window, &this->renderer);
+
+#ifdef __EMSCRIPTEN__
+    this->texTarget = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888,
+                                        SDL_TEXTUREACCESS_TARGET, this->width, this->height);
+#endif
+
+    // this->running = true;
+    this->initialised = true;
+    this->somethingChanged = true;
+
+    std::cout << "Created window." << std::endl;
+}
+
+void Window::step()
+{
+    handleEvents();
+
+    // TODO only start updating if not already running - otherwise you will get runtime errors
+
+    if (somethingChanged && !running)
     {
-        emscripten_destroy_worker(worker);
-        workers.pop_back();
+        somethingChanged = false;
+        update();
+#ifndef __EMSCRIPTEN__
+        draw();
+#endif
     }
 }
 
-void Window::addWorker()
+void Window::run()
 {
-    this->workers.push_back(emscripten_create_worker("/js/RayTracer.wasm.js"));
+    while (this->initialised)
+    {
+        step();
+    }
 }
+
+void Window::handleEvents()
+{
+    while (SDL_PollEvent(&event))
+    {
+        // SDL_WaitEvent(&event);
+        switch (event.type)
+        {
+        case SDL_QUIT:
+            this->initialised = false;
+            break;
+        case SDL_KEYDOWN:
+            switch (event.key.keysym.sym)
+            {
+            case SDLK_ESCAPE:
+                this->initialised = false;
+                break;
+            case SDLK_LEFT:
+                moveLeft();
+                break;
+            case SDLK_RIGHT:
+                moveRight();
+                break;
+            case SDLK_UP:
+                moveUp();
+                break;
+            case SDLK_DOWN:
+                moveDown();
+                break;
+                // cases for other keypresses
+            }
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+void Window::moveLeft() { moveCamera(STEP_SIZE, 1); }
+void Window::moveRight() { moveCamera(-STEP_SIZE, 1); }
+void Window::moveUp() { moveCamera(-STEP_SIZE, 0); }
+void Window::moveDown() { moveCamera(STEP_SIZE, 0); }
+
+void Window::moveCamera(float posChange, uint8_t axis)
+{
+    if (axis == 0)
+    {
+        this->xRotation += posChange;
+    }
+    else if (axis == 1)
+    {
+        this->yRotation += posChange;
+    }
+
+#ifndef __EMSCRIPTEN__
+    glm::dmat4 rotationX =
+        glm::rotate(glm::dmat4(1.0), (double)this->xRotation, glm::dvec3(1.0, 0.0, 0.0));
+
+    glm::dmat4 rotationY =
+        glm::rotate(glm::dmat4(1.0), (double)this->yRotation, glm::dvec3(0.0, 1.0, 0.0));
+
+    // glm::dmat4 rotationZ =
+    //     glm::rotate(glm::dmat4(1.0), posChange,
+    //                 glm::dvec3(0.0, 0.0, 1.0));
+
+    this->camera->position = rotationX * this->originalCameraPosition;
+    this->camera->position = rotationY * this->camera->position;
+    this->camera->updateTransform();
+#endif
+
+    this->somethingChanged = true;
+
+    // // old from here - move to raytracer module
+    // glm::dmat4 rotationY =
+    //     glm::rotate(glm::dmat4(1.0), posChange, axis);
+
+    // // glm::dmat4 rotationZ =
+    // //     glm::rotate(glm::dmat4(1.0), posChange,
+    // //                 glm::dvec3(0.0, 0.0, 1.0));
+
+    // this->camera->position = rotationY * this->camera->position;
+
+    // // matrix.makeRotationY(clock.getDelta() * 2 * Math.PI / period);
+
+    // // this->camera->position.x += posChange;
+    // this->camera->updateTransform();
+}
+
+std::vector<uint8_t> floatToByteArray(float d)
+{
+    uint8_t *bytePointer = reinterpret_cast<uint8_t *>(&d);
+    return std::vector<uint8_t>(bytePointer, bytePointer + sizeof(float));
+}
+
+void Window::update()
+{
+
+    // std::cout << "update?" << std::endl;
+    // if (somethingChanged && !running)
+    // {
+
+    SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
+    SDL_RenderClear(this->renderer);
+    // std::cout << "update" << std::endl;
+    this->running = true;
+
+#ifdef __EMSCRIPTEN__
+    int i = 0;
+    for (auto &renderWorker : this->workers)
+    {
+        // rotation info
+
+        this->busyWorkers.at(i) = true;
+
+        // std::cout << "Send rotations: " << this->xRotation << " " << this->yRotation << std::endl;
+
+        std::vector<uint8_t> xRotationBytes = floatToByteArray(this->xRotation);
+        std::vector<uint8_t> yRotationBytes = floatToByteArray(this->yRotation);
+
+        // TODO implement rotation based on this in the renderer api
+        for (auto &byte : xRotationBytes)
+            this->sceneBinary.push_back(byte);
+
+        for (auto &byte : yRotationBytes)
+            this->sceneBinary.push_back(byte);
+
+        this->sceneBinary.push_back((char)i);
+        this->sceneBinary.push_back((char)this->nWorkers);
+
+        // TODO fix ints to sizes of floats
+        float *xRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 10);
+        float *yRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 6);
+
+#ifdef WITH_THREADS
+        emscripten_call_worker(renderWorker, "renderSceneThreaded", &this->sceneBinary[0], this->sceneBinary.size(), renderCback, (void *)42);
+#else
+        emscripten_call_worker(renderWorker, "renderScene", &this->sceneBinary[0], this->sceneBinary.size(), renderCback, (void *)42);
+#endif //WITH_THREADS \
+    // std::cout << "Receive Rotations: " << *xRotationp << " " << *yRotationp << std::endl;
+        i++;
+        // this->somethingChanged = false;
+    }
+
+#else
+    this->rayTraceRenderer.render(*world);
+    this->running = false;
+#endif //__EMSCRIPTEN__
+}
+
+#ifndef __EMSCRIPTEN__
+void Window::draw()
+{
+    SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
+    SDL_RenderClear(this->renderer);
+
+    for (int i = 0; i < this->camera->hsize; i++)
+    {
+        for (int j = 0; j < this->camera->vsize; j++)
+        {
+            glm::ivec3 colour(this->rayTraceRenderer.canvas.getPixelInt(i, j));
+            SDL_SetRenderDrawColor(this->renderer, colour.x, colour.y, colour.z, 255);
+            SDL_RenderDrawPoint(this->renderer, i, j);
+        }
+    }
+
+    SDL_RenderPresent(this->renderer);
+
+    // SDL_Delay(1000/30);
+}
+#endif

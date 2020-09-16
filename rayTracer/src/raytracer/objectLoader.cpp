@@ -4,19 +4,23 @@ ObjectLoader::ObjectLoader(/* args */) {}
 
 ObjectLoader::~ObjectLoader() {}
 
-std::pair<std::shared_ptr<Camera>, std::unique_ptr<World>>
+std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>>
 ObjectLoader::loadYaml(const std::string &fileName)
 {
   // std::vector<std::shared_ptr<Shape>> ret;
   std::shared_ptr<Camera> camera;
-  std::unique_ptr<World> world = std::make_unique<World>();
+  std::shared_ptr<World> world = std::make_shared<World>();
 
   // world->shapes.clear();
   // world->lights.clear();
 
   YAML::Node root;
 
+#ifdef __EMSCRIPTEN__
   if (std::__fs::filesystem::exists(fileName))
+#else
+  if (std::filesystem::exists(fileName))
+#endif
   {
     // std::cout << "Found found: " << fileName << std::endl;
     root = YAML::LoadFile(fileName);
@@ -59,7 +63,7 @@ ObjectLoader::loadYaml(const std::string &fileName)
   }
 
   return std::pair<std::shared_ptr<Camera>,
-                   std::unique_ptr<World>>(camera, std::move(world));
+                   std::shared_ptr<World>>(camera, world);
 }
 
 std::shared_ptr<Shape> ObjectLoader::addShape(const YAML::Node &shapeNode)
@@ -130,15 +134,10 @@ std::shared_ptr<Shape> ObjectLoader::shapeFromDefinition(ShapeDefinition &shapeD
   }
   else if (shapeDefinition.shapeType == "obj")
   {
+#ifdef __EMSCRIPTEN__
     if (!std::__fs::filesystem::exists(shapeDefinition.filePath))
       downloadAsset(shapeDefinition.filePath, shapeDefinition.filePath);
-
-    // std::ifstream infile1;
-    // infile1.open(shapeDefinition.filePath);
-    // while (infile1.good())
-    //   std::cout << (char)infile1.get();
-
-    // exit(0);
+#endif
 
     Model model;
     model.build(shapeDefinition.filePath, true);
@@ -875,8 +874,10 @@ void ObjectLoader::parseUV(const YAML::Node &node, std::shared_ptr<UVTexture> &u
   }
   else if (uvPatternType == "image")
   {
+#ifdef __EMSCRIPTEN__
     if (!std::__fs::filesystem::exists(imageFileName))
       downloadAsset(imageFileName, imageFileName);
+#endif
 
     if (!face)
       uvTexture = std::make_shared<ImageTexture>(imageFileName);

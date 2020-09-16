@@ -29,6 +29,8 @@
 #ifdef __EMSCRIPTEN__
 // #include <emscripten.h>
 #include <emscripten/fetch.h>
+#else
+#include <filesystem>
 #endif
 
 class ObjectLoader
@@ -89,7 +91,7 @@ private:
 public:
   ObjectLoader();
   ~ObjectLoader();
-  std::pair<std::shared_ptr<Camera>, std::unique_ptr<World>> loadYaml(const std::string &fileName);
+  std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> loadYaml(const std::string &fileName);
   std::shared_ptr<Shape> loadModel(const std::string &fileName);
   std::pair<int, int> getCanvasSize(const std::string &fileName);
 };

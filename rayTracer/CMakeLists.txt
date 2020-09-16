@@ -7,24 +7,28 @@ if(NOT CMAKE_BUILD_TYPE)
 #   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(USE_THREADS ON)
+set(USE_THREADS OFF)
 
+if (${USE_THREADS})
+	set(CMAKE_CXX_FLAGS_DEBUG "-g -s USE_PTHREADS=1 -pthread")
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -flto -s USE_PTHREADS=1")
+else()
+	#set(CMAKE_CXX_FLAGS "-openmp-simd")
+	set(CMAKE_CXX_FLAGS_DEBUG "-g")
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -flto")
+endif()
 
-#set(CMAKE_CXX_FLAGS "-openmp-simd")
-set(CMAKE_CXX_FLAGS_DEBUG "-g")
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -flto")
-# set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -msimd128")
 set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "")
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "")
 set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "")
-# CMAKE_EXE_LINKER_FLAGS_RELEASE
 
-add_subdirectory("src/raytracer")
-add_subdirectory("src/runner")
+
 
 # if(${TO_NATIVE})
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 	message(STATUS "Setting compilation target to WASM")
+	add_subdirectory("src/runner")
+	add_subdirectory("src/raytracer")
 	# set(CMAKE_EXECUTABLE_SUFFIX ".html")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
 
@@ -51,6 +55,8 @@ else()
 	find_package(yaml-cpp CONFIG REQUIRED)
 	find_package(glm CONFIG REQUIRED)
 	find_package(TBB CONFIG REQUIRED)
+
+	add_subdirectory("src/raytracer")
 endif()
 
 

@@ -15,15 +15,15 @@
 
 #include <thread>
 
-// #include "camera.h"
-// #include "renderer.h"
-// #include "world.h"
-// #include "objectLoader.h"
-
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 void processCback(char *data, int size, void *arg);
 void renderCback(char *data, int size, void *arg);
+#else
+#include "../raytracer/camera.h"
+#include "../raytracer/renderer.h"
+#include "../raytracer/world.h"
+#include "../raytracer/objectLoader.h"
 #endif
 
 class Window
@@ -31,20 +31,21 @@ class Window
 private:
     SDL_Window *window;
     SDL_Renderer *renderer;
+#ifdef __EMSCRIPTEN__
     SDL_Texture *texTarget;
+    std::vector<worker_handle> workers;
+#else
+    glm::dvec4 originalCameraPosition;
+    std::shared_ptr<Camera> camera;
+    Renderer rayTraceRenderer;
+    std::shared_ptr<World> world;
+#endif
     // static const int PIXELS_PER_BATCH = 20000;
-    const float STEP_SIZE = 0.05f;
+    const float STEP_SIZE = 0.01f;
 
     SDL_Event event;
 
-    std::vector<worker_handle> workers;
-
     // std::string sceneDesc;
-    // std::shared_ptr<Camera> camera;
-
-    // Renderer rayTraceRenderer;
-
-    // std::shared_ptr<World> world;
     // std::vector<uint8_t> byteBuffer;
     // size_t bufferLength;
 
@@ -57,13 +58,14 @@ private:
 public:
     Window();
 
-    std::vector<bool> busyWorkers;
-
     bool initialised = false;
     float xRotation = 0.0f;
     float yRotation = 0.0f;
 
-    // Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<World> &world);
+#ifndef __EMSCRIPTEN__
+    Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<World> &world);
+    Window(const std::string &sceneDesc);
+#endif
     ~Window();
 
     bool running = false;
@@ -75,10 +77,14 @@ public:
     int height;
 
 #ifdef __EMSCRIPTEN__
+    std::vector<bool> busyWorkers;
     void processScene(const std::string &sceneDesc);
-    void destroyProcessorWorker();
     std::vector<char> sceneBinary;
+    void draw(uint8_t workerId);
     std::unordered_map<uint8_t, std::vector<char>> pixelsBinary;
+    void killWorker();
+    void addWorker();
+    void updateSize();
 #endif
 
     void moveLeft();
@@ -87,11 +93,10 @@ public:
     void moveDown();
 
     void initWindow();
-    void updateSize();
+
     void update();
-    void draw(uint8_t workerId);
+
+    void draw();
     void step();
     void run();
-    void killWorker();
-    void addWorker();
 };

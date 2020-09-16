@@ -8,8 +8,7 @@
 class Canvas
 {
 private:
-  std::vector<glm::dvec3> pixels;
-  void _writeRgbString(double f, bool &newLine, int &charsInLine,
+    void _writeRgbString(double f, bool &newLine, int &charsInLine,
                        std::ofstream *streamPtr);
   uint8_t rbgdoubleToInt(double f);
   char rbgdoubleToChar(double f);
@@ -18,6 +17,8 @@ public:
   Canvas();
   Canvas(unsigned int, unsigned int);
   ~Canvas();
+
+  std::vector<glm::dvec3> pixels;
 
   unsigned int width;
   unsigned int height;

@@ -118,7 +118,6 @@ extern "C"
 
 #else
 
-#include <RayTracer>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 
@@ -469,29 +468,29 @@ int main(int argc, char const *argv[])
 
   // renderToSDL(camera, world);
 
-  // renderToSDL("scenes/reflectionScene.yaml");
-  // renderToSDL("scenes/coverScene.yaml");
-  // renderToSDL("scenes/groups.yaml");
-  // renderToSDL("scenes/hippy.yaml");
-  // renderToSDL("../../../scenes/hippy.yaml");
-  // renderToSDL("scenes/globe.yaml");
-  // renderToSDL("scenes/skybox.yaml");
-  // renderToSDL("scenes/checkers.yaml");
-  // renderToSDL("scenes/christmas.yaml");
-  // renderToSDL("scenes/reflectionScene.yaml");
-  // renderToSDL("scenes/reflectionScene.yaml");
+  // renderToSDL("assets/scenes/reflectionScene.yaml");
+  // renderToSDL("assets/scenes/coverScene.yaml");
+  // renderToSDL("assets/scenes/groups.yaml");
+  // renderToPPM("assets/scenes/model.yaml");
+  // renderToSDL("assets/scenes/hippy.yaml");
+  // renderToSDL("assets/scenes/globe.yaml");
+  renderToSDL("assets/scenes/skybox.yaml");
+  // renderToSDL("assets/scenes/checkers.yaml");
+  // renderToSDL("assets/scenes/christmas.yaml");
+  // renderToSDL("assets/scenes/reflectionScene.yaml");
+  // renderToSDL("assets/scenes/reflectionScene.yaml");
 
   // renderToPPM("scenes/christmas.yaml");
   // renderToPPM("scenes/reflectionScene.yaml");
 
-  std::shared_ptr<World> world;
-  std::shared_ptr<Camera> camera;
+  // std::shared_ptr<World> world;
+  // std::shared_ptr<Camera> camera;
 
-  std::tie(camera, world) = draw3Dmodel("models/armadillo.obj");
+  // std::tie(camera, world) = draw3Dmodel("assets/models/armadillo.obj");
 
-  Renderer renderer(camera);
-  renderer.render(*world);
-  renderer.canvas.writeToPPM("armadillo.ppm", false);
+  // Renderer renderer(camera);
+  // renderer.render(*world);
+  // renderer.canvas.writeToPPM("armadillo.ppm", false);
 
   // renderToSDL(camera, world);
 

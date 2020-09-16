@@ -12,7 +12,7 @@ Renderer::~Renderer() {}
 
 void Renderer::render(World &world)
 {
-  int sqrtRaysPerPixel = std::sqrt(RAYS_PER_PIXEL);
+  int sqrtRaysPerPixel = (int)std::sqrt(RAYS_PER_PIXEL);
   double halfSubPixelSize = 1.0 / (double)sqrtRaysPerPixel / 2.0;
 
   std::vector<std::pair<int, int>> pixels;
@@ -33,16 +33,22 @@ void Renderer::render(World &world)
 
 #ifdef __EMSCRIPTEN__
 #ifdef WITH_THREADS
-  tf::Executor executor(std::thread::hardware_concurrency());
+  // TODO not working - blocking before execution of for_each for some reason
+  // tf::Executor executor(std::thread::hardware_concurrency());
+  tf::Executor executor;
   tf::Taskflow taskflow;
 
-  taskflow.parallel_for(
+  taskflow.for_each(
       pixels.begin(), pixels.end(),
       [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &pixel) {
-        renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
+        std::cout << "rendering: " << pixel.first << ", " << pixel.second << std::endl;
+        // this->renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
       });
+  std::cout << "starting thread" << std::endl;
+  // executor.run(taskflow).wait();
   executor.run(taskflow);
   executor.wait_for_all();
+  std::cout << "done thread" << std::endl;
 #else
   for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
        it != pixels.end(); ++it)
@@ -56,7 +62,6 @@ void Renderer::render(World &world)
       [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &&pixel) {
         renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
       });
-
   // #pragma omp parallel for
   // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
   //     it < pixels.end(); ++it)
@@ -69,6 +74,7 @@ void Renderer::render(World &world)
 void Renderer::renderPixel(World &world, std::pair<int, int> &pixel,
                            int sqrtRaysPerPixel, double halfSubPixelSize)
 {
+  // std::cout << "rendering: " << pixel.first << ", " << pixel.second << std::endl;
   glm::dvec3 cShape(0.0, 0.0, 0.0);
   for (int i = 0; i < RAYS_PER_PIXEL; i++)
   {

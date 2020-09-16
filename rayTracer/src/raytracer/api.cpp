@@ -19,41 +19,65 @@ struct membuf : std::streambuf
     }
 };
 
+std::vector<char> __processScene(const std::string &sceneDesc)
+{
+    std::shared_ptr<World> world;
+    std::shared_ptr<Camera> camera;
+    std::string scene;
+    ObjectLoader objectLoader;
+    std::tie(camera, world) = objectLoader.loadYaml(sceneDesc);
+    std::stringstream ss;
+
+    {
+        cereal::BinaryOutputArchive oarchive(ss);
+        oarchive(camera, world);
+    }
+    scene = ss.str();
+
+    std::vector<char> byteBuffer = std::vector<char>(scene.begin(), scene.end());
+    // }
+
+    uint8_t *widthBytePointer = reinterpret_cast<uint8_t *>(&(camera->hsize));
+    std::vector<uint8_t> widthBytes(widthBytePointer, widthBytePointer + sizeof(int));
+    byteBuffer.insert(byteBuffer.end(), widthBytes.begin(), widthBytes.end());
+
+    uint8_t *heightBytePointer = reinterpret_cast<uint8_t *>(&(camera->vsize));
+    std::vector<uint8_t> heightBytes(heightBytePointer, heightBytePointer + sizeof(int));
+    byteBuffer.insert(byteBuffer.end(), heightBytes.begin(), heightBytes.end());
+    // }
+    return byteBuffer;
+}
+
 extern "C"
 {
     void processScene(char *data, int size)
     {
-        std::unique_ptr<World> world;
-        std::shared_ptr<Camera> camera;
-        std::string scene;
 
-        ObjectLoader objectLoader;
-        std::string sceneDesc(data, size);
-        std::tie(camera, world) = objectLoader.loadYaml(sceneDesc);
-        std::stringstream ss;
+        // ObjectLoader objectLoader;
+        const std::string sceneDesc(data, size);
 
-        {
-            cereal::BinaryOutputArchive oarchive(ss);
-            oarchive(camera, world);
-        }
-        scene = ss.str();
+        // std::tie(camera, world) = objectLoader.loadYaml(sceneDesc);
+        // std::stringstream ss;
 
-        std::vector<char> byteBuffer = std::vector<char>(scene.begin(), scene.end());
+        // {
+        //     cereal::BinaryOutputArchive oarchive(ss);
+        //     oarchive(camera, world);
         // }
+        // scene = ss.str();
 
-        uint8_t *widthBytePointer = reinterpret_cast<uint8_t *>(&(camera->hsize));
-        std::vector<uint8_t> widthBytes(widthBytePointer, widthBytePointer + sizeof(int));
-        byteBuffer.insert(byteBuffer.end(), widthBytes.begin(), widthBytes.end());
+        // std::vector<char> byteBuffer = std::vector<char>(scene.begin(), scene.end());
 
-        uint8_t *heightBytePointer = reinterpret_cast<uint8_t *>(&(camera->vsize));
-        std::vector<uint8_t> heightBytes(heightBytePointer, heightBytePointer + sizeof(int));
-        byteBuffer.insert(byteBuffer.end(), heightBytes.begin(), heightBytes.end());
-        // }
+        // uint8_t *widthBytePointer = reinterpret_cast<uint8_t *>(&(camera->hsize));
+        // std::vector<uint8_t> widthBytes(widthBytePointer, widthBytePointer + sizeof(int));
+        // byteBuffer.insert(byteBuffer.end(), widthBytes.begin(), widthBytes.end());
+
+        // uint8_t *heightBytePointer = reinterpret_cast<uint8_t *>(&(camera->vsize));
+        // std::vector<uint8_t> heightBytes(heightBytePointer, heightBytePointer + sizeof(int));
+        // byteBuffer.insert(byteBuffer.end(), heightBytes.begin(), heightBytes.end());
+
+        std::vector<char> byteBuffer = __processScene(sceneDesc);
 
         emscripten_worker_respond(&byteBuffer[0], byteBuffer.size());
-
-        // std::vector<char> t;
-        // emscripten_worker_respond(&t[0], t.size());
     }
 
     void renderScene(char *data, int size)
@@ -76,7 +100,7 @@ extern "C"
 
         // std::vector<std::pair<int, int>> pixelsToRender;
 
-        std::unique_ptr<World> world;
+        std::shared_ptr<World> world;
         std::shared_ptr<Camera> camera;
 
         cereal::BinaryInputArchive iarchive(iss);
@@ -156,7 +180,7 @@ extern "C"
         membuf sbuf(data, data + size - 10);
         std::istream iss(&sbuf);
 
-        std::unique_ptr<World> world;
+        std::shared_ptr<World> world;
         std::shared_ptr<Camera> camera;
 
         cereal::BinaryInputArchive iarchive(iss);
@@ -193,18 +217,18 @@ extern "C"
         emscripten_worker_respond(&byteBuffer[0], bufferLength + 1);
     }
 }
-#else
+// #else
 
-Canvas renderScene(const std::string &sceneDesc)
-{
-    std::shared_ptr<World> world;
-    std::shared_ptr<Camera> camera;
+// std::vector<glm::dvec3> renderScene(const std::string &sceneDesc)
+// {
+//     std::shared_ptr<World> world;
+//     std::shared_ptr<Camera> camera;
 
-    ObjectLoader objectLoader;
-    std::tie(camera, world) = objectLoader.loadYaml(sceneDesc);
-    Renderer rayTraceRenderer = Renderer(camera);
-    rayTraceRenderer.render(*world);
+//     ObjectLoader objectLoader;
+//     std::tie(camera, world) = objectLoader.loadYaml(sceneDesc);
+//     Renderer rayTraceRenderer = Renderer(camera);
+//     rayTraceRenderer.render(*world);
 
-    return rayTraceRenderer.canvas;
-}
+//     return rayTraceRenderer.canvas.pixels;
+// }
 #endif
