@@ -37,6 +37,9 @@ public:
 
   static const int RAY_BOUNCE_LIMIT = 4;
   static const int RAYS_PER_PIXEL = 1;
+  static constexpr int sqrtRaysPerPixel = (int)std::sqrt(RAYS_PER_PIXEL);
+  static constexpr double halfSubPixelSize = 1.0 / (double)sqrtRaysPerPixel / 2.0;
+
   Canvas canvas;
 
   glm::dvec3 colourAt(Ray &ray, World &world, short remaining);
@@ -52,6 +55,5 @@ public:
   bool isShadowed(glm::dvec4 &point, World &world, std::shared_ptr<PointLight> &light);
 
   void render(World &world);
-  void renderPixel(World &world, std::pair<int, int> &pixel,
-                   int sqrtRaysPerPixel, double halfSubPixelSize);
+  void renderPixel(World &world, std::pair<int, int> &pixel);
 };

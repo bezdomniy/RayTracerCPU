@@ -12,9 +12,6 @@ Renderer::~Renderer() {}
 
 void Renderer::render(World &world)
 {
-  int sqrtRaysPerPixel = (int)std::sqrt(RAYS_PER_PIXEL);
-  double halfSubPixelSize = 1.0 / (double)sqrtRaysPerPixel / 2.0;
-
   std::vector<std::pair<int, int>> pixels;
   pixels.reserve(this->canvas.height * this->canvas.width);
 
@@ -40,9 +37,9 @@ void Renderer::render(World &world)
 
   taskflow.for_each(
       pixels.begin(), pixels.end(),
-      [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &pixel) {
+      [this, &world](auto &pixel) {
         std::cout << "rendering: " << pixel.first << ", " << pixel.second << std::endl;
-        // this->renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
+        // this->renderPixel(world, pixel);
       });
   std::cout << "starting thread" << std::endl;
   // executor.run(taskflow).wait();
@@ -53,26 +50,25 @@ void Renderer::render(World &world)
   for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
        it != pixels.end(); ++it)
   {
-    renderPixel(world, *it, sqrtRaysPerPixel, halfSubPixelSize);
+    renderPixel(world, *it);
   }
 #endif // WITH_THREADS
 #else
   std::for_each(
       std::execution::par_unseq, pixels.begin(), pixels.end(),
-      [this, &world, sqrtRaysPerPixel, halfSubPixelSize](auto &&pixel) {
-        renderPixel(world, pixel, sqrtRaysPerPixel, halfSubPixelSize);
+      [this, &world](auto &&pixel) {
+        renderPixel(world, pixel);
       });
   // #pragma omp parallel for
   // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
   //     it < pixels.end(); ++it)
   // {
-  //     renderPixel(world, *it, sqrtRaysPerPixel, halfSubPixelSize);
+  //     renderPixel(world, *it);
   // }
 #endif
 }
 
-void Renderer::renderPixel(World &world, std::pair<int, int> &pixel,
-                           int sqrtRaysPerPixel, double halfSubPixelSize)
+void Renderer::renderPixel(World &world, std::pair<int, int> &pixel)
 {
   // std::cout << "rendering: " << pixel.first << ", " << pixel.second << std::endl;
   glm::dvec3 cShape(0.0, 0.0, 0.0);
