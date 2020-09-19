@@ -39,7 +39,7 @@ public:
     virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
 
     // TODO make this match with other normalAts..
-    virtual glm::dvec4 normalAt(glm::dvec4 point, glm::dvec2 uv) override;
+    virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) override;
 };
 
 CEREAL_REGISTER_TYPE(SmoothTriangle);

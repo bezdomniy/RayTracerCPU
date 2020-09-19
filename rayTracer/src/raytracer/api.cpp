@@ -1,4 +1,5 @@
 
+
 #include <iostream>
 #include <memory>
 
@@ -126,9 +127,6 @@ extern "C"
 
         Renderer renderer(camera);
 
-        int sqrtRaysPerPixel = (int)std::sqrt(Renderer::RAYS_PER_PIXEL);
-        double halfSubPixelSize = 1.0 / (double)(sqrtRaysPerPixel) / 2.0;
-
         // pixelsToRender.clear();
         // pixelsToRender.reserve((camera->vsize * camera->hsize) / (*nWorkers + 1));
 
@@ -145,9 +143,7 @@ extern "C"
                     // TODO check if rendering just 1 pixel will give same memory outcome as rendering all of them
                     auto pixel = std::make_pair(x, y);
                     renderer.renderPixel(*world,
-                                         pixel,
-                                         sqrtRaysPerPixel,
-                                         halfSubPixelSize);
+                                         pixel);
                 }
             }
         }

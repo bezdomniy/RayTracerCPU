@@ -5,11 +5,13 @@
 
 #include <glm/glm.hpp>
 // #include <glm/gtx/intersect.hpp>
+
+#include <glm/gtc/matrix_access.hpp>
 #include <vector>
 // #include "shape.h"
 // #include "intersection.h"
 // #include "pointLight.h"
-#include "ray.h"
+// #include "ray.h"
 // #include "material.h"
 #include <algorithm>
 #include <cmath>
@@ -33,7 +35,7 @@ namespace Geometry
     glm::dvec4 underPoint;
     double n1;
     double n2;
-    bool inside;
+    bool inside; //TODO find way to remove
   };
 
   template <typename T>
@@ -80,16 +82,16 @@ namespace Geometry
   }
 
   template <typename T>
-  void getIntersectionParameters(Intersection<T> &intersection, Ray &ray,
+  void getIntersectionParameters(Intersection<T> &intersection, glm::dvec4 &rayOrigin, glm::dvec4 &rayDirection,
                                  std::vector<Intersection<T>> &intersections)
   {
     intersection.comps = std::make_unique<IntersectionParameters>();
     intersection.comps->point =
-        ray.origin + glm::normalize(ray.direction) * intersection.t;
+        rayOrigin + glm::normalize(rayDirection) * intersection.t;
     // TODO check that uv only null have using none-uv normalAt version
     intersection.comps->normalv =
         intersection.shapePtr->normalAt(intersection.comps->point, intersection.uv);
-    intersection.comps->eyev = -ray.direction;
+    intersection.comps->eyev = -rayDirection;
 
     if (glm::dot(intersection.comps->normalv, intersection.comps->eyev) < 0)
     {
@@ -102,7 +104,7 @@ namespace Geometry
     }
 
     intersection.comps->reflectv =
-        glm::reflect(ray.direction, intersection.comps->normalv);
+        glm::reflect(rayDirection, intersection.comps->normalv);
     intersection.comps->overPoint =
         intersection.comps->point + intersection.comps->normalv * EPSILON;
     intersection.comps->underPoint =
@@ -184,9 +186,7 @@ namespace Geometry
     return ret;
   }
 
-  // ​ 	  ​if​ tmin > tmax ​then​ swap(tmin, tmax)
-  // ​
-  // ​ 	  ​return​ tmin, tmax
-  // ​ 	​end​ ​function
+  // inline double vecDot(const glm::dvec4 &x, const glm::dvec4 &y);
+  // glm::dvec4 matVecMult(const glm::dmat4 &m, const glm::dvec4 &vec);
 
 } // namespace Geometry

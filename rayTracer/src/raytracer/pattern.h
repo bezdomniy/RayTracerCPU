@@ -25,7 +25,7 @@ public:
   Pattern(const Pattern &pattern);
   virtual ~Pattern() = 0;
 
-  virtual glm::dvec3 patternAt(glm::dvec4 point) = 0;
+  virtual glm::dvec3 patternAt(const glm::dvec4 &point) = 0;
   void setTransform(glm::dmat4 transform);
   void multiplyTransform(glm::dmat4 &transform);
   void calculateInverseTranform();

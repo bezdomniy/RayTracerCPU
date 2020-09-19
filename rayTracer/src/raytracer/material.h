@@ -44,8 +44,7 @@ public:
   double transparency;
   double refractiveIndex;
 
-  bool shadow = true;
-
   std::shared_ptr<Pattern> pattern;
+  bool shadow = true; //TODO find way to remove
   void setPattern(std::shared_ptr<Pattern> &pattern);
 };

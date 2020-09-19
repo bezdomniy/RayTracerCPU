@@ -15,7 +15,7 @@ if (${USE_THREADS})
 else()
 	#set(CMAKE_CXX_FLAGS "-openmp-simd")
 	set(CMAKE_CXX_FLAGS_DEBUG "-g -march=native")
-	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -flto -march=native")
+	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -flto -march=native -Wpadded") # -Wpadded
 endif()
 
 set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "")
@@ -53,6 +53,8 @@ else()
 	endif (WIN32)
 	find_package(SDL2 CONFIG REQUIRED)
 	find_package(yaml-cpp CONFIG REQUIRED)
+
+	# add_subdirectory(glm)
 	find_package(glm CONFIG REQUIRED)
 	find_package(TBB CONFIG REQUIRED)
 

@@ -8,9 +8,9 @@ PointLight::PointLight(glm::dvec4 position, glm::dvec3 intensity) : Shape()
 
 PointLight::~PointLight() {}
 
-glm::dvec4 PointLight::normalAt(glm::dvec4 point) { return glm::dvec4(); }
+glm::dvec4 PointLight::normalAt(const glm::dvec4 &point) { return glm::dvec4(); }
 
-glm::dvec4 PointLight::normalAt(glm::dvec4 point, glm::dvec2 uv)
+glm::dvec4 PointLight::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
 {
   return normalAt(point);
 }

@@ -76,13 +76,13 @@ Group::Group(const Group &group)
 
     nextShape->parent = child->parent;
     nextShape->material = child->material;
-    nextShape->materialSet = child->materialSet;
+    // nextShape->materialSet = child->materialSet;
     nextShape->transform = child->transform;
     nextShape->inverseTransform = child->inverseTransform;
 
     this->parent = group.parent;
     this->material = group.material;
-    this->materialSet = group.materialSet;
+    // this->materialSet = group.materialSet;
     this->transform = group.transform;
     this->inverseTransform = group.inverseTransform;
 
@@ -107,14 +107,14 @@ void Group::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &i
   return;
 }
 
-glm::dvec4 Group::normalAt(glm::dvec4 point)
+glm::dvec4 Group::normalAt(const glm::dvec4 &point)
 {
   throw std::runtime_error("group shouldn't call normal function");
   glm::dvec4 objectPoint = this->inverseTransform * point;
   return glm::normalize(glm::dvec4());
 }
 
-glm::dvec4 Group::normalAt(glm::dvec4 point, glm::dvec2 uv)
+glm::dvec4 Group::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
 {
   return normalAt(point);
 }
@@ -125,7 +125,7 @@ void Group::setMaterial(std::shared_ptr<Material> &mat)
 
   for (auto &child : this->children)
   {
-    if (!child->materialSet)
+    if (!child->material)
       child->setMaterial(mat);
   }
 }

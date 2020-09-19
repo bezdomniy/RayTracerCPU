@@ -8,7 +8,17 @@ Renderer::Renderer(std::shared_ptr<Camera> &c)
   this->canvas = Canvas(this->camera->hsize, this->camera->vsize);
 }
 
-Renderer::~Renderer() {}
+#ifdef __EMSCRIPTEN__
+Renderer::Renderer(std::shared_ptr<Camera> &c, uint8_t nWorkers)
+{
+  this->camera = c;
+  this->canvas = Canvas(this->camera->hsize, this->camera->vsize);
+}
+#endif
+
+Renderer::~Renderer()
+{
+}
 
 void Renderer::render(World &world)
 {
@@ -92,7 +102,7 @@ glm::dvec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
 
   if ((hit = Geometry::hit<Shape>(intersections)))
   {
-    Geometry::getIntersectionParameters<Shape>(*hit, ray, intersections);
+    Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
     return shadeHit(hit, world, remaining);
   }
   return glm::dvec3(0.0, 0.0, 0.0);

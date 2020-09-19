@@ -41,9 +41,8 @@ private:
     std::shared_ptr<World> world;
 #endif
     // static const int PIXELS_PER_BATCH = 20000;
-    const float STEP_SIZE = 0.01f;
-
     SDL_Event event;
+    const float STEP_SIZE = 0.01f;
 
     // std::string sceneDesc;
     // std::vector<uint8_t> byteBuffer;
@@ -58,7 +57,11 @@ private:
 public:
     Window();
 
-    bool initialised = false;
+    int nWorkers;
+
+    int width;
+    int height;
+
     float xRotation = 0.0f;
     float yRotation = 0.0f;
 
@@ -68,13 +71,9 @@ public:
 #endif
     ~Window();
 
+    bool initialised = false;
     bool running = false;
     bool somethingChanged = false;
-
-    int nWorkers;
-
-    int width;
-    int height;
 
 #ifdef __EMSCRIPTEN__
     std::vector<bool> busyWorkers;

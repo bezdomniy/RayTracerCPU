@@ -471,8 +471,8 @@ int main(int argc, char const *argv[])
   // renderToSDL("assets/scenes/reflectionScene.yaml");
   // renderToSDL("assets/scenes/coverScene.yaml");
   // renderToSDL("assets/scenes/groups.yaml");
-  renderToPPM("assets/scenes/model.yaml");
-  // renderToSDL("assets/scenes/hippy.yaml");
+  renderToPPM("../../../assets/scenes/model.yaml");
+  // renderToSDL("../../../assets/scenes/hippy.yaml");
   // renderToSDL("assets/scenes/globe.yaml");
   // renderToSDL("assets/scenes/skybox.yaml");
   // renderToSDL("assets/scenes/checkers.yaml");

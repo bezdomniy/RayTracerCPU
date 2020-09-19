@@ -46,22 +46,21 @@ private:
   struct Definition
   {
     virtual ~Definition() = default;
-    bool empty = true;
-    std::shared_ptr<Definition> inheritFrom;
+    std::unordered_map<std::string, int> transformCounts{{"rotate-x", 0}, {"rotate-y", 0}, {"rotate-z", 0}, {"translate", 0}, {"scale", 0}};
     std::unordered_map<std::string, Value> values;
     std::vector<std::string> valueOrder;
     std::shared_ptr<Pattern> pattern;
-
-    std::unordered_map<std::string, int> transformCounts{{"rotate-x", 0}, {"rotate-y", 0}, {"rotate-z", 0}, {"translate", 0}, {"scale", 0}};
+    std::shared_ptr<Definition> inheritFrom;
+    bool empty = true; //TODO do we need it? remove.
   };
 
   struct ShapeDefinition : Definition
   {
-    std::string shapeType;
     Definition materialDefinition;
     Definition transformDefinition;
     std::vector<Value> args;
     std::vector<ShapeDefinition> children;
+    std::string shapeType;
     std::string filePath;
   };
 

@@ -32,7 +32,7 @@ public:
   StripedPattern() {}
   StripedPattern(glm::dvec3 colourA, glm::dvec3 colourB);
   ~StripedPattern();
-  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
+  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
 };
 
 class GradientPattern : public ColourPattern
@@ -59,7 +59,7 @@ public:
   GradientPattern() {}
   GradientPattern(glm::dvec3 colourA, glm::dvec3 colourB);
   ~GradientPattern();
-  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
+  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
 };
 
 class RingPattern : public ColourPattern
@@ -86,7 +86,7 @@ public:
   RingPattern() {}
   RingPattern(glm::dvec3 colourA, glm::dvec3 colourB);
   ~RingPattern();
-  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
+  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
 };
 
 class CheckedPattern : public ColourPattern
@@ -113,7 +113,7 @@ public:
   CheckedPattern() {}
   CheckedPattern(glm::dvec3 colourA, glm::dvec3 colourB);
   ~CheckedPattern();
-  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
+  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
 };
 
 class BlendedPattern : public Pattern
@@ -143,7 +143,7 @@ public:
   BlendedPattern(const BlendedPattern &blendedPattern);
   ~BlendedPattern();
 
-  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
+  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
 
   std::shared_ptr<Pattern> patternA;
   std::shared_ptr<Pattern> patternB;
@@ -175,7 +175,7 @@ public:
   PerturbedPattern(const PerturbedPattern &perturbedPattern);
   ~PerturbedPattern();
 
-  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
+  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
 
   std::shared_ptr<Pattern> pattern;
   double perturbedCoeff;
@@ -207,7 +207,7 @@ public:
   MappedPattern(const MappedPattern &mappedPattern);
   ~MappedPattern();
 
-  virtual glm::dvec3 patternAt(glm::dvec4 point) override;
+  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
 
   std::shared_ptr<UVTexture> uvTexture;
   std::shared_ptr<TextureMap> textureMap;

@@ -37,12 +37,12 @@ void Triangle::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>>
     intersections.push_back(Geometry::Intersection<Shape>{t, this});
 }
 
-glm::dvec4 Triangle::normalAt(glm::dvec4 point)
+glm::dvec4 Triangle::normalAt(const glm::dvec4 &point)
 {
     return normalToWorld(this->normal);
 }
 
-glm::dvec4 Triangle::normalAt(glm::dvec4 point, glm::dvec2 uv)
+glm::dvec4 Triangle::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
 {
     return normalAt(point);
 }

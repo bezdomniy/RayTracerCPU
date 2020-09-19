@@ -40,7 +40,7 @@ std::vector<Geometry::Intersection<Shape>> World::intersectRayShadow(Ray &ray)
 
   for (auto &shape : this->shapes)
   {
-    if (shape->material->shadow)
+    if (shape->material->shadow) //TODO split material into 2 types - shadowed and not and store in 2 vectors
       shape->intersectRay(ray, ret);
   }
 

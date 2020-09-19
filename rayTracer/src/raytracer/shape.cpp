@@ -6,20 +6,23 @@ Shape::Shape()
   this->inverseTransform = glm::dmat4(1.0);
 }
 
-Ray Shape::transformRay(Ray &ray) {
+Ray Shape::transformRay(Ray &ray)
+{
   return ray.transform(this->inverseTransform);
 }
 
-void Shape::transformRayInPlace(Ray &ray) {
+void Shape::transformRayInPlace(Ray &ray)
+{
   return ray.transformInPlace(this->inverseTransform);
 }
 
-void Shape::setMaterial(std::shared_ptr<Material> &mat) {
+void Shape::setMaterial(std::shared_ptr<Material> &mat)
+{
   this->material = mat;
-  this->materialSet = true;
+  // this->materialSet = true;
 }
 
-glm::dvec3 Shape::patternAt(glm::dvec4 point)
+glm::dvec3 Shape::patternAt(const glm::dvec4 &point)
 {
   // glm::dmat4 shapeTransformInverse(glm::affineInverse(this->transform));
   glm::dvec4 objectPoint = this->inverseTransform * point;
@@ -36,32 +39,35 @@ void Shape::multiplyTransform(glm::dmat4 &transform)
   // this->inverseTransform = glm::affineInverse(this->transform);
 }
 
-void Shape::calculateInverseTranform() {
+void Shape::calculateInverseTranform()
+{
   this->inverseTransform = glm::affineInverse(this->transform);
 }
 
-glm::dvec4 Shape::worldToObject(glm::dvec4 point)
+glm::dvec4 Shape::worldToObject(const glm::dvec4 &point)
 {
   if (this->parent)
   {
-    point = this->parent->worldToObject(point);
+    // return Geometry::matVecMult(this->inverseTransform, this->parent->worldToObject(point));
+    return this->inverseTransform * this->parent->worldToObject(point);
   }
 
+  // return Geometry::matVecMult(this->inverseTransform, point);
   return this->inverseTransform * point;
 }
 
-glm::dvec4 Shape::normalToWorld(glm::dvec4 normal)
+glm::dvec4 Shape::normalToWorld(const glm::dvec4 &normal)
 {
-  normal = glm::transpose(this->inverseTransform) * normal;
-  normal.w = 0.0;
-  normal = glm::normalize(normal);
+  glm::dvec4 ret = glm::transpose(this->inverseTransform) * normal;
+  ret.w = 0.0;
+  ret = glm::normalize(ret);
 
   if (this->parent)
   {
-    normal = this->parent->normalToWorld(normal);
+    ret = this->parent->normalToWorld(ret);
   }
 
-  return normal;
+  return ret;
 }
 
 glm::dvec4 Shape::boundsCentroid()

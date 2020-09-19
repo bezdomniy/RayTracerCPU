@@ -31,18 +31,18 @@ public:
     ~Triangle();
 
     virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
-    virtual glm::dvec4 normalAt(glm::dvec4 point) override;
-    virtual glm::dvec4 normalAt(glm::dvec4 point, glm::dvec2 uv) override;
+    virtual glm::dvec4 normalAt(const glm::dvec4 &point) override;
+    virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) override;
     virtual std::pair<glm::dvec4, glm::dvec4> bounds() override;
     virtual std::string type() override;
 
 protected:
+    glm::dvec4 normal;
     glm::dvec3 p1;
     glm::dvec3 p2;
     glm::dvec3 p3;
     glm::dvec3 e1;
     glm::dvec3 e2;
-    glm::dvec4 normal;
 };
 
 CEREAL_REGISTER_TYPE(Triangle);

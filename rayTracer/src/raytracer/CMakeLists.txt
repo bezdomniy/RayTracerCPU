@@ -44,7 +44,7 @@ else()
 	if (WIN32)
 		target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb)
 	else()
-		target_link_libraries(RayTracer PRIVATE ${GLM_LIBRARIES} ${SDL2_LIBRARIES} tbb yaml-cpp )
+		target_link_libraries(RayTracer PRIVATE  ${SDL2_LIBRARIES} tbb yaml-cpp )
 	endif (WIN32)	
 
 	set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "-flto")

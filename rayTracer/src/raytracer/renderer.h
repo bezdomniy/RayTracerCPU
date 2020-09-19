@@ -33,12 +33,16 @@ private:
 public:
   Renderer();
   Renderer(std::shared_ptr<Camera> &c);
+#ifdef __EMSCRIPTEN__
+  Renderer(std::shared_ptr<Camera> &c, uint8_t nWorkers);
+#endif
   ~Renderer();
 
   static const int RAY_BOUNCE_LIMIT = 4;
   static const int RAYS_PER_PIXEL = 1;
-  static constexpr int sqrtRaysPerPixel = (int)std::sqrt(RAYS_PER_PIXEL);
-  static constexpr double halfSubPixelSize = 1.0 / (double)sqrtRaysPerPixel / 2.0;
+  // TODO static constexpr below
+  int sqrtRaysPerPixel = (int)std::sqrt(RAYS_PER_PIXEL);
+  double halfSubPixelSize = 1.0 / (double)sqrtRaysPerPixel / 2.0;
 
   Canvas canvas;
 

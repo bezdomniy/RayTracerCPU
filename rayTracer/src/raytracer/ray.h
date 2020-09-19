@@ -3,7 +3,10 @@
 #include <glm/glm.hpp>
 #include <ostream>
 
-class Ray {
+#include "geometry.h"
+
+class Ray
+{
 public:
   Ray();
   Ray(glm::dvec4, glm::dvec4);

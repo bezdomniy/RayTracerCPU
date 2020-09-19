@@ -70,39 +70,34 @@ public:
     int height;
 };
 
+struct Surface
+{
+private:
+    friend class cereal::access;
+    template <class Archive>
+    void serialize(Archive &archive)
+    {
+        archive(rgb, w, h, bpp);
+    }
+
+public:
+    Surface() {}
+    Surface(int w, int h, int bpp)
+    {
+        this->w = w;
+        this->h = h;
+        this->bpp = bpp;
+    }
+
+    std::vector<unsigned char> rgb;
+    int w;
+    int h;
+    int bpp;
+};
+
 class ImageTexture : public UVTexture
 {
 private:
-    struct Surface
-    {
-    private:
-        friend class cereal::access;
-        template <class Archive>
-        void serialize(Archive &archive)
-        {
-            archive(rgb, w, h, bpp);
-        }
-
-    public:
-        Surface() {}
-        Surface(int w, int h, int bpp)
-        {
-            this->w = w;
-            this->h = h;
-            this->bpp = bpp;
-        }
-
-        // TODO use zlib to compress rgb array and uncompress on read.
-        // https://github.com/emscripten-ports/zlib
-        // maybe that wont work ... we need to decompress to use
-        // TODO 2 try replacing stb with sdl_image and load to
-        // sdl surface
-        std::vector<unsigned char> rgb;
-        int w;
-        int h;
-        int bpp;
-    };
-
     friend class cereal::access;
     template <class Archive>
     void serialize(Archive &archive)

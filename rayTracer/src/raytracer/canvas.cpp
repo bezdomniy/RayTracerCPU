@@ -7,10 +7,16 @@ Canvas::Canvas(unsigned int w, unsigned int h)
   width = w;
   height = h;
   pixels.resize(width * height);
-  // pixels.reserve(width * height);
 }
 
-Canvas::~Canvas() {}
+#ifdef __EMSCRIPTEN__
+// TODO update this so only a size/nworkers size canvas in made for each worker
+Canvas::Canvas(unsigned int w, unsigned int h, uint8_t nWorkers)
+{
+  width = w;
+  height = h / nWorkers;
+  pixels.resize(width * height);
+}
 
 void Canvas::writePixel(unsigned int x, unsigned int y, glm::dvec3 colour)
 {
@@ -25,6 +31,26 @@ glm::dvec3 Canvas::getPixel(unsigned int x, unsigned int y)
   if (height >= width)
     return pixels[y * width + x];
   return pixels[x * height + y];
+}
+#else
+void Canvas::writePixel(unsigned int x, unsigned int y, glm::dvec3 colour)
+{
+  if (height >= width)
+    pixels[y * width + x] = colour;
+  else
+    pixels[x * height + y] = colour;
+}
+
+glm::dvec3 Canvas::getPixel(unsigned int x, unsigned int y)
+{
+  if (height >= width)
+    return pixels[y * width + x];
+  return pixels[x * height + y];
+}
+#endif //EMSCRIPTEN
+
+Canvas::~Canvas()
+{
 }
 
 glm::ivec3 Canvas::getPixelInt(unsigned int x, unsigned int y)

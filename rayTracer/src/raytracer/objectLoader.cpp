@@ -27,7 +27,7 @@ ObjectLoader::loadYaml(const std::string &fileName)
   }
   else
   {
-    // std::cout << "Found not found: " << fileName << std::endl;
+    std::cout << "File not found: " << fileName << std::endl;
     root = YAML::Load(fileName);
   }
 
