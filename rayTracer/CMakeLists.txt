@@ -56,7 +56,7 @@ else()
 
 	# add_subdirectory(glm)
 	find_package(glm CONFIG REQUIRED)
-	find_package(TBB CONFIG REQUIRED)
+	# find_package(TBB CONFIG REQUIRED)
 
 	add_subdirectory("src/raytracer")
 endif()

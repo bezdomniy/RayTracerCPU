@@ -38,14 +38,23 @@ Renderer::~Renderer()
 
 void Renderer::render(World &world)
 {
-  std::vector<std::pair<int, int>> pixels;
-  pixels.reserve(this->canvas.height * this->canvas.width);
+  // std::vector<std::pair<int, int>> pixels;
+  // pixels.reserve(this->canvas.height * this->canvas.width);
 
+  // for (int y = 0; y < this->canvas.height; y++)
+  // {
+  //   for (int x = 0; x < this->canvas.width; x++)
+  //   {
+  //     pixels.push_back(std::make_pair(x, y));
+  //   }
+  // }
+
+  moodycamel::ConcurrentQueue<std::pair<int, int>> q;
   for (int y = 0; y < this->canvas.height; y++)
   {
     for (int x = 0; x < this->canvas.width; x++)
     {
-      pixels.push_back(std::make_pair(x, y));
+      q.enqueue(std::make_pair(x, y));
     }
   }
 
@@ -80,16 +89,60 @@ void Renderer::render(World &world)
   }
 #endif // WITH_THREADS
 #else
-  std::for_each(
-      std::execution::par_unseq, pixels.begin(), pixels.end(),
-      [this, &world](auto &&pixel) {
+
+  size_t t = std::thread::hardware_concurrency();
+
+  std::thread threads[t];
+
+  // for (int i = 0; i < this->canvas.height * this->canvas.width; ++i)
+  // {
+  //   q.enqueue(i);
+  // }
+
+  // Consumers
+  // size_t itemPerBatch = this->canvas.height * this->canvas.width / t;
+  for (int i = 0; i < t; ++i)
+  {
+    threads[i] = std::thread([&]() {
+      std::pair<int, int> pixel;
+      while (q.try_dequeue(pixel))
+      {
         renderPixel(world, pixel);
-      });
+      }
+    });
+    // std::pair<int, int> items[itemPerBatch];
+    // for (std::size_t count = q.try_dequeue_bulk(items, itemPerBatch); count != 0; --count)
+    // {
+    //   for (int j = 0; j < itemPerBatch; ++j)
+    //     renderPixel(world, items[j]);
+    // }
+  }
+
+  // Wait for all threads
+  for (int i = 0; i < t; ++i)
+  {
+    threads[i].join();
+  }
+
+  // Collect any leftovers (could be some if e.g. consumers finish before producers)
+  std::pair<int, int> pixel;
+  while (q.try_dequeue(pixel))
+  {
+    renderPixel(world, pixel);
+  }
+
+  // std::for_each(
+  //     std::execution::par_unseq, pixels.begin(), pixels.end(),
+  //     [this, &world](auto &&pixel) {
+  //       renderPixel(world, pixel);
+  //     });
+  //
   // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
   //      it != pixels.end(); ++it)
   // {
   //   renderPixel(world, *it);
   // }
+  //
   // #pragma omp parallel for
   // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
   //     it < pixels.end(); ++it)
@@ -99,7 +152,7 @@ void Renderer::render(World &world)
 #endif
 }
 
-void Renderer::renderPixel(World &world, std::pair<int, int> &pixel)
+void Renderer::renderPixel(World &world, const std::pair<int, int> &pixel)
 {
   // std::cout << "rendering: " << pixel.first << ", " << pixel.second << std::endl;
   glm::dvec3 cShape(0.0, 0.0, 0.0);

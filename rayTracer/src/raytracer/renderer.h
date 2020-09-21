@@ -15,7 +15,9 @@
 #include <taskflow/taskflow.hpp>
 #endif //WITH_THREADS
 #else
-#include <execution>
+// #include <execution>
+#include "concurrentqueue.h"
+#include <thread>
 #endif
 
 #include <algorithm>
@@ -60,5 +62,5 @@ public:
   bool isShadowed(glm::dvec4 &point, World &world, std::shared_ptr<PointLight> &light);
 
   void render(World &world);
-  void renderPixel(World &world, std::pair<int, int> &pixel);
+  void renderPixel(World &world, const std::pair<int, int> &pixel);
 };
