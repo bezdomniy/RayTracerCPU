@@ -16,9 +16,6 @@ private:
 public:
   Canvas();
   Canvas(unsigned int, unsigned int);
-#ifdef __EMSCRIPTEN__
-  Canvas(unsigned int, unsigned int, uint8_t nWorkers);
-#endif
   ~Canvas();
 
   std::vector<glm::dvec3> pixels;

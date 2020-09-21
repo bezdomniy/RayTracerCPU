@@ -46,6 +46,10 @@ std::vector<char> __processScene(const std::string &sceneDesc)
     std::vector<uint8_t> heightBytes(heightBytePointer, heightBytePointer + sizeof(int));
     byteBuffer.insert(byteBuffer.end(), heightBytes.begin(), heightBytes.end());
     // }
+
+    // Padding for rotations and worker ids
+    byteBuffer.resize(byteBuffer.size() + 2);
+
     return byteBuffer;
 }
 
@@ -83,8 +87,10 @@ extern "C"
 
     void renderScene(char *data, int size)
     {
-        uint8_t *workerId = reinterpret_cast<uint8_t *>(data + size - 2);
-        uint8_t *nWorkers = reinterpret_cast<uint8_t *>(data + size - 1);
+        uint8_t *workerId = reinterpret_cast<uint8_t *>(data + size - 1);
+        uint8_t *nWorkers = reinterpret_cast<uint8_t *>(data + size - 2);
+
+        // std::cout << "worker id: " << (int)*workerId << "nworkers " << (int)*nWorkers << std::endl;
 
         float *xRotation = reinterpret_cast<float *>(data + size - 10);
         float *yRotation = reinterpret_cast<float *>(data + size - 6);
@@ -96,7 +102,7 @@ extern "C"
 
         // std::istringstream iss;
         // iss.rdbuf()->pubsetbuf(data, size - 10);
-        membuf sbuf(data, data + size - 10);
+        membuf sbuf(data, data + size - (sizeof(float) * 2 + sizeof(char) * 2));
         std::istream iss(&sbuf);
 
         // std::vector<std::pair<int, int>> pixelsToRender;
@@ -125,7 +131,7 @@ extern "C"
         // this->camera->position.x += posChange;
         camera->updateTransform();
 
-        Renderer renderer(camera);
+        Renderer renderer(camera, *nWorkers);
 
         // pixelsToRender.clear();
         // pixelsToRender.reserve((camera->vsize * camera->hsize) / (*nWorkers + 1));
@@ -143,7 +149,7 @@ extern "C"
                     // TODO check if rendering just 1 pixel will give same memory outcome as rendering all of them
                     auto pixel = std::make_pair(x, y);
                     renderer.renderPixel(*world,
-                                         pixel);
+                                         pixel, *nWorkers);
                 }
             }
         }
@@ -161,15 +167,15 @@ extern "C"
 
         std::tie(byteBuffer, bufferLength) = renderer.canvas.writeToRGBA(false);
 
-        byteBuffer.push_back(*(data + size - 2));
+        byteBuffer.push_back(*(data + size - 1));
 
         emscripten_worker_respond(&byteBuffer[0], bufferLength + 1);
     }
 
     void renderSceneThreaded(char *data, int size)
     {
-        uint8_t *workerId = reinterpret_cast<uint8_t *>(data + size - 2);
-        uint8_t *nWorkers = reinterpret_cast<uint8_t *>(data + size - 1);
+        uint8_t *workerId = reinterpret_cast<uint8_t *>(data + size - 1);
+        uint8_t *nWorkers = reinterpret_cast<uint8_t *>(data + size - 2);
 
         float *xRotation = reinterpret_cast<float *>(data + size - 10);
         float *yRotation = reinterpret_cast<float *>(data + size - 6);
@@ -208,7 +214,7 @@ extern "C"
         size_t bufferLength;
         std::tie(byteBuffer, bufferLength) = renderer.canvas.writeToRGBA(false);
 
-        byteBuffer.push_back(*(data + size - 2));
+        byteBuffer.push_back(*(data + size - 1));
 
         emscripten_worker_respond(&byteBuffer[0], bufferLength + 1);
     }

@@ -42,7 +42,7 @@ private:
 #endif
     // static const int PIXELS_PER_BATCH = 20000;
     SDL_Event event;
-    const float STEP_SIZE = 0.01f;
+    const float STEP_SIZE = 0.05f;
 
     // std::string sceneDesc;
     // std::vector<uint8_t> byteBuffer;
@@ -57,6 +57,8 @@ private:
 public:
     Window();
 
+    // big assumption that sizeof(float) == sizeof(int)
+    const size_t offset = (sizeof(int) * 2) + (sizeof(char) * 2);
     int nWorkers;
 
     int width;

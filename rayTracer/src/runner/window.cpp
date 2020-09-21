@@ -9,26 +9,32 @@ Window::Window()
     this->nWorkers = 1;
 
 #ifndef WITH_THREADS
-    const auto processor_count = std::thread::hardware_concurrency();
+    // const auto processor_count = std::thread::hardware_concurrency();
 
-    if (processor_count > 0)
-    {
-        // if (processor_count > 6)
-        //     this->nWorkers = 6;
-        // else
-        this->nWorkers = processor_count;
-    }
+    // if (processor_count > 0)
+    // {
+    //     // if (processor_count > 6)
+    //     //     this->nWorkers = 6;
+    //     // else
+    //     this->nWorkers = processor_count;
+    // }
 #endif //WITH_THREADS
 }
 
 void Window::processScene(const std::string &sceneDesc)
 {
-    if (workers.empty())
+    if (workers.size() < this->nWorkers)
     {
-        for (int i = 0; i < this->nWorkers; ++i)
+        for (int i = workers.size(); i < this->nWorkers; i++)
         {
-            this->workers.push_back(emscripten_create_worker("/js/RayTracer.wasm.js"));
-            this->busyWorkers.push_back(false);
+            addWorker();
+        }
+    }
+    else
+    {
+        for (int i = this->nWorkers; i < workers.size(); i++)
+        {
+            killWorker();
         }
     }
 
@@ -50,12 +56,14 @@ void Window::killWorker()
     {
         emscripten_destroy_worker(worker);
         workers.pop_back();
+        busyWorkers.pop_back();
     }
 }
 
 void Window::addWorker()
 {
     this->workers.push_back(emscripten_create_worker("/js/RayTracer.wasm.js"));
+    this->busyWorkers.push_back(false);
 }
 
 void Window::updateSize()
@@ -80,6 +88,7 @@ void Window::draw(uint8_t workerId)
 
     for (int j = 0; j < this->height; j++)
     {
+        // if (true)
         if (j % this->nWorkers == workerId)
         {
             // std::cout << "Writing row: " << j << std::endl;
@@ -87,7 +96,7 @@ void Window::draw(uint8_t workerId)
             {
                 // glm::ivec3 colour(this->rayTraceRenderer.canvas.getPixelInt(i, j));
                 // if (this->height >= this->width)
-                pixelsOffset = (j * this->width + i) * 4;
+                pixelsOffset = (((j / this->nWorkers) * this->width) + i) * 4;
                 // else
                 //     pixelsOffset = (i * this->height + j) * 4;
 
@@ -317,39 +326,50 @@ void Window::update()
     this->running = true;
 
 #ifdef __EMSCRIPTEN__
-    int i = 0;
+
+    // std::cout << "Send rotations: " << this->xRotation << " " << this->yRotation << std::endl;
+
+    std::vector<uint8_t> xRotationBytes = floatToByteArray(this->xRotation);
+    std::vector<uint8_t> yRotationBytes = floatToByteArray(this->yRotation);
+
+    // TODO implement rotation based on this in the renderer api
+    int i = this->sceneBinary.size() - ((sizeof(int) * 2) + (sizeof(char) * 2));
+    for (auto &byte : xRotationBytes)
+    {
+        this->sceneBinary[i] = byte;
+        i++;
+    }
+
+    for (auto &byte : yRotationBytes)
+    {
+        this->sceneBinary[i] = byte;
+        i++;
+    }
+
+    // this->sceneBinary.push_back((char)this->nWorkers);
+    this->sceneBinary[i] = ((char)this->nWorkers);
+    i++;
+
+    // std::cout << "nworkers " << (int)nWorkers << std::endl;
+
+    // TODO fix ints to sizes of floats
+    // float *xRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 10);
+    // float *yRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 6);
+
+    int worker = 0;
     for (auto &renderWorker : this->workers)
     {
         // rotation info
 
-        this->busyWorkers.at(i) = true;
-
-        // std::cout << "Send rotations: " << this->xRotation << " " << this->yRotation << std::endl;
-
-        std::vector<uint8_t> xRotationBytes = floatToByteArray(this->xRotation);
-        std::vector<uint8_t> yRotationBytes = floatToByteArray(this->yRotation);
-
-        // TODO implement rotation based on this in the renderer api
-        for (auto &byte : xRotationBytes)
-            this->sceneBinary.push_back(byte);
-
-        for (auto &byte : yRotationBytes)
-            this->sceneBinary.push_back(byte);
-
-        this->sceneBinary.push_back((char)i);
-        this->sceneBinary.push_back((char)this->nWorkers);
-
-        // TODO fix ints to sizes of floats
-        float *xRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 10);
-        float *yRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 6);
-
+        this->busyWorkers.at(worker) = true;
+        this->sceneBinary[i] = ((char)worker);
 #ifdef WITH_THREADS
         emscripten_call_worker(renderWorker, "renderSceneThreaded", &this->sceneBinary[0], this->sceneBinary.size(), renderCback, (void *)42);
 #else
         emscripten_call_worker(renderWorker, "renderScene", &this->sceneBinary[0], this->sceneBinary.size(), renderCback, (void *)42);
 #endif //WITH_THREADS \
     // std::cout << "Receive Rotations: " << *xRotationp << " " << *yRotationp << std::endl;
-        i++;
+        worker++;
         // this->somethingChanged = false;
     }
 

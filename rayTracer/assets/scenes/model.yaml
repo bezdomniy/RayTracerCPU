@@ -70,9 +70,9 @@
 - define: armadillo
   value:
     add: obj
-    file: assets/models/lucy.obj
+    file: assets/models/armadillo.obj
     transform:
-      - [scale, 0.003, 0.003, 0.003]
+      - [scale, 0.012, 0.012, 0.012]
 - define: dragon
   value:
     add: obj
@@ -89,8 +89,8 @@
   args: [-1, 1, 1]
   material: pink-material
   transform:
-    - [rotate-y, -2.5]
-    - [translate, -0.2, 0.0, 0.5]
+    - [rotate-y, -0.5]
+    - [translate, -0.2, 0.65, 0.5]
 - add: bunny
   material: dalmatian-material
   transform:

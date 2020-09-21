@@ -3,6 +3,8 @@
 std::shared_ptr<Group> FirBranch::build()
 {
     std::shared_ptr<Group> root = std::make_shared<Group>();
+    std::shared_ptr<Material> rootMaterial = std::make_shared<Material>();
+    root->setMaterial(rootMaterial);
 
     double length = 2.0;
     double radius = 0.025;
@@ -34,9 +36,16 @@ std::shared_ptr<Group> FirBranch::build()
     std::mt19937 gen(rd());
     std::uniform_real_distribution<double> dis(0, 1);
 
+    std::shared_ptr<Material> triMaterial = std::make_shared<Material>();
+    triMaterial->colour = glm::dvec3(0.26, 0.36, 0.16);
+    // triMaterial->ambient = 0.2;
+    triMaterial->specular = 0.1;
+    // triMaterial->diffuse = 0.6;
+
     for (int y = 0; y < segments; y++)
     {
         std::shared_ptr<Group> subgroup = std::make_shared<Group>();
+        subgroup->setMaterial(triMaterial);
 
         for (int i = 0; i < perSegment; i++)
         {
@@ -59,12 +68,7 @@ std::shared_ptr<Group> FirBranch::build()
             triangle->multiplyTransform(rotation);
             triangle->calculateInverseTranform();
 
-            std::shared_ptr<Material> triMaterial = std::make_shared<Material>();
-            triMaterial->colour = glm::dvec3(0.26, 0.36, 0.16);
-            // triMaterial->ambient = 0.2;
-            triMaterial->specular = 0.1;
-            // triMaterial->diffuse = 0.6;
-            triangle->setMaterial(triMaterial);
+            // triangle->setMaterial(triMaterial);
 
             subgroup->addChild(triangle);
         }

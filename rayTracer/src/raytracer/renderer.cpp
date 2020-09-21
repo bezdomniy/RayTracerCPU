@@ -8,11 +8,27 @@ Renderer::Renderer(std::shared_ptr<Camera> &c)
   this->canvas = Canvas(this->camera->hsize, this->camera->vsize);
 }
 
-#ifdef __EMSCRIPTEN__
+#ifdef __EMSCRIPTEN__ //TODO change to if emscripten AND if use_threaded
 Renderer::Renderer(std::shared_ptr<Camera> &c, uint8_t nWorkers)
 {
   this->camera = c;
-  this->canvas = Canvas(this->camera->hsize, this->camera->vsize);
+  this->canvas = Canvas(this->camera->hsize, (this->camera->vsize / nWorkers) + 1);
+}
+
+void Renderer::renderPixel(World &world, std::pair<int, int> &pixel, uint8_t nWorkers)
+{
+  // std::cout << "rendering: " << pixel.first << ", " << pixel.second << std::endl;
+  glm::dvec3 cShape(0.0, 0.0, 0.0);
+  for (int i = 0; i < RAYS_PER_PIXEL; i++)
+  {
+    Ray cast = this->camera->rayForPixel(pixel.first, pixel.second, i,
+                                         sqrtRaysPerPixel, halfSubPixelSize);
+    cShape += colourAt(cast, world, RAY_BOUNCE_LIMIT);
+  }
+
+  cShape *= 1.0 / (double)RAYS_PER_PIXEL;
+
+  this->canvas.writePixel(pixel.first, pixel.second / nWorkers, cShape);
 }
 #endif
 
@@ -69,6 +85,11 @@ void Renderer::render(World &world)
       [this, &world](auto &&pixel) {
         renderPixel(world, pixel);
       });
+  // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
+  //      it != pixels.end(); ++it)
+  // {
+  //   renderPixel(world, *it);
+  // }
   // #pragma omp parallel for
   // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
   //     it < pixels.end(); ++it)

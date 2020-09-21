@@ -12,12 +12,12 @@ Window window;
 // TODO maybe even the obj files can just be downloaded ad-hoc from the server
 void processCback(char *data, int size, void *arg)
 {
-  window.sceneBinary = std::vector<char>(data, data + size - (sizeof(int) * 2));
+  window.sceneBinary = std::vector<char>(data, data + size);
 
   std::cout << "Scene binary size: " << window.sceneBinary.size() << std::endl;
 
-  window.width = *reinterpret_cast<int *>(data + size - (sizeof(int) * 2));
-  window.height = *reinterpret_cast<int *>(data + size - sizeof(int));
+  window.width = *reinterpret_cast<int *>(data + size - window.offset);
+  window.height = *reinterpret_cast<int *>(data + size - window.offset + sizeof(int));
 
   if (!window.initialised)
     window.initWindow();
@@ -74,9 +74,11 @@ extern "C"
     window.killWorker();
   }
 
-  void EMSCRIPTEN_KEEPALIVE draw(const char *s)
+  void EMSCRIPTEN_KEEPALIVE draw(const char *s, int c)
   {
     std::string sceneDesc(s);
+    window.nWorkers = c;
+    std::cout << "nworkers: " << window.nWorkers << std::endl;
     window.processScene(sceneDesc);
     window.xRotation = 0.0f;
     window.yRotation = 0.0f;
@@ -470,13 +472,13 @@ int main(int argc, char const *argv[])
 
   // renderToSDL("assets/scenes/reflectionScene.yaml");
   // renderToSDL("assets/scenes/coverScene.yaml");
-  // renderToSDL("assets/scenes/groups.yaml");
-  renderToPPM("../../../assets/scenes/model.yaml");
+  // renderToPPM("../../../assets/scenes/groups.yaml");
+  // renderToPPM("../../../assets/scenes/model.yaml");
   // renderToSDL("../../../assets/scenes/hippy.yaml");
   // renderToSDL("assets/scenes/globe.yaml");
   // renderToSDL("assets/scenes/skybox.yaml");
   // renderToSDL("assets/scenes/checkers.yaml");
-  // renderToSDL("assets/scenes/christmas.yaml");
+  renderToSDL("../../../assets/scenes/christmas.yaml");
   // renderToSDL("assets/scenes/reflectionScene.yaml");
   // renderToSDL("assets/scenes/reflectionScene.yaml");
 

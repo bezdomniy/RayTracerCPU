@@ -124,7 +124,7 @@ std::pair<glm::dvec2, int> CubeMap::uv_map(glm::dvec4 point)
     {
         return {cubeUVFront(point), face};
     }
-    else if (face == 5)
+    else
     {
         return {cubeUVBack(point), face};
     }

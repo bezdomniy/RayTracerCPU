@@ -27,7 +27,7 @@ ObjectLoader::loadYaml(const std::string &fileName)
   }
   else
   {
-    std::cout << "File not found: " << fileName << std::endl;
+    // std::cout << "File not found: " << fileName << std::endl;
     root = YAML::Load(fileName);
   }
 
@@ -433,8 +433,8 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
   {
     if (newPattern)
       shapePtr->setMaterial(newMaterial);
-    else
-      shapePtr->material = newMaterial;
+    // else
+    //   shapePtr->material = newMaterial;
   }
 
   shapePtr->calculateInverseTranform();

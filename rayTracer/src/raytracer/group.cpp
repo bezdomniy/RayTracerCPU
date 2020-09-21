@@ -96,7 +96,9 @@ void Group::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &i
 {
   Ray transformedRay = transformRay(ray);
 
-  if (boundIntersection(transformedRay))
+  bool isHit = boundIntersection(transformedRay);
+
+  if (isHit)
   {
     for (auto &shape : this->children)
     {
@@ -181,14 +183,15 @@ void Group::addChild(std::shared_ptr<Shape> &child)
 void Group::updateBoundingBox(std::shared_ptr<Shape> &shape)
 {
   std::vector<glm::dvec4> points(8);
-  points.at(0) = shape->bounds().first;
-  points.at(1) = glm::dvec4(shape->bounds().first.x, shape->bounds().first.y, shape->bounds().second.z, 1.);
-  points.at(2) = glm::dvec4(shape->bounds().first.x, shape->bounds().second.y, shape->bounds().first.z, 1.);
-  points.at(3) = glm::dvec4(shape->bounds().first.x, shape->bounds().second.y, shape->bounds().second.z, 1.);
-  points.at(4) = glm::dvec4(shape->bounds().second.x, shape->bounds().first.y, shape->bounds().first.z, 1.);
-  points.at(5) = glm::dvec4(shape->bounds().second.x, shape->bounds().first.y, shape->bounds().second.z, 1.);
-  points.at(6) = glm::dvec4(shape->bounds().second.x, shape->bounds().second.y, shape->bounds().first.z, 1.);
-  points.at(7) = shape->bounds().second;
+  const auto &bounds = shape->bounds();
+  points.at(0) = bounds.first;
+  points.at(1) = glm::dvec4(bounds.first.x, bounds.first.y, bounds.second.z, 1.);
+  points.at(2) = glm::dvec4(bounds.first.x, bounds.second.y, bounds.first.z, 1.);
+  points.at(3) = glm::dvec4(bounds.first.x, bounds.second.y, bounds.second.z, 1.);
+  points.at(4) = glm::dvec4(bounds.second.x, bounds.first.y, bounds.first.z, 1.);
+  points.at(5) = glm::dvec4(bounds.second.x, bounds.first.y, bounds.second.z, 1.);
+  points.at(6) = glm::dvec4(bounds.second.x, bounds.second.y, bounds.first.z, 1.);
+  points.at(7) = bounds.second;
 
   for (auto point : points)
   {
@@ -212,10 +215,11 @@ bool Group::boundIntersection(Ray &transformedRay)
   double tmin = std::max({xtminmax.first, ytminmax.first, ztminmax.first});
   double tmax = std::min({xtminmax.second, ytminmax.second, ztminmax.second});
 
-  if (tmin > tmax)
-    return false;
+  return !(tmin > tmax);
+  // if (tmin > tmax)
+  //   return false;
 
-  return true;
+  // return true;
 }
 
 std::string Group::type() { return "Group"; }

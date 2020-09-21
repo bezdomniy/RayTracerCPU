@@ -35,6 +35,7 @@ public:
   Renderer(std::shared_ptr<Camera> &c);
 #ifdef __EMSCRIPTEN__
   Renderer(std::shared_ptr<Camera> &c, uint8_t nWorkers);
+  void renderPixel(World &world, std::pair<int, int> &pixel, uint8_t nWorkers);
 #endif
   ~Renderer();
 
