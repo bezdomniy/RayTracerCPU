@@ -1,0 +1,30 @@
+- add: camera
+  width: 100
+  height: 100
+  field-of-view: 0.785
+  from: [-6, 6, -10]
+  to: [6, 0, 6]
+  up: [-0.45, 1, 0]
+- add: light
+  at: [50, 100, -50]
+  intensity: [1, 1, 1]
+- define: white-material
+  value:
+    color: [1, 1, 1]
+    diffuse: 0.7
+    ambient: 0.1
+    specular: 0.0
+    reflective: 0.1
+- define: blue-material
+  extend: white-material
+  value:
+    color: [0.537, 0.831, 0.914]
+- define: standard-transform
+  value:
+    - [translate, 1, -1, 1]
+    - [scale, 4, 4, 4]
+- add: sphere
+  material: blue-material
+  transform:
+    - standard-transform
+    - [translate, 3, 3.5, 0.5]

@@ -2,12 +2,9 @@
 [submodule "rayTracer/yaml-cpp"]
 	path = rayTracer/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp.git
+[submodule "rayTracer/cpp-taskflow"]
+	path = rayTracer/cpp-taskflow
+	url = https://github.com/cpp-taskflow/cpp-taskflow.git
 [submodule "rayTracer/glm"]
 	path = rayTracer/glm
 	url = https://github.com/g-truc/glm.git
-[submodule "rayTracer/parallelstl"]
-	path = rayTracer/parallelstl
-	url = https://github.com/intel/parallelstl.git
-[submodule "rayTracer/glfw"]
-	path = rayTracer/glfw
-	url = https://github.com/glfw/glfw.git

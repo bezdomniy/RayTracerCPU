@@ -1,3 +1,4 @@
 build/
 *.ppm
 *.png
+include/cereal

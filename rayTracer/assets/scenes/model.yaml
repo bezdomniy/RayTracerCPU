@@ -1,0 +1,110 @@
+- add: camera
+  width: 600
+  height: 400
+  field-of-view: 1.0472
+  from: [-.2, 2, -5]
+  to: [0, 0.8, 0]
+  up: [0, 1, 0]
+- add: light
+  at: [2, 4, -3]
+  intensity: [1, 1, 1]
+- define: base-material
+  value:
+    color: [1, 1, 1]
+    diffuse: 0.7
+    ambient: 0.1
+    specular: 0.3
+    shininess: 200
+- define: blue-material
+  extend: base-material
+  value:
+    color: [0.537, 0.831, 0.914]
+    transparency: 0.5
+    refractive-index: 1.655
+- define: pink-material
+  extend: base-material
+  value:
+    color: [1, 0.42, 0.7]
+    reflective: 0.2
+- define: standard-transform
+  value:
+    - [scale, 0.5, 0.5, 0.5]
+    - [translate, 1, -1, 1]
+- define: dalmatian-material
+  value:
+    pattern:
+      type: checkers
+      perturbed: 0.5
+      colors:
+        - [0.90, 0.16, 0.16]
+        - [1, 1, 1]
+      transform:
+        - [scale, 0.25, 0.25, 0.25]
+    diffuse: 0.7
+    ambient: 0.1
+    transparency: 0.8
+    refractive-index: 1.52
+- define: hippy-material
+  value:
+    pattern:
+      type: blended
+      perturbed: 0.1
+      patterns:
+        - type: stripes
+          perturbed: 0.1
+          colors:
+            - [0.09, 0.69, 0.86]
+            - [0.88, 0.71, 0.4]
+          transform:
+            - [scale, 0.25, 0.25, 0.25]
+        - type: stripes
+          perturbed: 0.1
+          colors:
+            - [0.02, 0.40, 0.33]
+            - [0.9, 0.16, 0.16]
+          transform:
+            - [rotate-y, 1.5708]
+            - [scale, 0.25, 0.25, 0.25]
+    diffuse: 0.7
+    ambient: 0.1
+- define: armadillo
+  value:
+    add: obj
+    file: assets/models/armadillo.obj
+    transform:
+      - [scale, 0.012, 0.012, 0.012]
+- define: dragon
+  value:
+    add: obj
+    file: assets/models/dragon.obj
+    transform:
+      - [scale, 0.268, 0.268, 0.268]
+- define: bunny
+  value:
+    add: obj
+    file: assets/models/bunny.obj
+    transform:
+      - [scale, 0.5, 0.5, -0.5]
+- add: armadillo
+  args: [-1, 1, 1]
+  material: pink-material
+  transform:
+    - [rotate-y, -0.5]
+    - [translate, -0.2, 0.65, 0.5]
+- add: bunny
+  material: dalmatian-material
+  transform:
+    - [rotate-y, -0.4]
+    - [translate, 1.5, 0, -0.5]
+- add: dragon
+  material: blue-material
+  transform:
+    - [rotate-y, 3.7]
+    - [translate, -1.5, 0, -0.5]
+- add: plane
+  material: hippy-material
+  transform:
+    - [rotate-x, 1.5708]
+    - [translate, 0, 0, 2.5]
+- add: plane
+  material: hippy-material

@@ -1,0 +1,76 @@
+- add: camera
+  width: 500
+  height: 250
+  field-of-view: 1.0472
+  from: [0, 1.5, -5]
+  to: [0, 1, 0]
+  up: [0, 1, 0]
+- add: light
+  at: [-10, 10, 0]
+  intensity: [1, 1, 1]
+- define: base-material
+  value:
+    color: [1, 1, 1]
+    diffuse: 0.7
+    ambient: 0.1
+    specular: 0.3
+    shininess: 200
+    # reflective: 0.1
+- define: blue-material
+  extend: base-material
+  value:
+    color: [0.537, 0.831, 0.914]
+- define: white-material
+  extend: base-material
+  value:
+    color: [1, 1, 1]
+- define: standard-transform
+  value:
+    - [scale, 0.5, 0.5, 0.5]
+    - [translate, 1, -1, 1]
+
+- add: sphere
+  material: blue-material
+  transform:
+    - [rotate-y, 1]
+    - [rotate-x, 1]
+    - [translate, -0.5, 1, 0.5]
+
+- add: sphere
+  material: blue-material
+  transform:
+    - [scale, 0.5, 0.5, 0.5]
+    - [translate, 1.5, 0.5, -0.5]
+
+- add: sphere
+  material: blue-material
+  transform:
+    - [scale, 0.33, 0.33, 0.33]
+    - [translate, -1.5, 0.33, -0.75]
+
+- add: plane
+  material:
+    pattern:
+      type: checkers
+      colors:
+        - [0, 0, 0]
+        - [1, 1, 1]
+      transform:
+        - [scale, 0.25, 0.25, 0.25]
+    diffuse: 0.7
+    ambient: 0.1
+
+- add: plane
+  material: 
+    pattern:
+      type: checkers
+      colors:
+        - [0, 0, 0]
+        - [1, 1, 1]
+      transform:
+        - [scale, 0.25, 0.25, 0.25]
+    diffuse: 0.7
+    ambient: 0.1
+  transform:
+    - [rotate-x, 1.5708]
+    - [translate, 0, 0, 2.5]
