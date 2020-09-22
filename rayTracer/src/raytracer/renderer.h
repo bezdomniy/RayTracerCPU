@@ -12,7 +12,8 @@
 
 #ifdef __EMSCRIPTEN__
 #ifdef WITH_THREADS
-#include <taskflow/taskflow.hpp>
+#include "concurrentqueue.h"
+// #include <taskflow/taskflow.hpp>
 #endif //WITH_THREADS
 #else
 // #include <execution>

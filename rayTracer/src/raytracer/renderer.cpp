@@ -65,22 +65,44 @@ void Renderer::render(World &world)
 
 #ifdef __EMSCRIPTEN__
 #ifdef WITH_THREADS
-  // TODO not working - blocking before execution of for_each for some reason
-  // tf::Executor executor(std::thread::hardware_concurrency());
-  tf::Executor executor;
-  tf::Taskflow taskflow;
+  size_t t = std::thread::hardware_concurrency();
+  std::thread threads[t];
+  for (int i = 0; i < t; ++i)
+  {
+    threads[i] = std::thread([&]() {
+      std::pair<int, int> pixel;
+      while (q.try_dequeue(pixel))
+      {
+        renderPixel(world, pixel);
+      }
+    });
+  }
 
-  taskflow.for_each(
-      pixels.begin(), pixels.end(),
-      [this, &world](auto &pixel) {
-        std::cout << "rendering: " << pixel.first << ", " << pixel.second << std::endl;
-        // this->renderPixel(world, pixel);
-      });
-  std::cout << "starting thread" << std::endl;
-  // executor.run(taskflow).wait();
-  executor.run(taskflow);
-  executor.wait_for_all();
-  std::cout << "done thread" << std::endl;
+  // Wait for all threads
+  for (int i = 0; i < t; ++i)
+  {
+    threads[i].join();
+  }
+
+  std::pair<int, int> pixel;
+  while (q.try_dequeue(pixel))
+  {
+    renderPixel(world, pixel);
+  }
+  // tf::Executor executor;
+  // tf::Taskflow taskflow;
+
+  // taskflow.for_each(
+  //     pixels.begin(), pixels.end(),
+  //     [this, &world](auto &pixel) {
+  //       std::cout << "rendering: " << pixel.first << ", " << pixel.second << std::endl;
+  //       // this->renderPixel(world, pixel);
+  //     });
+  // std::cout << "starting thread" << std::endl;
+  // // executor.run(taskflow).wait();
+  // executor.run(taskflow);
+  // executor.wait_for_all();
+  // std::cout << "done thread" << std::endl;
 #else
   for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
        it != pixels.end(); ++it)
@@ -91,16 +113,7 @@ void Renderer::render(World &world)
 #else
 
   size_t t = std::thread::hardware_concurrency();
-
   std::thread threads[t];
-
-  // for (int i = 0; i < this->canvas.height * this->canvas.width; ++i)
-  // {
-  //   q.enqueue(i);
-  // }
-
-  // Consumers
-  // size_t itemPerBatch = this->canvas.height * this->canvas.width / t;
   for (int i = 0; i < t; ++i)
   {
     threads[i] = std::thread([&]() {
@@ -110,12 +123,6 @@ void Renderer::render(World &world)
         renderPixel(world, pixel);
       }
     });
-    // std::pair<int, int> items[itemPerBatch];
-    // for (std::size_t count = q.try_dequeue_bulk(items, itemPerBatch); count != 0; --count)
-    // {
-    //   for (int j = 0; j < itemPerBatch; ++j)
-    //     renderPixel(world, items[j]);
-    // }
   }
 
   // Wait for all threads
@@ -124,7 +131,6 @@ void Renderer::render(World &world)
     threads[i].join();
   }
 
-  // Collect any leftovers (could be some if e.g. consumers finish before producers)
   std::pair<int, int> pixel;
   while (q.try_dequeue(pixel))
   {

@@ -24,13 +24,7 @@ void processCback(char *data, int size, void *arg)
   else
     window.updateSize();
 
-  // window.destroyProcessorWorker();
   window.somethingChanged = true;
-
-  // window.killWorker();
-  // window.addWorker();
-
-  // window.update();
 }
 
 void renderCback(char *data, int size, void *arg)
@@ -49,21 +43,12 @@ void renderCback(char *data, int size, void *arg)
 
   if (std::all_of(window.busyWorkers.begin(), window.busyWorkers.end(), [](bool v) { return !v; }))
     window.running = false;
-  // std::cout << size << std::endl;
 }
 
 void loop()
 {
   window.step();
 }
-
-// int EMSCRIPTEN_KEEPALIVE main(int argc, char const *argv[])
-// {
-//   window.processScene("/scenes/christmas.yaml");
-
-//   // window.step();
-//   emscripten_set_main_loop(loop, 2, true);
-// }
 
 #ifdef __cplusplus
 extern "C"
@@ -101,19 +86,6 @@ extern "C"
     window.moveRight();
   }
 
-// void EMSCRIPTEN_KEEPALIVE getModel(const char *url)
-// {
-//   std::string urlText(url);
-
-//   std::cout << "url: : " << urlText << '\n';
-
-//   std::size_t found = urlText.find_last_of("/\\");
-//   std::string newPath = "/models/" + urlText.substr(found + 1);
-
-//   emscripten_wget(url, newPath.c_str());
-//   std::cout << " loaded to: "
-//             << newPath << std::endl;
-// }
 #ifdef __cplusplus
 }
 #endif
@@ -146,89 +118,6 @@ void renderToSDL(const std::shared_ptr<Camera> &camera, const std::shared_ptr<Wo
 {
   Window window(camera, world);
   window.run();
-}
-
-std::shared_ptr<Shape> hexagonCorner()
-{
-  std::shared_ptr<Shape> corner = std::make_shared<Sphere>();
-  std::shared_ptr<Material> material = std::make_shared<Material>();
-  material->colour = glm::dvec3(0.8, 0.8, 0.8);
-  corner->setMaterial(material);
-
-  glm::dmat4 scale =
-      glm::scale(glm::dmat4(1.0), glm::dvec3(0.25, 0.25, 0.25));
-
-  glm::dmat4 translate =
-      glm::translate(glm::dmat4(1.0), glm::dvec3(0., 0., -1.));
-
-  corner->multiplyTransform(scale);
-  corner->multiplyTransform(translate);
-
-  corner->calculateInverseTranform();
-
-  return corner;
-}
-
-std::shared_ptr<Shape> hexagonEdge()
-{
-  std::shared_ptr<Shape> edge = std::make_shared<Cylinder>(0., 1., false);
-  std::shared_ptr<Material> material = std::make_shared<Material>();
-  material->colour = glm::dvec3(0.8, 0.8, 0.8);
-  edge->setMaterial(material);
-
-  glm::dmat4 translate =
-      glm::translate(glm::dmat4(1.0), glm::dvec3(0., 0., -1.));
-
-  glm::dmat4 scale =
-      glm::scale(glm::dmat4(1.0), glm::dvec3(0.25, 1., 0.25));
-
-  glm::dmat4 rotationy =
-      glm::rotate(glm::dmat4(1.0), 0.52359877559,
-                  glm::dvec3(0.0, 1.0, 0.0));
-
-  glm::dmat4 rotationz =
-      glm::rotate(glm::dmat4(1.0), 1.57079632679,
-                  glm::dvec3(0.0, 0.0, 1.0));
-
-  edge->multiplyTransform(scale);
-  edge->multiplyTransform(rotationz);
-  edge->multiplyTransform(rotationy);
-  edge->multiplyTransform(translate);
-
-  edge->calculateInverseTranform();
-  return edge;
-}
-
-std::shared_ptr<Group> hexagonSide()
-{
-  std::shared_ptr<Group> side = std::make_shared<Group>();
-
-  std::shared_ptr<Shape> corner = hexagonCorner();
-  std::shared_ptr<Shape> edge = hexagonEdge();
-
-  side->addChild(corner);
-  side->addChild(edge);
-
-  return side;
-}
-
-std::shared_ptr<Group> hexagon()
-{
-  std::shared_ptr<Group> hex = std::make_shared<Group>();
-
-  for (int i = 0; i < 6; i++)
-  {
-    std::shared_ptr<Shape> side = hexagonSide();
-    glm::dmat4 rotationy =
-        glm::rotate(glm::dmat4(1.0), i * 1.0471975512,
-                    glm::dvec3(0.0, 1.0, 0.0));
-    side->multiplyTransform(rotationy);
-
-    side->calculateInverseTranform();
-    hex->addChild(side);
-  }
-
-  return hex;
 }
 
 #include <cmath>
@@ -345,156 +234,37 @@ std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> rayTracerInOneWeekend
   return std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>>(camera, world);
 }
 
-Model mesh(const std::string &objPath)
-{
-  Model model(objPath, true);
-  std::shared_ptr<Material> material = std::make_shared<Material>();
-  material->colour = glm::dvec3(0.8, 0.8, 0.8);
-  model.mesh->setMaterial(material);
-
-  glm::dmat4 scale =
-      glm::scale(glm::dmat4(1.0), glm::dvec3(0.04, 0.04, 0.04));
-  // glm::dmat4 rotationy =
-  //     glm::rotate(glm::dmat4(1.0), 3.8,
-  //                 glm::dvec3(0.0, 1.0, 0.0));
-  glm::dmat4 translate =
-      glm::translate(glm::dmat4(1.0), glm::dvec3(0., -3, 0.));
-
-  model.mesh->multiplyTransform(scale);
-  // model.mesh->multiplyTransform(rotationy);
-  model.mesh->multiplyTransform(translate);
-  model.mesh->calculateInverseTranform();
-
-  return model;
-}
-
-std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> draw3Dmodel(std::string modelFile)
-{
-  std::shared_ptr<World> world = std::make_shared<World>();
-  std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(5., 5, -20., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 400, 0.524);
-
-  Model model = mesh(modelFile);
-  // Model model2 = model;
-  // Model model3 = model;
-  // Model model4 = model;
-  // Model model5 = model;
-
-  std::shared_ptr<PointLight> light = std::make_shared<PointLight>(
-      glm::dvec4(glm::dvec4(10., 10., -10., 1.)),
-      glm::dvec3(1., 1., 1.));
-
-  std::shared_ptr<Shape> mesh = std::dynamic_pointer_cast<Shape>(model.mesh);
-  // std::shared_ptr<Shape> mesh2 = std::dynamic_pointer_cast<Shape>(model2.mesh);
-  // std::shared_ptr<Shape> mesh3 = std::dynamic_pointer_cast<Shape>(model3.mesh);
-  // std::shared_ptr<Shape> mesh4 = std::dynamic_pointer_cast<Shape>(model4.mesh);
-  // std::shared_ptr<Shape> mesh5 = std::dynamic_pointer_cast<Shape>(model5.mesh);
-
-  // glm::dmat4 translateMesh =
-  //     glm::translate(glm::dmat4(1.0), glm::dvec3(0., 2, 0.));
-  // mesh2->multiplyTransform(translateMesh);
-  // mesh2->calculateInverseTranform();
-
-  // translateMesh =
-  //     glm::translate(glm::dmat4(1.0), glm::dvec3(0., -2, 0.));
-  // mesh3->multiplyTransform(translateMesh);
-  // mesh3->calculateInverseTranform();
-
-  // translateMesh =
-  //     glm::translate(glm::dmat4(1.0), glm::dvec3(2., 2, 0.));
-  // mesh4->multiplyTransform(translateMesh);
-  // mesh4->calculateInverseTranform();
-
-  // translateMesh =
-  //     glm::translate(glm::dmat4(1.0), glm::dvec3(2., -2, 0.));
-  // mesh5->multiplyTransform(translateMesh);
-  // mesh5->calculateInverseTranform();
-
-  // glm::dmat4 scale =
-  //     glm::scale(glm::dmat4(1.0), glm::dvec3(3., 3., 3.));
-  // mesh->multiplyTransform(scale);
-  // mesh->calculateInverseTranform();
-
-  std::shared_ptr<Shape> plane = std::make_shared<Plane>();
-
-  std::shared_ptr<Material> planeMaterial = std::make_shared<Material>();
-  planeMaterial->reflective = 0.8;
-  planeMaterial->colour = glm::dvec3(0.8, 0.1, 0.1);
-  plane->setMaterial(planeMaterial);
-
-  glm::dmat4 translate =
-      glm::translate(glm::dmat4(1.0), glm::dvec3(0., -0.2, 0.));
-  plane->multiplyTransform(translate);
-  plane->calculateInverseTranform();
-
-  world->addShape(mesh);
-  // world->addShape(mesh2);
-  // world->addShape(mesh3);
-  // world->addShape(mesh4);
-  // world->addShape(mesh5);
-  // world->addShape(plane);
-  world->addLight(light);
-
-  return std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>>(camera, world);
-}
-
 void run(void *arg)
 {
   Window *window = static_cast<Window *>(arg);
   window->step();
 }
 
-// bool fileExists(const std::string &name)
+// bool fileExists(const char *name)
 // {
-//   ifstream f(name.c_str());
+//   std::ifstream f(name);
 //   return f.good();
 // }
 
-// #include <filesystem>
+#include <filesystem>
 
 int main(int argc, char const *argv[])
 {
-  // rayTracerInOneWeekendCover();
+  std::string option(argv[1]);
+  std::string f(argv[2]);
 
-  // std::shared_ptr<World> world = std::make_shared<World>();
-  // std::shared_ptr<Camera> camera = std::make_shared<Camera>(glm::dvec4(10., 5., -10., 1.), glm::dvec4(0., 0., 0., 1.), glm::dvec4(0., 1., 0., 0.), 400, 200, 0.524);
+  if (!std::filesystem::exists(f))
+  {
+    std::cout << "File does not exist: " << std::filesystem::absolute(f) << std::endl;
+    exit(0);
+  }
 
-  // std::shared_ptr<Group> group = hexagon();
-  // std::shared_ptr<PointLight> light = std::make_shared<PointLight>(
-  //     glm::dvec4(glm::dvec4(10., 10., 10., 1.)),
-  //     glm::dvec3(1., 1., 1.));
-
-  // std::shared_ptr<Shape> groupShape = std::move(std::dynamic_pointer_cast<Shape>(group));
-
-  // world->addShape(groupShape);
-  // world->addLight(light);
-
-  // renderToSDL(camera, world);
-
-  // renderToSDL("assets/scenes/reflectionScene.yaml");
-  // renderToSDL("assets/scenes/coverScene.yaml");
-  // renderToPPM("../../../assets/scenes/groups.yaml");
-  // renderToPPM("../../../assets/scenes/model.yaml");
-  // renderToSDL("../../../assets/scenes/hippy.yaml");
-  // renderToSDL("assets/scenes/globe.yaml");
-  // renderToSDL("assets/scenes/skybox.yaml");
-  // renderToSDL("assets/scenes/checkers.yaml");
-  renderToPPM("../../../assets/scenes/christmas.yaml");
-  // renderToSDL("assets/scenes/reflectionScene.yaml");
-  // renderToSDL("assets/scenes/reflectionScene.yaml");
-
-  // renderToPPM("scenes/christmas.yaml");
-  // renderToPPM("scenes/reflectionScene.yaml");
-
-  // std::shared_ptr<World> world;
-  // std::shared_ptr<Camera> camera;
-
-  // std::tie(camera, world) = draw3Dmodel("assets/models/armadillo.obj");
-
-  // Renderer renderer(camera);
-  // renderer.render(*world);
-  // renderer.canvas.writeToPPM("armadillo.ppm", false);
-
-  // renderToSDL(camera, world);
+  if (option == "-p")
+    renderToPPM(f);
+  else if (option == "-s")
+    renderToSDL(f);
+  else
+    std::cout << "Invalid option: " << option << std::endl;
 
   return 0;
 }
