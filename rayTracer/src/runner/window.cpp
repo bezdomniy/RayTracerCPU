@@ -224,37 +224,70 @@ void Window::handleEvents()
 {
     while (SDL_PollEvent(&event))
     {
-        // SDL_WaitEvent(&event);
         switch (event.type)
         {
         case SDL_QUIT:
             this->initialised = false;
             break;
-        case SDL_KEYDOWN:
-            switch (event.key.keysym.sym)
-            {
-            case SDLK_ESCAPE:
-                this->initialised = false;
-                break;
-            case SDLK_LEFT:
-                moveLeft();
-                break;
-            case SDLK_RIGHT:
-                moveRight();
-                break;
-            case SDLK_UP:
-                moveUp();
-                break;
-            case SDLK_DOWN:
-                moveDown();
-                break;
-                // cases for other keypresses
-            }
-            break;
-        default:
-            break;
         }
     }
+
+    
+
+    if(keystate[SDL_SCANCODE_ESCAPE])
+    {
+        this->initialised = false;
+    }
+    if(keystate[SDL_SCANCODE_LEFT])
+    {
+        moveLeft();
+    }
+    if(keystate[SDL_SCANCODE_RIGHT])
+    {
+        moveRight();
+    }
+    if(keystate[SDL_SCANCODE_UP])
+    {
+        moveUp();
+    }
+    if(keystate[SDL_SCANCODE_DOWN])
+    {
+        moveDown();
+    }
+
+    // while (SDL_PollEvent(&event))
+    // {
+    //     // SDL_WaitEvent(&event);
+    //     switch (event.type)
+    //     {
+    //     case SDL_QUIT:
+    //         this->initialised = false;
+    //         break;
+    //     case SDL_KEYDOWN:
+    //         switch (event.key.keysym.sym)
+    //         {
+    //         case SDLK_ESCAPE:
+    //             this->initialised = false;
+    //             break;
+    //         case SDLK_LEFT:
+    //             moveLeft();
+    //             break;
+    //         case SDLK_RIGHT:
+    //             moveRight();
+    //             break;
+    //         case SDLK_UP:
+    //             moveUp();
+    //             break;
+    //         case SDLK_DOWN:
+    //             moveDown();
+    //             break;
+    //             // cases for other keypresses
+    //         }
+    //         break;
+    //     default:
+    //         break;
+    //     }
+    // }
 }
 
 void Window::moveLeft() { moveCamera(STEP_SIZE, 1); }
