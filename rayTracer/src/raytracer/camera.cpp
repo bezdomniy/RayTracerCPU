@@ -18,6 +18,7 @@ void Camera::updateTransform()
 {
   this->transform = glm::lookAt(glm::dvec3(position),
                                 glm::dvec3(this->centre), glm::dvec3(this->up));
+  this->inverseTransform = glm::affineInverse(this->transform);
 }
 
 Camera::~Camera() {}
@@ -53,10 +54,10 @@ Ray Camera::rayForPixel(double px, double py, int currentRayNumber, int sqrtRays
   double worldX = this->halfWidth - xOffset;
   double worldY = this->halfHeight - yOffset;
 
-  glm::dvec4 pixel = glm::affineInverse(this->transform) *
+  glm::dvec4 pixel = this->inverseTransform *
                      glm::dvec4(worldX, worldY, -1.0, 1.0);
   glm::dvec4 origin =
-      glm::affineInverse(this->transform) * glm::dvec4(0.0, 0.0, 0.0, 1.0);
+      this->inverseTransform * glm::dvec4(0.0, 0.0, 0.0, 1.0);
   glm::dvec4 direction = glm::normalize(pixel - origin);
 
   return Ray(origin, direction);

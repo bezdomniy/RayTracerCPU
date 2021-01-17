@@ -80,21 +80,25 @@ Group::Group(const Group &group)
     nextShape->transform = child->transform;
     nextShape->inverseTransform = child->inverseTransform;
 
-    this->parent = group.parent;
-    this->material = group.material;
-    // this->materialSet = group.materialSet;
-    this->transform = group.transform;
-    this->inverseTransform = group.inverseTransform;
-
     this->children.push_back(nextShape);
   }
+  this->parent = group.parent;
+  this->material = group.material;
+  // this->materialSet = group.materialSet;
+  this->transform = group.transform;
+  this->inverseTransform = group.inverseTransform;
 
   this->boundingBox = group.boundingBox;
 }
 
 void Group::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections)
 {
-  Ray transformedRay = transformRay(ray);
+  Ray transformedRay;
+
+  if (!this->parent)
+    transformedRay = transformRay(ray);
+  else
+    transformedRay = ray;
 
   bool isHit = boundIntersection(transformedRay);
 

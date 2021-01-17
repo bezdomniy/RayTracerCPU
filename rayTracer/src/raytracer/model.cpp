@@ -143,7 +143,10 @@ void Model::build(std::string const &path, bool buildBVH)
 	}
 	else
 	{
-		mesh = std::make_shared<Group>(triangles);
+		mesh = std::make_shared<Group>();
+
+		for (auto &triangle : triangles)
+			mesh->addChild(triangle);
 	}
 
 	// for (unsigned int i = 0; i < vertexIndices.size(); i++)
@@ -172,15 +175,23 @@ std::shared_ptr<Group> Model::recursiveBuild(std::vector<std::shared_ptr<Shape>>
 
 	int nShapes = end - start;
 
-	if (nShapes == 1)
+	if (nShapes <= 2)
 	{
-		for (int i = start; i < end; ++i)
-			node->addChild(shapes.at(i));
+		// for (int i = start; i < end; ++i)
+		// 	node->addChild(shapes.at(i));
+		node->addChild(shapes.at(start));
+
+		if (nShapes == 2)
+			node->addChild(shapes.at(start + 1));
 		return node;
 	}
 	else
 	{
-		std::pair<glm::dvec4, glm::dvec4> centroidBounds;
+		// std::pair<glm::dvec4, glm::dvec4> centroidBounds;
+		std::pair<glm::dvec4, glm::dvec4> centroidBounds{
+			glm::vec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.f),
+			glm::vec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.f)};
+
 		//for (const auto &shape : shapes)
 		for (auto it = shapes.begin() + start; it != shapes.begin() + end; ++it)
 			centroidBounds = mergeBounds(centroidBounds, (*it)->bounds());
