@@ -212,18 +212,31 @@ std::pair<glm::dvec4, glm::dvec4> Group::bounds()
 
 bool Group::boundIntersection(Ray &transformedRay)
 {
-  std::pair<double, double> xtminmax = Geometry::checkAxis<double>(transformedRay.origin.x, transformedRay.direction.x, this->boundingBox.first.x, this->boundingBox.second.x);
-  std::pair<double, double> ytminmax = Geometry::checkAxis<double>(transformedRay.origin.y, transformedRay.direction.y, this->boundingBox.first.y, this->boundingBox.second.y);
-  std::pair<double, double> ztminmax = Geometry::checkAxis<double>(transformedRay.origin.z, transformedRay.direction.z, this->boundingBox.first.z, this->boundingBox.second.z);
+  double t_min = -std::numeric_limits<double>::infinity();
+  double t_max = std::numeric_limits<double>::infinity();
 
-  double tmin = std::max({xtminmax.first, ytminmax.first, ztminmax.first});
-  double tmax = std::min({xtminmax.second, ytminmax.second, ztminmax.second});
+  for (int a = 0; a < 3; a++)
+  {
+    auto invD = 1.0 / transformedRay.direction[a];
+    auto t0 = (this->boundingBox.first[a] - transformedRay.origin[a]) * invD;
+    auto t1 = (this->boundingBox.second[a] - transformedRay.origin[a]) * invD;
+    if (invD < 0.0f)
+      std::swap(t0, t1);
+    t_min = t0 > t_min ? t0 : t_min;
+    t_max = t1 < t_max ? t1 : t_max;
+    if (t_max <= t_min)
+      return false;
+  }
+  return true;
 
-  return !(tmin > tmax);
-  // if (tmin > tmax)
-  //   return false;
+  // std::pair<double, double> xtminmax = Geometry::checkAxis<double>(transformedRay.origin.x, transformedRay.direction.x, this->boundingBox.first.x, this->boundingBox.second.x);
+  // std::pair<double, double> ytminmax = Geometry::checkAxis<double>(transformedRay.origin.y, transformedRay.direction.y, this->boundingBox.first.y, this->boundingBox.second.y);
+  // std::pair<double, double> ztminmax = Geometry::checkAxis<double>(transformedRay.origin.z, transformedRay.direction.z, this->boundingBox.first.z, this->boundingBox.second.z);
 
-  // return true;
+  // double tmin = std::max({xtminmax.first, ytminmax.first, ztminmax.first});
+  // double tmax = std::min({xtminmax.second, ytminmax.second, ztminmax.second});
+
+  // return !(tmin > tmax);
 }
 
 std::string Group::type() { return "Group"; }
