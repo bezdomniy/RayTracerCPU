@@ -2,14 +2,13 @@
 
 std::shared_ptr<Group> FirBranch::build()
 {
-    std::shared_ptr<Group> root = std::make_shared<Group>();
-    std::shared_ptr<Material> rootMaterial = std::make_shared<Material>();
-    root->setMaterial(rootMaterial);
-
     double length = 2.0;
     double radius = 0.025;
     int segments = 20;
     int perSegment = 24;
+
+    std::vector<std::shared_ptr<Shape>> shapes;
+    shapes.reserve(segments + (segments * perSegment));
 
     std::shared_ptr<Shape> branch = std::make_shared<Cylinder>(0.0, length, true);
     glm::dmat4 scale =
@@ -25,7 +24,7 @@ std::shared_ptr<Group> FirBranch::build()
     branchMaterial->diffuse = 0.6;
 
     branch->setMaterial(branchMaterial);
-    root->addChild(branch);
+    shapes.push_back(branch);
 
     double segSize = length / (segments - 1);
     double theta = 2.1 * glm::pi<double>() / (double)perSegment;
@@ -44,9 +43,6 @@ std::shared_ptr<Group> FirBranch::build()
 
     for (int y = 0; y < segments; y++)
     {
-        std::shared_ptr<Group> subgroup = std::make_shared<Group>();
-        subgroup->setMaterial(triMaterial);
-
         for (int i = 0; i < perSegment; i++)
         {
             double yBase = segSize * (double)y + dis(gen) * segSize;
@@ -60,21 +56,23 @@ std::shared_ptr<Group> FirBranch::build()
             glm::dvec3 p2(-ofs, yBase, ofs);
             glm::dvec3 p3(0.0, yTip, needleLength);
 
-            std::shared_ptr<Shape> triangle = std::make_shared<Triangle>(p1, p2, p3);
-
             glm::dmat4 rotation = glm::rotate(glm::dmat4(1.0), yAngle,
                                               glm::dvec3(0.0, 1.0, 0.0));
 
-            triangle->multiplyTransform(rotation);
-            triangle->calculateInverseTranform();
+            p1 = glm::dvec3(rotation * glm::dvec4(p1, 1.0));
+            p2 = glm::dvec3(rotation * glm::dvec4(p2, 1.0));
+            p3 = glm::dvec3(rotation * glm::dvec4(p3, 1.0));
 
-            // triangle->setMaterial(triMaterial);
+            std::shared_ptr<Shape> triangle = std::make_shared<Triangle>(p1, p2, p3);
+            triangle->setMaterial(triMaterial);
 
-            subgroup->addChild(triangle);
+            shapes.push_back(triangle);
         }
-        std::shared_ptr<Shape> subgroupShape = std::dynamic_pointer_cast<Shape>(subgroup);
-        root->addChild(subgroupShape);
     }
+
+    std::shared_ptr<Group> root = Model::buildBoundingVolumeHierarchy(shapes);
+    std::shared_ptr<Material> rootMaterial = std::make_shared<Material>();
+    root->setMaterial(rootMaterial);
 
     return root;
 }
