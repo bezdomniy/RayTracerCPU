@@ -169,7 +169,12 @@ void Renderer::renderPixel(World &world, const std::pair<int, int> &pixel)
     cShape += colourAt(cast, world, RAY_BOUNCE_LIMIT);
   }
 
-  cShape *= 1.0 / (double)RAYS_PER_PIXEL;
+  // auto scale = 1.0 / (double)RAYS_PER_PIXEL;
+  // cShape.r = glm::clamp(std::sqrt(scale * cShape.r), 0.0, 0.999);
+  // cShape.g = glm::clamp(std::sqrt(scale * cShape.g), 0.0, 0.999);
+  // cShape.b = glm::clamp(std::sqrt(scale * cShape.b), 0.0, 0.999);
+
+  cShape /= (double)RAYS_PER_PIXEL;
 
   this->canvas.writePixel(pixel.first, pixel.second, cShape);
 }
@@ -191,7 +196,6 @@ glm::dvec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
 glm::dvec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world,
                               short remaining)
 {
-
   glm::dvec3 surface(0.0);
 
   for (auto &light : world.lights)
