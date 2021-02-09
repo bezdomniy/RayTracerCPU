@@ -123,26 +123,35 @@ namespace Geometry
   template <typename T>
   Intersection<T> *hit(std::vector<Intersection<T>> &intersections)
   {
-    int retIndex = -1;
+    // int retIndex = -1;
 
-    if (!intersections.empty())
+    for (auto &intersection : intersections)
     {
-      for (int i = 0; i < intersections.size(); i++)
+      if (intersection.t > 0)
       {
-        if ((retIndex == -1 && intersections.at(i).t > 0) ||
-            (intersections.at(i).t > 0 &&
-             intersections.at(i).t < intersections.at(retIndex).t))
-        {
-          retIndex = i;
-        }
-      }
-
-      if (retIndex != -1 && intersections.at(retIndex).t > 0)
-      {
-        return &intersections.at(retIndex);
+        return &intersection;
       }
     }
     return nullptr;
+
+    // if (!intersections.empty())
+    // {
+    //   for (int i = 0; i < intersections.size(); i++)
+    //   {
+    //     if ((retIndex == -1 && intersections.at(i).t > 0) ||
+    //         (intersections.at(i).t > 0 &&
+    //          intersections.at(i).t < intersections.at(retIndex).t))
+    //     {
+    //       retIndex = i;
+    //     }
+    //   }
+
+    //   if (retIndex != -1 && intersections.at(retIndex).t > 0)
+    //   {
+    //     return &intersections.at(retIndex);
+    //   }
+    // }
+    // return nullptr;
   }
 
   template <typename T>
