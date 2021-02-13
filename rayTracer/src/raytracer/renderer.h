@@ -42,8 +42,8 @@ public:
 #endif
   ~Renderer();
 
-  static const int RAY_BOUNCE_LIMIT = 4;
-  static const int RAYS_PER_PIXEL = 1;
+  static const int RAY_BOUNCE_LIMIT = 8;
+  static const int RAYS_PER_PIXEL = 8;
   // TODO static constexpr below
   int sqrtRaysPerPixel = (int)std::sqrt(RAYS_PER_PIXEL);
   double halfSubPixelSize = 1.0 / (double)sqrtRaysPerPixel / 2.0;
@@ -56,6 +56,7 @@ public:
   glm::dvec3 lighting(Shape *shape, std::shared_ptr<PointLight> &light,
                       glm::dvec4 &point, glm::dvec4 &eyev, glm::dvec4 &normalv,
                       bool &inShadow);
+  glm::dvec3 lighting(Shape *shape, glm::dvec4 &point);
   glm::dvec3 shadeHit(Geometry::Intersection<Shape> *hit, World &world,
                       short remaining);
   glm::dvec3 refractedColour(Geometry::Intersection<Shape> *hit, World &world,

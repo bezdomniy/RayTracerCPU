@@ -179,18 +179,61 @@ void Renderer::renderPixel(World &world, const std::pair<int, int> &pixel)
   this->canvas.writePixel(pixel.first, pixel.second, cShape);
 }
 
+inline glm::dvec3 randomInHemisphere(glm::dvec4 &normalv)
+{
+  glm::dvec3 inUnitSphere = glm::ballRand(1.0);
+  if (glm::dot(inUnitSphere, glm::dvec3(normalv)) > 0.0) // In the same hemisphere as the normal
+    return inUnitSphere;
+  else
+    return -inUnitSphere;
+}
+
 glm::dvec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
 {
+  if (remaining < 0)
+    return glm::dvec3(0, 0, 0);
+
   std::vector<Geometry::Intersection<Shape>> intersections =
       world.intersectRay(ray);
   Geometry::Intersection<Shape> *hit;
 
   if ((hit = Geometry::hit<Shape>(intersections)))
   {
+    // Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
+
+    // // glm::dvec4 target = hit->comps->point + hit->comps->normalv + glm::dvec4(glm::ballRand(1.0), 0.0);
+    // glm::dvec4 target = hit->comps->point + glm::dvec4(randomInHemisphere(hit->comps->normalv), 0.0);
+    // Ray newRay(hit->comps->point, target - hit->comps->point);
+
+    // return 0.5 * colourAt(newRay, world, remaining - 1);
+
     Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
-    return shadeHit(hit, world, remaining);
+    auto scatterDirection = hit->comps->normalv + glm::dvec4(glm::normalize(glm::sphericalRand(1.0)), 0.0);
+
+    Ray newRay(hit->comps->point, scatterDirection);
+    return shadeHit(hit, world, remaining) * colourAt(newRay, world, remaining - 1);
+
+    // return shadeHit(hit, world, remaining);
   }
-  return glm::dvec3(0.0, 0.0, 0.0);
+
+  // Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
+  // auto scatterDirection = hit->comps->normalv + glm::dvec4(glm::normalize(glm::sphericalRand(1.0)), 0.0);
+
+  // Ray newRay(hit->comps->point, scatterDirection);
+  // glm::dvec3 effectiveColour;
+
+  // if (hit->shapePtr->material->pattern == nullptr)
+  //   effectiveColour = hit->shapePtr->material->colour;
+  // else
+  //   effectiveColour = hit->shapePtr->patternAt(hit->comps->point);
+
+  return glm::dvec3(1.0, 1.0, 1.0);
+
+  // glm::dvec3 unit_direction = glm::normalize(ray.direction);
+  // auto t = 0.5 * (unit_direction.y + 1.0);
+  // return (1.0 - t) * glm::dvec3(1.0, 1.0, 1.0) + t * glm::dvec3(0.5, 0.7, 1.0);
+
+  // return glm::dvec3(0.0, 0.0, 0.0);
 }
 
 glm::dvec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world,
@@ -200,7 +243,8 @@ glm::dvec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world,
 
   for (auto &light : world.lights)
   {
-    bool inShadow = this->isShadowed(hit->comps->overPoint, world, light);
+    // bool inShadow = this->isShadowed(hit->comps->overPoint, world, light);
+    bool inShadow = false;
     surface += lighting(hit->shapePtr, light, hit->comps->overPoint,
                         hit->comps->eyev, hit->comps->normalv, inShadow);
   }
@@ -252,12 +296,25 @@ glm::dvec3 Renderer::refractedColour(Geometry::Intersection<Shape> *hit,
   return colour * hit->shapePtr->material->transparency;
 }
 
-glm::dvec3 Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
-                              glm::dvec4 &point, glm::dvec4 &eyev,
-                              glm::dvec4 &normalv, bool &inShadow)
+glm::dvec3 Renderer::lighting(Shape *shape, glm::dvec4 &point)
+{
+  glm::dvec3 effectiveColour;
+
+  if (shape->material->pattern == nullptr)
+    effectiveColour = shape->material->colour;
+  else
+    effectiveColour = shape->patternAt(point);
+
+  return effectiveColour;
+}
+
+glm::dvec3
+Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
+                   glm::dvec4 &point, glm::dvec4 &eyev,
+                   glm::dvec4 &normalv, bool &inShadow)
 {
   glm::dvec3 diffuse;
-  glm::dvec3 specular;
+  // glm::dvec3 specular;
   glm::dvec3 effectiveColour;
 
   if (shape->material->pattern == nullptr)
@@ -268,9 +325,9 @@ glm::dvec3 Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
   // combine the surface color with the light's color/intensity​
   // glm::dvec3 effectiveColour = material->colour * light->intensity;
   // compute the ambient contribution​
-  glm::dvec3 ambient = effectiveColour * shape->material->ambient;
-  if (inShadow)
-    return ambient;
+  // glm::dvec3 ambient = effectiveColour * shape->material->ambient;
+  // if (inShadow)
+  //   return ambient;
 
   glm::dvec4 lightv = glm::normalize(light->position - point);
 
@@ -282,7 +339,7 @@ glm::dvec3 Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
   if (lightDotNormal < 0)
   {
     diffuse = glm::dvec3(0.0, 0.0, 0.0);
-    specular = glm::dvec3(0.0, 0.0, 0.0);
+    // specular = glm::dvec3(0.0, 0.0, 0.0);
   }
   else
   {
@@ -292,22 +349,22 @@ glm::dvec3 Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
     // reflect_dot_eye represents the cosine of the angle between the
     // reflection vector and the eye vector. A negative number means the
     // light reflects away from the eye.​
-    glm::dvec4 reflectv = glm::reflect(-lightv, normalv);
-    double reflectDotEye = glm::dot(reflectv, eyev);
+    // glm::dvec4 reflectv = glm::reflect(-lightv, normalv);
+    // double reflectDotEye = glm::dot(reflectv, eyev);
 
-    if (reflectDotEye <= 0)
-    {
-      specular = glm::dvec3(0.0, 0.0, 0.0);
-    }
-    else
-    {
-      // compute the specular contribution​
-      double factor = std::pow(reflectDotEye, shape->material->shininess);
-      specular = light->intensity * shape->material->specular * factor;
-    }
+    // if (reflectDotEye <= 0)
+    // {
+    //   specular = glm::dvec3(0.0, 0.0, 0.0);
+    // }
+    // else
+    // {
+    //   // compute the specular contribution​
+    //   double factor = std::pow(reflectDotEye, shape->material->shininess);
+    //   specular = light->intensity * shape->material->specular * factor;
+    // }
   }
 
-  return (ambient + diffuse + specular);
+  return diffuse; //(ambient + diffuse + specular);
 }
 
 bool Renderer::isShadowed(glm::dvec4 &point, World &world,

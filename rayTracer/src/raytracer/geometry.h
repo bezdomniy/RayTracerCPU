@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <cmath>
 #include <glm/gtc/matrix_inverse.hpp>
+
+#include <glm/gtc/random.hpp>
 #include <limits>
 #include <memory>
 
@@ -127,7 +129,7 @@ namespace Geometry
 
     for (auto &intersection : intersections)
     {
-      if (intersection.t > 0)
+      if (intersection.t > 0.001)
       {
         return &intersection;
       }
