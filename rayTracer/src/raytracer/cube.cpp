@@ -11,15 +11,21 @@ void Cube::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &in
 {
     Ray transformedRay = transformRay(ray);
 
-    std::pair<double, double> xtminmax = Geometry::checkAxis<double>(transformedRay.origin.x, transformedRay.direction.x);
-    std::pair<double, double> ytminmax = Geometry::checkAxis<double>(transformedRay.origin.y, transformedRay.direction.y);
-    std::pair<double, double> ztminmax = Geometry::checkAxis<double>(transformedRay.origin.z, transformedRay.direction.z);
+    double tmin = -std::numeric_limits<double>::infinity();
+    double tmax = std::numeric_limits<double>::infinity();
 
-    double tmin = std::max({xtminmax.first, ytminmax.first, ztminmax.first});
-    double tmax = std::min({xtminmax.second, ytminmax.second, ztminmax.second});
-
-    if (tmin > tmax)
-        return;
+    for (int a = 0; a < 3; a++)
+    {
+        auto invD = 1.0 / transformedRay.direction[a];
+        auto t0 = (-1.0 - transformedRay.origin[a]) * invD;
+        auto t1 = (1.0 - transformedRay.origin[a]) * invD;
+        if (invD < 0.0)
+            std::swap(t0, t1);
+        tmin = t0 > tmin ? t0 : tmin;
+        tmax = t1 < tmax ? t1 : tmax;
+        if (tmax <= tmin)
+            return;
+    }
 
     intersections.push_back(Geometry::Intersection<Shape>{tmin, this});
     intersections.push_back(Geometry::Intersection<Shape>{tmax, this});
