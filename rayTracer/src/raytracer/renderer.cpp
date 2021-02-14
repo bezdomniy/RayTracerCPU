@@ -38,6 +38,30 @@ Renderer::~Renderer()
 
 void Renderer::render(World &world)
 {
+  // std::vector<std::pair<int, int>> pixels;
+  // pixels.reserve(this->canvas.height * this->canvas.width);
+
+  // for (int y = 0; y < this->canvas.height; y++)
+  // {
+  //   for (int x = 0; x < this->canvas.width; x++)
+  //   {
+  //     pixels.push_back(std::make_pair(x, y));
+  //   }
+  // }
+
+  moodycamel::ConcurrentQueue<std::pair<int, int>> q;
+  for (int y = 0; y < this->canvas.height; y++)
+  {
+    for (int x = 0; x < this->canvas.width; x++)
+    {
+      q.enqueue(std::make_pair(x, y));
+    }
+  }
+
+  // std::random_device rd;
+  // std::mt19937 g(rd());
+
+  // std::shuffle(pixels.begin(), pixels.end(), g);
 
 #ifdef __EMSCRIPTEN__
 #ifdef WITH_THREADS
@@ -80,21 +104,6 @@ void Renderer::render(World &world)
   // executor.wait_for_all();
   // std::cout << "done thread" << std::endl;
 #else
-  std::vector<std::pair<int, int>> pixels;
-  pixels.reserve(this->canvas.height * this->canvas.width);
-
-  for (int y = 0; y < this->canvas.height; y++)
-  {
-    for (int x = 0; x < this->canvas.width; x++)
-    {
-      pixels.push_back(std::make_pair(x, y));
-    }
-  }
-
-  std::random_device rd;
-  std::mt19937 g(rd());
-
-  std::shuffle(pixels.begin(), pixels.end(), g);
   for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
        it != pixels.end(); ++it)
   {
@@ -102,14 +111,7 @@ void Renderer::render(World &world)
   }
 #endif // WITH_THREADS
 #else
-  moodycamel::ConcurrentQueue<std::pair<int, int>> q;
-  for (int y = 0; y < this->canvas.height; y++)
-  {
-    for (int x = 0; x < this->canvas.width; x++)
-    {
-      q.enqueue(std::make_pair(x, y));
-    }
-  }
+
   size_t t = std::thread::hardware_concurrency();
   std::thread threads[t];
   for (int i = 0; i < t; ++i)
@@ -167,23 +169,14 @@ void Renderer::renderPixel(World &world, const std::pair<int, int> &pixel)
     cShape += colourAt(cast, world, RAY_BOUNCE_LIMIT);
   }
 
-  // auto scale = 1.0 / (double)RAYS_PER_PIXEL;
-  // cShape.r = glm::clamp(std::sqrt(scale * cShape.r), 0.0, 0.999);
-  // cShape.g = glm::clamp(std::sqrt(scale * cShape.g), 0.0, 0.999);
-  // cShape.b = glm::clamp(std::sqrt(scale * cShape.b), 0.0, 0.999);
+  auto scale = 1.0 / (double)RAYS_PER_PIXEL;
+  cShape.r = glm::clamp(std::sqrt(scale * cShape.r), 0.0, 0.999);
+  cShape.g = glm::clamp(std::sqrt(scale * cShape.g), 0.0, 0.999);
+  cShape.b = glm::clamp(std::sqrt(scale * cShape.b), 0.0, 0.999);
 
-  cShape /= (double)RAYS_PER_PIXEL;
+  // cShape /= (double)RAYS_PER_PIXEL;
 
   this->canvas.writePixel(pixel.first, pixel.second, cShape);
-}
-
-inline glm::dvec3 randomInHemisphere(glm::dvec4 &normalv)
-{
-  glm::dvec3 inUnitSphere = glm::ballRand(1.0);
-  if (glm::dot(inUnitSphere, glm::dvec3(normalv)) > 0.0) // In the same hemisphere as the normal
-    return inUnitSphere;
-  else
-    return -inUnitSphere;
 }
 
 glm::dvec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
@@ -206,10 +199,10 @@ glm::dvec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
     // return 0.5 * colourAt(newRay, world, remaining - 1);
 
     Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
-    auto scatterDirection = hit->comps->normalv + glm::dvec4(glm::normalize(glm::sphericalRand(1.0)), 0.0);
+    auto scatterDirection = hit->comps->normalv + glm::dvec4(glm::normalize(glm::ballRand(1.0)), 0.0);
 
-    Ray newRay(hit->comps->point, scatterDirection);
-    return shadeHit(hit, world, remaining) * colourAt(newRay, world, remaining - 1);
+    Ray newRay(hit->comps->overPoint, scatterDirection);
+    return hit->shapePtr->material->emissiveness + shadeHit(hit, world, remaining) * colourAt(newRay, world, remaining - 1);
 
     // return shadeHit(hit, world, remaining);
   }
@@ -225,7 +218,8 @@ glm::dvec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
   // else
   //   effectiveColour = hit->shapePtr->patternAt(hit->comps->point);
 
-  return glm::dvec3(1.0, 1.0, 1.0);
+  // Background light
+  return glm::dvec3(0.0, 0.0, 0.0);
 
   // glm::dvec3 unit_direction = glm::normalize(ray.direction);
   // auto t = 0.5 * (unit_direction.y + 1.0);
@@ -237,35 +231,35 @@ glm::dvec3 Renderer::colourAt(Ray &ray, World &world, short remaining)
 glm::dvec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world,
                               short remaining)
 {
-  glm::dvec3 surface(0.0);
+  // glm::dvec3 surface(0.0);
 
-  for (auto &light : world.lights)
-  {
-    // bool inShadow = this->isShadowed(hit->comps->overPoint, world, light);
-    bool inShadow = false;
-    surface += lighting(hit->shapePtr, light, hit->comps->overPoint,
-                        hit->comps->eyev, hit->comps->normalv, inShadow);
-  }
+  // for (auto &light : world.lights)
+  // {
+  //   // bool inShadow = this->isShadowed(hit->comps->overPoint, world, light);
+  //   bool inShadow = false;
+  //   surface += lighting(hit->shapePtr, light, hit->comps->overPoint,
+  //                       hit->comps->eyev, hit->comps->normalv, inShadow);
+  // }
 
-  glm::dvec3 reflection = reflectColour(hit, world, remaining);
-  glm::dvec3 refraction = refractedColour(hit, world, remaining);
+  glm::dvec3 surface = lighting(hit->shapePtr, hit->comps->overPoint);
 
-  if (hit->shapePtr->material->reflective > 0 &&
-      hit->shapePtr->material->transparency > 0)
-  {
-    double reflectance = Geometry::schlick<Shape>(hit->comps);
-    return surface + reflection * reflectance + refraction * (1 - reflectance);
-  }
-  return surface + reflection + refraction;
+  // glm::dvec3 reflection = reflectColour(hit, world, remaining);
+  // glm::dvec3 refraction = refractedColour(hit, world, remaining);
+
+  // if (hit->shapePtr->material->reflective > 0 &&
+  //     hit->shapePtr->material->transparency > 0)
+  // {
+  //   double reflectance = Geometry::schlick<Shape>(hit->comps);
+  //   return surface + reflection * reflectance + refraction * (1 - reflectance);
+  // }
+  return surface; // + reflection + refraction;
 }
 
 glm::dvec3 Renderer::reflectColour(Geometry::Intersection<Shape> *hit,
                                    World &world, short remaining)
 {
   if (hit->shapePtr->material->reflective == 0 || remaining <= 0)
-  {
     return glm::dvec3(0.0, 0.0, 0.0);
-  }
 
   Ray reflectRay = Ray(hit->comps->overPoint, hit->comps->reflectv);
   return colourAt(reflectRay, world, remaining - 1) *
@@ -275,16 +269,12 @@ glm::dvec3 Renderer::reflectColour(Geometry::Intersection<Shape> *hit,
 glm::dvec3 Renderer::refractedColour(Geometry::Intersection<Shape> *hit,
                                      World &world, short remaining)
 {
-  if (hit->shapePtr->material->transparency == 0 || remaining <= 0)
-  {
-    return glm::dvec3(0.0, 0.0, 0.0);
-  }
-
   double nRatio = hit->comps->n1 / hit->comps->n2;
   double cosI = glm::dot(hit->comps->eyev, hit->comps->normalv);
   double sin2T = (nRatio * nRatio) * (1 - (cosI * cosI));
 
-  if (sin2T > 1)
+  if (hit->shapePtr->material->transparency == 0 || sin2T > 1 ||
+      remaining <= 0)
   {
     return glm::dvec3(0.0, 0.0, 0.0);
   }

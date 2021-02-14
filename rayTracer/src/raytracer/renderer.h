@@ -42,8 +42,8 @@ public:
 #endif
   ~Renderer();
 
-  static const int RAY_BOUNCE_LIMIT = 8;
-  static const int RAYS_PER_PIXEL = 8;
+  static const int RAY_BOUNCE_LIMIT = 50;
+  static const int RAYS_PER_PIXEL = 200;
   // TODO static constexpr below
   int sqrtRaysPerPixel = (int)std::sqrt(RAYS_PER_PIXEL);
   double halfSubPixelSize = 1.0 / (double)sqrtRaysPerPixel / 2.0;

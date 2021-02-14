@@ -350,6 +350,11 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
       newMaterial->colour = definition.values[value].vector;
       newPattern = true;
     }
+    else if (value == "emissiveness")
+    {
+      newMaterial->emissiveness = definition.values[value].vector;
+      newPattern = true;
+    }
     else if (value == "diffuse")
     {
       newMaterial->diffuse = definition.values[value].scalar;
@@ -517,6 +522,15 @@ void ObjectLoader::parseMaterial(const YAML::Node &node,
                              valueIt->second[1].as<double>(),
                              valueIt->second[2].as<double>())};
         definition.valueOrder.push_back("color");
+      }
+      else if (valueKey == "emissiveness")
+      {
+        definition.values["emissiveness"] =
+            Value{0.0,
+                  glm::dvec3(valueIt->second[0].as<double>(),
+                             valueIt->second[1].as<double>(),
+                             valueIt->second[2].as<double>())};
+        definition.valueOrder.push_back("emissiveness");
       }
       else if (valueKey == "diffuse")
       {

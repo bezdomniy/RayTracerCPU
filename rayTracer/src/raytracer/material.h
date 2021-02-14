@@ -15,6 +15,7 @@ private:
   void serialize(Archive &archive)
   {
     archive(colour,
+            emissiveness,
             ambient,
             diffuse,
             specular,
@@ -28,7 +29,7 @@ private:
 
 public:
   Material();
-  Material(glm::dvec3 colour, double ambient, double diffuse, double specular,
+  Material(glm::dvec3 colour, glm::dvec3 emissiveness, double ambient, double diffuse, double specular,
            double shininess);
 
   Material(const Material &material);
@@ -36,6 +37,7 @@ public:
   ~Material();
 
   glm::dvec3 colour;
+  glm::dvec3 emissiveness;
   double ambient;
   double diffuse;
   double specular;
