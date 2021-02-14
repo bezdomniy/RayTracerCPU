@@ -69,10 +69,10 @@ BlendedPattern::~BlendedPattern() {}
 
 glm::dvec3 BlendedPattern::patternAt(const glm::dvec4 &point)
 {
-  glm::dmat4 patternTransformA(glm::affineInverse(patternA->transform));
+  glm::dmat4 patternTransformA(patternA->inverseTransform);
   glm::dvec4 patternPointA = patternTransformA * point;
 
-  glm::dmat4 patternTransformB(glm::affineInverse(patternB->transform));
+  glm::dmat4 patternTransformB(patternB->inverseTransform);
   glm::dvec4 patternPointB = patternTransformB * point;
 
   return (this->patternA->patternAt(patternPointA) +
@@ -100,7 +100,7 @@ PerturbedPattern::~PerturbedPattern() {}
 // TODO something to do with this is breaking checkered uv map
 glm::dvec3 PerturbedPattern::patternAt(const glm::dvec4 &point)
 {
-  glm::dmat4 patternTransform(glm::affineInverse(pattern->transform));
+  glm::dmat4 patternTransform(pattern->inverseTransform);
   glm::dvec4 patternPoint = patternTransform * point;
 
   double value = SimplexNoise::noise(patternPoint.x * perturbedCoeff,

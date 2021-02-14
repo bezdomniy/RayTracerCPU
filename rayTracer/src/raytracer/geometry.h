@@ -36,7 +36,7 @@ namespace Geometry
     glm::dvec4 underPoint;
     double n1;
     double n2;
-    bool inside; //TODO find way to remove
+    // bool inside; //TODO find way to remove
   };
 
   template <typename T>
@@ -96,13 +96,13 @@ namespace Geometry
 
     if (glm::dot(intersection.comps->normalv, intersection.comps->eyev) < 0)
     {
-      intersection.comps->inside = true;
+      // intersection.comps->inside = true;
       intersection.comps->normalv = -intersection.comps->normalv;
     }
-    else
-    {
-      intersection.comps->inside = false;
-    }
+    // else
+    // {
+    //   intersection.comps->inside = false;
+    // }
 
     intersection.comps->reflectv =
         glm::reflect(rayDirection, intersection.comps->normalv);
