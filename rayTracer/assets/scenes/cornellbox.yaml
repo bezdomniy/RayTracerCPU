@@ -40,11 +40,11 @@
   value:
     emissiveness: [7,7,7]
 
-- add: sphere
+- add: cube
   material: white-light
   transform:
-    - [scale, 30, 30, 30]
-    - [translate, 278, 400, 0]
+    - [scale, 65, 1, 53]
+    - [translate, 278, 554, 280]
 
 - add: sphere
   material: blue-material
