@@ -39,7 +39,7 @@ void Cone::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &in
              (2 * transformedRay.origin.y * transformedRay.direction.y) +
              (2 * transformedRay.origin.z * transformedRay.direction.z);
 
-  if (std::abs(a) < Geometry::EPSILON)
+  if (std::abs(a) < Geometry::EPSILON) {
     if (std::abs(b) < Geometry::EPSILON)
     {
       return;
@@ -48,7 +48,7 @@ void Cone::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &in
     {
       singleIntersection = false;
     }
-
+ }
   double c = std::pow(transformedRay.origin.x, 2) - std::pow(transformedRay.origin.y, 2) +
              std::pow(transformedRay.origin.z, 2);
 

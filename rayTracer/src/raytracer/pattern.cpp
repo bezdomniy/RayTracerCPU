@@ -21,7 +21,7 @@ void Pattern::setTransform(glm::dmat4 transform)
 void Pattern::multiplyTransform(glm::dmat4 &transform)
 {
   this->transform = transform * this->transform;
-  // this->inverseTransform = glm::affineInverse(this->transform);
+  this->inverseTransform = glm::affineInverse(this->transform);
 }
 
 void Pattern::calculateInverseTranform()

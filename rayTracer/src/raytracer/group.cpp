@@ -220,7 +220,7 @@ bool Group::boundIntersection(Ray &transformedRay)
     auto invD = 1.0 / transformedRay.direction[a];
     auto t0 = (this->boundingBox.first[a] - transformedRay.origin[a]) * invD;
     auto t1 = (this->boundingBox.second[a] - transformedRay.origin[a]) * invD;
-    if (invD < 0.0f)
+    if (invD < 0.0)
       std::swap(t0, t1);
     t_min = t0 > t_min ? t0 : t_min;
     t_max = t1 < t_max ? t1 : t_max;
