@@ -1,0 +1,78 @@
+- add: camera
+  width: 600
+  height: 600
+  field-of-view: 0.698132
+  from: [278, 278, -800]
+  to: [278, 278, 0]
+  up: [0, 1, 0]
+- add: light
+  at: [263, 385, 0]
+  intensity: [1, 1, 1]
+- define: base-material
+  value:
+    color: [1, 1, 1]
+    diffuse: 0.7
+    ambient: 0.1
+    specular: 0.3
+    shininess: 200
+    # reflective: 0.1
+- define: blue-material
+  extend: base-material
+  value:
+    color: [0.537, 0.831, 0.914]
+- define: green-material
+  extend: base-material
+  value:
+    color: [0.12, 0.45, 0.15]
+
+- define: red-material
+  extend: base-material
+  value:
+    color: [0.65, 0.05, 0.05]
+
+- define: white-material
+  extend: base-material
+  value:
+    color: [0.73, 0.73, 0.73]
+
+# - define: white-light
+#   extend: base-material
+#   value:
+#     emissiveness: [7,7,7]
+
+# - add: sphere
+#   material: white-light
+#   transform:
+#     - [scale, 30, 30, 30]
+#     - [translate, 278, 400, 0]
+
+- add: sphere
+  material: blue-material
+  transform:
+    - [scale, 60, 60, 60]
+    - [translate, 378, 50, 100]
+
+
+- add: plane
+  material: white-material
+- add: plane
+  material: white-material
+  transform:
+    - [translate, 0, 555, 0]
+
+- add: plane
+  material: white-material
+  transform:
+    - [rotate-x, 1.5708]
+    - [translate, 0, 0, 555]
+
+- add: plane
+  material: red-material
+  transform:
+    - [rotate-z, 1.5708]
+    - [translate, 555, 0, 0]
+- add: plane
+  material: green-material
+  transform:
+    - [rotate-z, 1.5708]
+    - [translate, 0, 0, 0]
