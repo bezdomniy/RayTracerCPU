@@ -11,6 +11,8 @@ ObjectLoader::loadYaml(const std::string &fileName)
   std::shared_ptr<Camera> camera;
   std::shared_ptr<World> world = std::make_shared<World>();
 
+  // std::vector<std::shared_ptr<Shape>> shapes;
+
   // world->shapes.clear();
   // world->lights.clear();
 
@@ -50,6 +52,7 @@ ObjectLoader::loadYaml(const std::string &fileName)
       {
         std::shared_ptr<Shape> shape = addShape(*it);
         world->addShape(shape);
+        // shapes.push_back(shape);
       }
     }
     else if (it->begin()->first.as<std::string>() == "define")
@@ -61,6 +64,13 @@ ObjectLoader::loadYaml(const std::string &fileName)
       throw std::invalid_argument("invalid operator in yaml file");
     }
   }
+
+  // std::shared_ptr<Shape> bvh = Model::buildBoundingVolumeHierarchy(shapes);
+
+  // std::shared_ptr<Material> rootMaterial = std::make_shared<Material>();
+  // bvh->setMaterial(rootMaterial);
+
+  // world->addShape(bvh);
 
   return std::pair<std::shared_ptr<Camera>,
                    std::shared_ptr<World>>(camera, world);
