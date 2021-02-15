@@ -2,7 +2,7 @@
   width: 300
   height: 300
   field-of-view: 0.698132
-  from: [278, 278, -800]
+  from: [278, 278, -760]
   to: [278, 278, 0]
   up: [0, 1, 0]
 - add: light
@@ -40,39 +40,53 @@
   value:
     emissiveness: [7,7,7]
 
+- define: lucy
+  value:
+    add: obj
+    file: assets/models/lucy.obj
+    transform:
+      - [scale, 0.36, 0.36, 0.36]
+
 - add: cube
   material: white-light
   transform:
     - [scale, 65, 1, 53]
-    - [translate, 278, 554, 280]
+    - [translate, 278, 554, 278]
 
 - add: sphere
   material: blue-material
   transform:
     - [scale, 60, 60, 60]
+    # - [rotate-y, -1.0]
     - [translate, 378, 50, 100]
 
-
-- add: plane
-  material: white-material
-- add: plane
+- add: cube
   material: white-material
   transform:
-    - [translate, 0, 555, 0]
-
-- add: plane
+    - [scale, 278, 1, 278]
+    - [translate, 278, 0, 278]
+- add: cube
   material: white-material
   transform:
+    - [scale, 278, 1, 278]
+    - [translate, 278, 555, 278]
+
+- add: cube
+  material: white-material
+  transform:
+    - [scale, 278, 1, 278]
     - [rotate-x, 1.5708]
-    - [translate, 0, 0, 555]
+    - [translate, 278, 278, 555]
 
-- add: plane
+- add: cube
   material: red-material
   transform:
+    - [scale, 278, 1, 278]
     - [rotate-z, 1.5708]
-    - [translate, 555, 0, 0]
-- add: plane
+    - [translate, 555, 278, 278]
+- add: cube
   material: green-material
   transform:
+    - [scale, 278, 1, 278]
     - [rotate-z, 1.5708]
-    - [translate, 0, 0, 0]
+    - [translate, 0, 278, 278]
