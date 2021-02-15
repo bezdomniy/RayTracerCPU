@@ -2,3 +2,8 @@ build/
 *.ppm
 *.png
 include/cereal
+CMakeFiles/
+CMakeScripts/
+RayTracer.xcodeproj/
+**/Debug/
+**/Release/
