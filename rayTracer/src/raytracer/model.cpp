@@ -169,13 +169,38 @@ void Model::build(std::string const &path, bool buildBVH)
 	// }
 }
 
+struct BucketInfo
+{
+	int count = 0;
+	std::pair<glm::dvec4, glm::dvec4> bounds;
+};
+
+glm::dvec4 Offset(const glm::dvec4 &p, const std::pair<glm::dvec4, glm::dvec4> &bounds)
+{
+	glm::dvec4 o = p - bounds.first;
+	if (bounds.second.x > bounds.first.x)
+		o.x /= bounds.second.x - bounds.first.x;
+	if (bounds.second.y > bounds.first.y)
+		o.y /= bounds.second.y - bounds.first.y;
+	if (bounds.second.z > bounds.first.z)
+		o.z /= bounds.second.z - bounds.first.z;
+	return o;
+}
+
+glm::dvec4 Diagonal(const std::pair<glm::dvec4, glm::dvec4> &bounds) { return bounds.second - bounds.first; }
+double SurfaceArea(const std::pair<glm::dvec4, glm::dvec4> &bounds)
+{
+	glm::dvec4 d = Diagonal(bounds);
+	return 2.0 * (d.x * d.y + d.x * d.z + d.y * d.z);
+}
+
 std::shared_ptr<Group> Model::recursiveBuild(std::vector<std::shared_ptr<Shape>> &shapes, uint32_t start, uint32_t end)
 {
 	std::shared_ptr<Group> node = std::make_shared<Group>();
 
 	int nShapes = end - start;
 
-	if (nShapes <= 2)
+	if (nShapes <= 1)
 	{
 		// for (int i = start; i < end; ++i)
 		// 	node->addChild(shapes.at(i));
@@ -216,22 +241,110 @@ std::shared_ptr<Group> Model::recursiveBuild(std::vector<std::shared_ptr<Shape>>
 		}
 		else
 		{
-			mid = (start + end) / 2;
-			std::nth_element(&shapes[start], &shapes[mid],
-							 &shapes[end - 1] + 1,
-							 [splitDimension](const std::shared_ptr<Shape> &a, const std::shared_ptr<Shape> &b) {
-								 return a->boundsCentroid()[splitDimension] < b->boundsCentroid()[splitDimension];
-							 });
+			// mid = (start + end) / 2;
+			// std::nth_element(&shapes[start], &shapes[mid],
+			// 				 &shapes[end - 1] + 1,
+			// 				 [splitDimension](const std::shared_ptr<Shape> &a, const std::shared_ptr<Shape> &b) {
+			// 					 return a->boundsCentroid()[splitDimension] < b->boundsCentroid()[splitDimension];
+			// 				 });
 
-			// double pmid = (centroidBounds.first[splitDimension] + centroidBounds.second[splitDimension]) / 2;
-			// std::shared_ptr<Shape> *midPtr =
-			// 	std::partition(&shapes[start], &shapes[end - 1] + 1,
-			// 				   [splitDimension, pmid](const std::shared_ptr<Shape> &pi) {
-			// 					   return pi->boundsCentroid()[splitDimension] < pmid;
-			// 				   });
-			// mid = midPtr - &shapes[0];
-			// if (mid != start && mid != end)
-			// 	break;
+			// Partition primitives using approximate SAH
+			if (nShapes <= 2)
+			{
+				mid = (start + end) / 2;
+				std::nth_element(&shapes[start], &shapes[mid],
+								 &shapes[end - 1] + 1,
+								 [splitDimension](const std::shared_ptr<Shape> &a, const std::shared_ptr<Shape> &b) {
+									 return a->boundsCentroid()[splitDimension] < b->boundsCentroid()[splitDimension];
+								 });
+			}
+			else
+			{
+				// Allocate _BucketInfo_ for SAH partition buckets
+				constexpr int nBuckets = 12;
+				constexpr int maxPrimsInNode = 2;
+				BucketInfo buckets[nBuckets];
+
+				// Initialize _BucketInfo_ for SAH partition buckets
+				for (int i = start; i < end; ++i)
+				{
+					int b = nBuckets * Offset(shapes[i]->boundsCentroid(), centroidBounds)[splitDimension];
+					if (b == nBuckets)
+						b = nBuckets - 1;
+					// CHECK_GE(b, 0);
+					// CHECK_LT(b, nBuckets);
+					buckets[b].count++;
+					buckets[b].bounds =
+						mergeBounds(buckets[b].bounds, shapes[i]->boundsCentroid());
+				}
+
+				// Compute costs for splitting after each bucket
+				double cost[nBuckets - 1];
+				for (int i = 0; i < nBuckets - 1; ++i)
+				{
+					std::pair<glm::dvec4, glm::dvec4> b0, b1;
+					int count0 = 0, count1 = 0;
+					for (int j = 0; j <= i; ++j)
+					{
+						b0 = mergeBounds(b0, buckets[j].bounds);
+						count0 += buckets[j].count;
+					}
+					for (int j = i + 1; j < nBuckets; ++j)
+					{
+						b1 = mergeBounds(b1, buckets[j].bounds);
+						count1 += buckets[j].count;
+					}
+					cost[i] = 1 +
+							  (count0 * SurfaceArea(b0) +
+							   count1 * SurfaceArea(b1)) /
+								  SurfaceArea(centroidBounds);
+				}
+
+				// Find bucket to split at that minimizes SAH metric
+				double minCost = cost[0];
+				int minCostSplitBucket = 0;
+				for (int i = 1; i < nBuckets - 1; ++i)
+				{
+					if (cost[i] < minCost)
+					{
+						minCost = cost[i];
+						minCostSplitBucket = i;
+					}
+				}
+
+				// Either create leaf or split primitives at selected SAH
+				// bucket
+				float leafCost = nShapes;
+				if (nShapes > maxPrimsInNode || minCost < leafCost)
+				{
+					auto pmid = std::partition(
+						&shapes[start], &shapes[end - 1] + 1,
+						[=](std::shared_ptr<Shape> pi) {
+							int b = nBuckets *
+									Offset(pi->boundsCentroid(), centroidBounds)[splitDimension];
+							if (b == nBuckets)
+								b = nBuckets - 1;
+							// CHECK_GE(b, 0);
+							// CHECK_LT(b, nBuckets);
+							return b <= minCostSplitBucket;
+						});
+					mid = pmid - &shapes[0];
+				}
+				else
+				{
+					// Create leaf _BVHBuildNode_
+					// int firstPrimOffset = orderedPrims.size();
+					// for (int i = start; i < end; ++i)
+					// {
+					// 	int primNum = shapes[i].primitiveNumber;
+					// 	orderedPrims.push_back(primitives[primNum]);
+					// }
+
+					node->addChild(shapes.at(start));
+					// node->InitLeaf(firstPrimOffset, nPrimitives, bounds);
+					return node;
+				}
+			}
 
 			std::shared_ptr<Shape> leftChild = recursiveBuild(shapes, start, mid);
 			std::shared_ptr<Shape> rightChild = recursiveBuild(shapes, mid, end);
@@ -264,6 +377,16 @@ std::pair<glm::dvec4, glm::dvec4> Model::mergeBounds(const std::pair<glm::dvec4,
 											 glm::dvec4(std::max(b1.second.x, b2.second.x),
 														std::max(b1.second.y, b2.second.y),
 														std::max(b1.second.z, b2.second.z), 1.));
+}
+
+std::pair<glm::dvec4, glm::dvec4> Model::mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const glm::dvec4 p)
+{
+	return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::min(b1.first.x, p.x),
+														std::min(b1.first.y, p.y),
+														std::min(b1.first.z, p.z), 1.),
+											 glm::dvec4(std::max(b1.second.x, p.x),
+														std::max(b1.second.y, p.y),
+														std::max(b1.second.z, p.z), 1.));
 }
 
 Model::~Model()
