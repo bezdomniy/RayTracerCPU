@@ -95,10 +95,10 @@ void Group::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &i
 {
   Ray transformedRay;
 
-  if (!this->parent)
-    transformedRay = transformRay(ray);
-  else
-    transformedRay = ray;
+  // if (!this->parent)
+  transformedRay = transformRay(ray);
+  // else
+  //   transformedRay = ray;
 
   bool isHit = boundIntersection(transformedRay);
 

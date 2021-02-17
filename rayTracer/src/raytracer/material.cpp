@@ -10,6 +10,7 @@ Material::Material()
   this->reflective = 0;
   this->transparency = 0;
   this->refractiveIndex = 1.0;
+  this->shadow = true;
 }
 
 // TODO make 2 material constructors, 1 with colour, the other with pattern
@@ -24,6 +25,7 @@ Material::Material(glm::dvec3 colour, double ambient, double diffuse,
   this->reflective = 0.;
   this->transparency = 0.;
   this->refractiveIndex = 1.0;
+  this->shadow = true;
 }
 
 Material::Material(const Material &material)

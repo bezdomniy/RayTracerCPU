@@ -94,6 +94,7 @@ extern "C"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
+#include <chrono>
 
 void renderToPPM(const std::string &sceneDesc)
 {
@@ -104,7 +105,12 @@ void renderToPPM(const std::string &sceneDesc)
   std::tie(camera, world) = objectLoader.loadYaml(sceneDesc);
 
   Renderer renderer(camera);
+  auto start = std::chrono::high_resolution_clock::now();
   renderer.render(*world);
+  auto stop = std::chrono::high_resolution_clock::now();
+
+  std::cout << "Time to render image: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << std::endl;
+
   renderer.canvas.writeToPPM("out.ppm", false);
 }
 

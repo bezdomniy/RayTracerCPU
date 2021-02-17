@@ -38,7 +38,6 @@ Renderer::~Renderer()
 
 void Renderer::render(World &world)
 {
-
 #ifdef __EMSCRIPTEN__
 #ifdef WITH_THREADS
   size_t t = std::thread::hardware_concurrency();

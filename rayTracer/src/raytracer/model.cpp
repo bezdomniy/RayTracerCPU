@@ -1,6 +1,4 @@
 #include "model.h"
-#include <chrono>
-#include <iostream>
 
 Model::Model()
 {
@@ -200,14 +198,15 @@ std::shared_ptr<Group> Model::recursiveBuild(std::vector<std::shared_ptr<Shape>>
 
 	int nShapes = end - start;
 
-	if (nShapes <= 1)
+	if (nShapes == 1)
 	{
 		// for (int i = start; i < end; ++i)
 		// 	node->addChild(shapes.at(i));
+
 		node->addChild(shapes.at(start));
 
-		if (nShapes == 2)
-			node->addChild(shapes.at(start + 1));
+		//        if (nShapes == 2)
+		//            node->addChild(shapes.at(start + 1));
 		return node;
 	}
 	else
@@ -219,7 +218,7 @@ std::shared_ptr<Group> Model::recursiveBuild(std::vector<std::shared_ptr<Shape>>
 
 		//for (const auto &shape : shapes)
 		for (auto it = shapes.begin() + start; it != shapes.begin() + end; ++it)
-			centroidBounds = mergeBounds(centroidBounds, (*it)->bounds());
+			centroidBounds = mergeBounds(centroidBounds, (*it)->boundsCentroid());
 
 		glm::dvec4 diagonal = centroidBounds.second - centroidBounds.first;
 		int splitDimension;
@@ -241,15 +240,7 @@ std::shared_ptr<Group> Model::recursiveBuild(std::vector<std::shared_ptr<Shape>>
 		}
 		else
 		{
-			// mid = (start + end) / 2;
-			// std::nth_element(&shapes[start], &shapes[mid],
-			// 				 &shapes[end - 1] + 1,
-			// 				 [splitDimension](const std::shared_ptr<Shape> &a, const std::shared_ptr<Shape> &b) {
-			// 					 return a->boundsCentroid()[splitDimension] < b->boundsCentroid()[splitDimension];
-			// 				 });
-
-			// Partition primitives using approximate SAH
-			if (nShapes <= 2)
+			if (false)
 			{
 				mid = (start + end) / 2;
 				std::nth_element(&shapes[start], &shapes[mid],
@@ -260,93 +251,110 @@ std::shared_ptr<Group> Model::recursiveBuild(std::vector<std::shared_ptr<Shape>>
 			}
 			else
 			{
-				// Allocate _BucketInfo_ for SAH partition buckets
-				constexpr int nBuckets = 12;
-				constexpr int maxPrimsInNode = 2;
-				BucketInfo buckets[nBuckets];
-
-				// Initialize _BucketInfo_ for SAH partition buckets
-				for (int i = start; i < end; ++i)
+				// Partition primitives using approximate SAH
+				if (nShapes <= 2)
 				{
-					int b = nBuckets * Offset(shapes[i]->boundsCentroid(), centroidBounds)[splitDimension];
-					if (b == nBuckets)
-						b = nBuckets - 1;
-					// CHECK_GE(b, 0);
-					// CHECK_LT(b, nBuckets);
-					buckets[b].count++;
-					buckets[b].bounds =
-						mergeBounds(buckets[b].bounds, shapes[i]->boundsCentroid());
-				}
-
-				// Compute costs for splitting after each bucket
-				double cost[nBuckets - 1];
-				for (int i = 0; i < nBuckets - 1; ++i)
-				{
-					std::pair<glm::dvec4, glm::dvec4> b0, b1;
-					int count0 = 0, count1 = 0;
-					for (int j = 0; j <= i; ++j)
-					{
-						b0 = mergeBounds(b0, buckets[j].bounds);
-						count0 += buckets[j].count;
-					}
-					for (int j = i + 1; j < nBuckets; ++j)
-					{
-						b1 = mergeBounds(b1, buckets[j].bounds);
-						count1 += buckets[j].count;
-					}
-					cost[i] = 1 +
-							  (count0 * SurfaceArea(b0) +
-							   count1 * SurfaceArea(b1)) /
-								  SurfaceArea(centroidBounds);
-				}
-
-				// Find bucket to split at that minimizes SAH metric
-				double minCost = cost[0];
-				int minCostSplitBucket = 0;
-				for (int i = 1; i < nBuckets - 1; ++i)
-				{
-					if (cost[i] < minCost)
-					{
-						minCost = cost[i];
-						minCostSplitBucket = i;
-					}
-				}
-
-				// Either create leaf or split primitives at selected SAH
-				// bucket
-				float leafCost = nShapes;
-				if (nShapes > maxPrimsInNode || minCost < leafCost)
-				{
-					auto pmid = std::partition(
-						&shapes[start], &shapes[end - 1] + 1,
-						[=](std::shared_ptr<Shape> pi) {
-							int b = nBuckets *
-									Offset(pi->boundsCentroid(), centroidBounds)[splitDimension];
-							if (b == nBuckets)
-								b = nBuckets - 1;
-							// CHECK_GE(b, 0);
-							// CHECK_LT(b, nBuckets);
-							return b <= minCostSplitBucket;
-						});
-					mid = pmid - &shapes[0];
+					mid = (start + end) / 2;
+					std::nth_element(&shapes[start], &shapes[mid],
+									 &shapes[end - 1] + 1,
+									 [splitDimension](const std::shared_ptr<Shape> &a, const std::shared_ptr<Shape> &b) {
+										 return a->boundsCentroid()[splitDimension] < b->boundsCentroid()[splitDimension];
+									 });
 				}
 				else
 				{
-					// Create leaf _BVHBuildNode_
-					// int firstPrimOffset = orderedPrims.size();
-					// for (int i = start; i < end; ++i)
-					// {
-					// 	int primNum = shapes[i].primitiveNumber;
-					// 	orderedPrims.push_back(primitives[primNum]);
-					// }
+					// Allocate _BucketInfo_ for SAH partition buckets
+					constexpr int nBuckets = 12;
+					constexpr int maxPrimsInNode = 4;
+					BucketInfo buckets[nBuckets];
 
-					node->addChild(shapes.at(start));
-					// node->InitLeaf(firstPrimOffset, nPrimitives, bounds);
-					return node;
+					// Initialize _BucketInfo_ for SAH partition buckets
+					for (int i = start; i < end; ++i)
+					{
+						int b = nBuckets * Offset(shapes[i]->boundsCentroid(), centroidBounds)[splitDimension];
+						if (b == nBuckets)
+							b = nBuckets - 1;
+
+						buckets[b].count++;
+						buckets[b].bounds =
+							mergeBounds(buckets[b].bounds, shapes[i]->bounds());
+					}
+
+					// Compute costs for splitting after each bucket
+					double cost[nBuckets - 1];
+					for (int i = 0; i < nBuckets - 1; ++i)
+					{
+						std::pair<glm::dvec4, glm::dvec4> b0, b1;
+						int count0 = 0, count1 = 0;
+						for (int j = 0; j <= i; ++j)
+						{
+							b0 = mergeBounds(b0, buckets[j].bounds);
+							count0 += buckets[j].count;
+						}
+						for (int j = i + 1; j < nBuckets; ++j)
+						{
+							b1 = mergeBounds(b1, buckets[j].bounds);
+							count1 += buckets[j].count;
+						}
+
+						std::pair<glm::dvec4, glm::dvec4> bounds{
+							glm::vec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.f),
+							glm::vec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.f)};
+
+						for (auto it = shapes.begin() + start; it != shapes.begin() + end; ++it)
+							bounds = mergeBounds(bounds, (*it)->bounds());
+
+						cost[i] = 1 +
+								  (count0 * SurfaceArea(b0) +
+								   count1 * SurfaceArea(b1)) /
+									  SurfaceArea(bounds);
+					}
+
+					// Find bucket to split at that minimizes SAH metric
+					double minCost = cost[0];
+					int minCostSplitBucket = 0;
+					for (int i = 1; i < nBuckets - 1; ++i)
+					{
+						if (cost[i] < minCost)
+						{
+							minCost = cost[i];
+							minCostSplitBucket = i;
+						}
+					}
+
+					// Either create leaf or split primitives at selected SAH
+					// bucket
+					float leafCost = nShapes;
+					if (nShapes > maxPrimsInNode || minCost < leafCost)
+					{
+						auto pmid = std::partition(
+							&shapes[start], &shapes[end - 1] + 1,
+							[=](const std::shared_ptr<Shape> &pi) {
+								int b = nBuckets *
+										Offset(pi->boundsCentroid(), centroidBounds)[splitDimension];
+								if (b == nBuckets)
+									b = nBuckets - 1;
+								return b <= minCostSplitBucket;
+							});
+						mid = pmid - &shapes[0];
+					}
+					else
+					{
+						// Create leaf
+						for (int i = start; i < end; ++i)
+						{
+							node->addChild(shapes.at(i));
+						}
+
+						return node;
+					}
 				}
 			}
 
+			//            if (start !=mid)
 			std::shared_ptr<Shape> leftChild = recursiveBuild(shapes, start, mid);
+
+			//            if (end !=mid)
 			std::shared_ptr<Shape> rightChild = recursiveBuild(shapes, mid, end);
 
 			node->addChild(leftChild);
@@ -364,7 +372,7 @@ std::shared_ptr<Group> Model::buildBoundingVolumeHierarchy(std::vector<std::shar
 
 	auto stop = std::chrono::high_resolution_clock::now();
 
-	std::cout << "Time to build BVH: " << std::chrono::duration_cast<std::chrono::seconds>(stop - start).count() << std::endl;
+	std::cout << "Time to build BVH: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << std::endl;
 
 	return root;
 }

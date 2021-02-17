@@ -232,25 +232,23 @@ void Window::handleEvents()
         }
     }
 
-    
-
-    if(keystate[SDL_SCANCODE_ESCAPE])
+    if (keystate[SDL_SCANCODE_ESCAPE])
     {
         this->initialised = false;
     }
-    if(keystate[SDL_SCANCODE_LEFT])
+    if (keystate[SDL_SCANCODE_LEFT])
     {
         moveLeft();
     }
-    if(keystate[SDL_SCANCODE_RIGHT])
+    if (keystate[SDL_SCANCODE_RIGHT])
     {
         moveRight();
     }
-    if(keystate[SDL_SCANCODE_UP])
+    if (keystate[SDL_SCANCODE_UP])
     {
         moveUp();
     }
-    if(keystate[SDL_SCANCODE_DOWN])
+    if (keystate[SDL_SCANCODE_DOWN])
     {
         moveDown();
     }
