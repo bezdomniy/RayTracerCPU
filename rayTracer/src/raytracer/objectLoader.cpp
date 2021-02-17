@@ -7,7 +7,7 @@ ObjectLoader::~ObjectLoader() {}
 std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>>
 ObjectLoader::loadYaml(const std::string &fileName)
 {
-  // std::vector<std::shared_ptr<Shape>> ret;
+  // std::vector<std::shared_ptr<Shape>> shapes;
   std::shared_ptr<Camera> camera;
   std::shared_ptr<World> world = std::make_shared<World>();
 
@@ -66,10 +66,9 @@ ObjectLoader::loadYaml(const std::string &fileName)
   }
 
   // std::shared_ptr<Shape> bvh = Model::buildBoundingVolumeHierarchy(shapes);
-
-  // std::shared_ptr<Material> rootMaterial = std::make_shared<Material>();
-  // bvh->setMaterial(rootMaterial);
-
+  // std::shared_ptr<Material> bvhMaterial = std::make_shared<Material>();
+  // bvhMaterial->shadow = false;
+  // bvh->setMaterial(bvhMaterial);
   // world->addShape(bvh);
 
   return std::pair<std::shared_ptr<Camera>,

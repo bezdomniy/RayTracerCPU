@@ -8,6 +8,8 @@
 #include <sstream>
 #include <memory>
 #include <utility>
+#include <chrono>
+#include <iostream>
 
 #include "group.h"
 
@@ -16,6 +18,7 @@ class Model
 private:
 	static std::shared_ptr<Group> recursiveBuild(std::vector<std::shared_ptr<Shape>> &shapes, uint32_t start, uint32_t end);
 	static std::pair<glm::dvec4, glm::dvec4> mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const std::pair<glm::dvec4, glm::dvec4> b2);
+	static std::pair<glm::dvec4, glm::dvec4> mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const glm::dvec4 p);
 
 public:
 	Model();

@@ -42,7 +42,7 @@ private:
 #endif
     // static const int PIXELS_PER_BATCH = 20000;
     SDL_Event event;
-    const Uint8* keystate = SDL_GetKeyboardState(NULL);
+    const Uint8 *keystate = SDL_GetKeyboardState(NULL);
     const float STEP_SIZE = 0.01f;
 
     // std::string sceneDesc;
