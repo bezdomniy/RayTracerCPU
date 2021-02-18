@@ -88,7 +88,7 @@ namespace Geometry
   void getIntersectionParameters(Intersection<T> &intersection, glm::dvec4 &rayOrigin, glm::dvec4 &rayDirection,
                                  std::vector<Intersection<T>> &intersections)
   {
-    intersection.comps = std::make_unique<IntersectionParameters>();
+    // intersection.comps = std::make_unique<IntersectionParameters>();
     intersection.comps->point =
         rayOrigin + glm::normalize(rayDirection) * intersection.t;
     // TODO check that uv only null have using none-uv normalAt version
