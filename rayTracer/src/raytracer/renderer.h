@@ -48,20 +48,20 @@ public:
   int sqrtRaysPerPixel = (int)std::sqrt(RAYS_PER_PIXEL);
   double halfSubPixelSize = 1.0 / (double)sqrtRaysPerPixel / 2.0;
 
+  bool isPathTracer = true;
+
   Canvas canvas;
 
-  glm::dvec3 colourAt(Ray &ray, World &world, short remaining, std::vector<Geometry::Intersection<Shape>> &intersections, std::unique_ptr<Geometry::IntersectionParameters> &hitCompsBuffer);
-  glm::dvec3 reflectColour(Geometry::Intersection<Shape> *hit, World &world,
-                           short remaining);
+  glm::dvec3 rayColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, std::unique_ptr<Geometry::IntersectionParameters> &hitCompsBuffer, short remaining);
+  glm::dvec3 pathColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, std::unique_ptr<Geometry::IntersectionParameters> &hitCompsBuffer, short remaining);
+  glm::dvec3 reflectColour(Geometry::Intersection<Shape> *hit, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
   glm::dvec3 lighting(Shape *shape, std::shared_ptr<PointLight> &light,
                       glm::dvec4 &point, glm::dvec4 &eyev, glm::dvec4 &normalv,
                       bool &inShadow);
   glm::dvec3 lighting(Shape *shape, glm::dvec4 &point);
-  glm::dvec3 shadeHit(Geometry::Intersection<Shape> *hit, World &world,
-                      short remaining);
-  glm::dvec3 refractedColour(Geometry::Intersection<Shape> *hit, World &world,
-                             short remaining);
-  // bool isShadowed(glm::dvec4 &point, World &world, std::shared_ptr<PointLight> &light);
+  glm::dvec3 shadeHit(Geometry::Intersection<Shape> *hit, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
+  glm::dvec3 refractedColour(Geometry::Intersection<Shape> *hit, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
+  bool isShadowed(glm::dvec4 &point, std::vector<Geometry::Intersection<Shape>> &intersections, World &world, std::shared_ptr<PointLight> &light);
 
   void render(World &world);
   void renderPixel(World &world, const std::pair<int, int> &pixel);

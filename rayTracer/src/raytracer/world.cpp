@@ -19,6 +19,7 @@ void World::addShape(std::shared_ptr<Shape> &shape_ptr)
 
 void World::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &ret)
 {
+  ret.clear();
   // std::vector<Geometry::Intersection<Shape>> ret;
   // ret.reserve(this->shapes.size() * 2);
 
@@ -33,18 +34,21 @@ void World::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &r
   // return ret;
 }
 
-void World::intersectRayShadow(Ray &ray, std::vector<Geometry::Intersection<Shape>> &ret)
+bool World::intersectRayShadow(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersectionBuffer, double distance)
 {
-  // std::vector<Geometry::Intersection<Shape>> ret;
-  // ret.reserve(this->shapes.size() * 2);
-
+  intersectionBuffer.clear();
   for (auto &shape : this->shapes)
   {
-    if (shape->material->shadow) //TODO split material into 2 types - shadowed and not and store in 2 vectors
-      shape->intersectRay(ray, ret);
+    if (shape->material->shadow)
+    {
+      shape->intersectRay(ray, intersectionBuffer);
+
+      for (auto &intersection : intersectionBuffer)
+      {
+        if (intersection.t > 0.001 && intersection.t < distance)
+          return true;
+      }
+    }
   }
-
-  std::sort(ret.begin(), ret.end(), Geometry::compareIntersection<Shape>);
-
-  // return ret;
+  return false;
 }

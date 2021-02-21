@@ -59,6 +59,7 @@ Ray Camera::rayForPixel(double px, double py, int currentRayNumber, int sqrtRays
   glm::dvec4 origin =
       this->inverseTransform * glm::dvec4(0.0, 0.0, 0.0, 1.0);
   glm::dvec4 direction = glm::normalize(pixel - origin);
+  // glm::dvec4 direction = pixel - origin;
 
   return Ray(origin, direction);
 }
