@@ -93,10 +93,10 @@
 # ======================================================
 # the camera
 # ======================================================
-
+# TODO update all the lights, only 1 done now
 - add: camera
-  width: 800
-  height: 600
+  width: 400
+  height: 300
   field-of-view: 1.047
   from: [0, 0, -4]
   to: [0, 0, 0]
@@ -108,9 +108,19 @@
 # ornament.
 # ======================================================
 
-- add: light
-  at: [-10, 10, -10]
-  intensity: [0.6, 0.6, 0.6]
+- define: white-light
+  value:
+    emissiveness: [4, 4, 4]
+    
+- add: sphere
+  material: white-light
+  transform:
+    - [scale, 5, 5, 5]
+    - [translate, -10, 10, -10]
+
+# - add: light
+#   at: [-10, 10, -10]
+#   intensity: [0.6, 0.6, 0.6]
 - add: sphere
   shadow: false
   transform:
@@ -139,6 +149,7 @@
 - add: light
   at: [-2, 1, -6]
   intensity: [0.2, 0.1, 0.1]
+  
 - add: sphere
   shadow: false
   transform:

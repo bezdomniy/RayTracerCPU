@@ -1,6 +1,6 @@
 - add: camera
-  width: 600
-  height: 400
+  width: 300
+  height: 200
   field-of-view: 1.0472
   from: [-.2, 2, -5]
   to: [0, 0.8, 0]
@@ -8,6 +8,17 @@
 - add: light
   at: [2, 4, -3]
   intensity: [1, 1, 1]
+
+- define: white-light
+  value:
+    emissiveness: [7,7,7]
+    
+- add: sphere
+  material: white-light
+  transform:
+    - [scale, 1, 0.1, 1]
+    - [translate, 2, 4, -3]
+
 - define: base-material
   value:
     color: [1, 1, 1]
