@@ -23,7 +23,6 @@ set(CMAKE_EXE_LINKER_FLAGS_RELEASE "")
 set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "")
 
 
-
 # if(${TO_NATIVE})
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 	message(STATUS "Setting compilation target to WASM")
@@ -34,30 +33,11 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 
 	add_subdirectory(yaml-cpp)
 	add_subdirectory(glm)
-	if (${USE_THREADS})
-		add_subdirectory(cpp-taskflow)
-	endif()
 else()
 	message(STATUS "Setting compilation target to native binary")
 
-	set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-	set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-	set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-
-	# set(TBB_DIR /home/ilia/dev/tools/tbb/cmake)
-	#set(TBB_DIR C:\\dev\\tools\\tbb\\cmake)
-	#set(TBB_DIR /home/ilia/vcpkg/installed/x64-linux/share/tbb)
-
-	if (WIN32)
-		#find_package(TBB CONFIG REQUIRED)
-	endif (WIN32)
 	find_package(SDL2 CONFIG REQUIRED)
-	find_package(yaml-cpp CONFIG REQUIRED)
-
-	# add_subdirectory(glm)
-	find_package(glm CONFIG REQUIRED)
-	# find_package(TBB CONFIG REQUIRED)
-
+	
 	add_subdirectory("src/raytracer")
 endif()
 
