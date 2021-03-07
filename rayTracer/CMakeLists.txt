@@ -37,7 +37,8 @@ else()
 	message(STATUS "Setting compilation target to native binary")
 
 	find_package(SDL2 CONFIG REQUIRED)
-	
+	add_subdirectory(yaml-cpp)
+	add_subdirectory(glm)
 	add_subdirectory("src/raytracer")
 endif()
 

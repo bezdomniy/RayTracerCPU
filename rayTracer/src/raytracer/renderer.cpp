@@ -23,13 +23,13 @@ void Renderer::renderPixel(World &world, std::pair<int, int> &pixel, uint8_t nWo
   std::vector<Geometry::Intersection<Shape>> intersections;
   intersections.reserve(world.shapes.size() * 2);
 
-  std::unique_ptr<Geometry::IntersectionParameters> hitCompsBuffer = std::make_unique<Geometry::IntersectionParameters>();
+  // std::unique_ptr<Geometry::IntersectionParameters> hitCompsBuffer = std::make_unique<Geometry::IntersectionParameters>();
 
   for (int i = 0; i < RAYS_PER_PIXEL; i++)
   {
     Ray cast = this->camera->rayForPixel(pixel.first, pixel.second, i,
                                          sqrtRaysPerPixel, halfSubPixelSize);
-    cShape += rayColourAt(cast, world, intersections, hitCompsBuffer, RAY_BOUNCE_LIMIT, RAY_BOUNCE_LIMIT);
+    cShape += rayColourAt(cast, world, intersections, RAY_BOUNCE_LIMIT);
   }
 
   cShape *= 1.0 / (double)RAYS_PER_PIXEL;
@@ -172,7 +172,7 @@ void Renderer::renderPixel(World &world, const std::pair<int, int> &pixel)
   std::vector<Geometry::Intersection<Shape>> intersections;
   intersections.reserve(world.shapes.size() * 2);
 
-  std::unique_ptr<Geometry::IntersectionParameters> hitCompsBuffer = std::make_unique<Geometry::IntersectionParameters>();
+  //  std::unique_ptr<Geometry::IntersectionParameters> hitCompsBuffer = std::make_unique<Geometry::IntersectionParameters>();
 
   for (int i = 0; i < RAYS_PER_PIXEL; i++)
   {
@@ -181,9 +181,9 @@ void Renderer::renderPixel(World &world, const std::pair<int, int> &pixel)
     // intersections.clear();
 
     if (isPathTracer)
-      cShape += pathColourAt(cast, world, intersections, hitCompsBuffer, RAY_BOUNCE_LIMIT);
+      cShape += pathColourAt(cast, world, intersections, RAY_BOUNCE_LIMIT);
     else
-      cShape += rayColourAt(cast, world, intersections, hitCompsBuffer, RAY_BOUNCE_LIMIT);
+      cShape += rayColourAt(cast, world, intersections, RAY_BOUNCE_LIMIT);
   }
 
   if (isPathTracer)
@@ -201,7 +201,7 @@ void Renderer::renderPixel(World &world, const std::pair<int, int> &pixel)
   this->canvas.writePixel(pixel.first, pixel.second, cShape);
 }
 
-glm::dvec3 Renderer::pathColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, std::unique_ptr<Geometry::IntersectionParameters> &hitCompsBuffer, short remaining)
+glm::dvec3 Renderer::pathColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
 {
   if (remaining < 0)
     return glm::dvec3(0, 0, 0);
@@ -225,16 +225,15 @@ glm::dvec3 Renderer::pathColourAt(Ray &ray, World &world, std::vector<Geometry::
 
     // TODO: this does a lot of memory allocation. Make intersectionparameters once and reuse.
 
-    hit->comps = std::move(hitCompsBuffer);
-    Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
-    auto scatterDirection = hit->comps->normalv + glm::dvec4(glm::normalize(glm::ballRand(1.0)), 0.0);
+    Geometry::IntersectionParameters comps = Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
+    auto scatterDirection = comps.normalv + glm::dvec4(glm::normalize(glm::ballRand(1.0)), 0.0);
 
-    Ray newRay(hit->comps->overPoint, scatterDirection);
+    Ray newRay(comps.overPoint, scatterDirection);
 
-    glm::dvec3 hitColour = lighting(hit->shapePtr, hit->comps->overPoint);
-    hitCompsBuffer = std::move(hit->comps);
+    glm::dvec3 hitColour = lighting(hit->shapePtr, comps.overPoint);
+    // hitCompsBuffer = std::move(hit->comps);
     // intersections.clear();
-    return hit->shapePtr->material->emissiveness + hitColour * pathColourAt(newRay, world, intersections, hitCompsBuffer, remaining - 1);
+    return hit->shapePtr->material->emissiveness + hitColour * pathColourAt(newRay, world, intersections, remaining - 1);
 
     // return shadeHit(hit, world, remaining);
   }
@@ -260,19 +259,18 @@ glm::dvec3 Renderer::pathColourAt(Ray &ray, World &world, std::vector<Geometry::
   // return glm::dvec3(0.0, 0.0, 0.0);
 }
 
-glm::dvec3 Renderer::rayColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, std::unique_ptr<Geometry::IntersectionParameters> &hitCompsBuffer, short remaining)
+glm::dvec3 Renderer::rayColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
 {
+  // intersections.clear();
   // std::vector<Geometry::Intersection<Shape>> intersections =
   world.intersectRay(ray, intersections);
   Geometry::Intersection<Shape> *hit;
 
   if ((hit = Geometry::hit<Shape>(intersections)))
   {
-    Geometry::Intersection<Shape> hitCopy{hit->t, hit->shapePtr, hit->uv};
-    hitCopy.comps = std::move(hitCompsBuffer);
-    Geometry::getIntersectionParameters<Shape>(hitCopy, ray.origin, ray.direction, intersections);
-    glm::dvec3 hitColour = shadeHit(&hitCopy, world, intersections, remaining);
-    hitCompsBuffer = std::move(hitCopy.comps);
+    // TODO: Geometry::getRefractiveIndexFromTo no longer working because this is now a copy, so pointer equality breaks!
+    Geometry::IntersectionParameters comps = Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
+    glm::dvec3 hitColour = shadeHit(hit, comps, world, intersections, remaining);
     return hitColour;
   }
   return glm::dvec3(0.0, 0.0, 0.0);
@@ -284,25 +282,29 @@ glm::dvec3 Renderer::rayColourAt(Ray &ray, World &world, std::vector<Geometry::I
 // glm::dvec3 hitColour = shadeHit(&hitCopy, world, intersections, remaining);
 // hitCompsBuffer = std::move(hitCopy.comps);
 
-glm::dvec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
+glm::dvec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, Geometry::IntersectionParameters &comps, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
 {
   glm::dvec3 surface(0.0);
 
+  double reflective = hit->shapePtr->material->reflective;
+  double transparency = hit->shapePtr->material->transparency;
+  Shape *shapePtr = hit->shapePtr;
+
   for (auto &light : world.lights)
   {
-    bool inShadow = this->isShadowed(hit->comps->overPoint, intersections, world, light);
-    // bool inShadow = false;
-    surface += lighting(hit->shapePtr, light, hit->comps->overPoint,
-                        hit->comps->eyev, hit->comps->normalv, inShadow);
+    bool inShadow = this->isShadowed(comps.overPoint, intersections, world, light);
+    //     bool inShadow = false;
+    surface += lighting(shapePtr, light, comps.overPoint,
+                        comps.eyev, comps.normalv, inShadow);
   }
 
-  bool doSchlick = hit->shapePtr->material->reflective > 0 && hit->shapePtr->material->transparency > 0;
+  bool doSchlick = reflective > 0 && transparency > 0;
   double reflectance = 0.0;
   if (doSchlick)
-    reflectance = Geometry::schlick<Shape>(hit->comps);
+    reflectance = Geometry::schlick<Shape>(comps);
 
-  glm::dvec3 reflection = reflectColour(hit, world, intersections, remaining);
-  glm::dvec3 refraction = refractedColour(hit, world, intersections, remaining);
+  glm::dvec3 reflection = reflectColour(comps, reflective, world, intersections, remaining);
+  glm::dvec3 refraction = refractedColour(comps, transparency, world, intersections, remaining);
 
   if (doSchlick)
   {
@@ -311,48 +313,50 @@ glm::dvec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, World &world, 
   return surface + reflection + refraction;
 }
 
-glm::dvec3 Renderer::reflectColour(Geometry::Intersection<Shape> *hit,
+glm::dvec3 Renderer::reflectColour(Geometry::IntersectionParameters &comps, double reflective,
                                    World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
 {
   //  intersections.clear();
-  if (hit->shapePtr->material->reflective == 0 || remaining <= 0)
+  if (reflective == 0 || remaining <= 0)
     return glm::dvec3(0.0, 0.0, 0.0);
 
-  Ray reflectRay = Ray(hit->comps->overPoint, hit->comps->reflectv);
+  Ray reflectRay = Ray(comps.overPoint, comps.reflectv);
 
-  std::unique_ptr<Geometry::IntersectionParameters> hitCompsBuffer = std::move(hit->comps);
-  glm::dvec3 reflectionColour = rayColourAt(reflectRay, world, intersections, hitCompsBuffer, remaining - 1) *
-                                hit->shapePtr->material->reflective;
-  hit->comps = std::move(hitCompsBuffer);
+  // std::unique_ptr<Geometry::IntersectionParameters> hitCompsBuffer = std::move(hit->comps);
+  glm::dvec3 reflectionColour = rayColourAt(reflectRay, world, intersections, remaining - 1) *
+                                reflective;
+  // hit->comps = std::move(hitCompsBuffer);
 
   return reflectionColour;
 }
 
-glm::dvec3 Renderer::refractedColour(Geometry::Intersection<Shape> *hit,
+glm::dvec3 Renderer::refractedColour(Geometry::IntersectionParameters &comps, double transparency,
                                      World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
 {
-  //  intersections.clear();
-  double nRatio = hit->comps->n1 / hit->comps->n2;
-  double cosI = glm::dot(hit->comps->eyev, hit->comps->normalv);
+  if (transparency == 0 || remaining <= 0)
+  {
+    return glm::dvec3(0.0, 0.0, 0.0);
+  }
+
+  double nRatio = comps.n1 / comps.n2;
+  double cosI = glm::dot(comps.eyev, comps.normalv);
   double sin2T = (nRatio * nRatio) * (1 - (cosI * cosI));
 
-  if (hit->shapePtr->material->transparency == 0 || sin2T > 1 ||
-      remaining <= 0)
+  if (sin2T > 1)
   {
     return glm::dvec3(0.0, 0.0, 0.0);
   }
 
   double cosT = std::sqrt(1.0 - sin2T);
-  glm::dvec4 direction = hit->comps->normalv * ((nRatio * cosI) - cosT) -
-                         (hit->comps->eyev * nRatio);
+  glm::dvec4 direction = comps.normalv * ((nRatio * cosI) - cosT) -
+                         (comps.eyev * nRatio);
 
-  Ray refractedRay(hit->comps->underPoint, direction);
+  Ray refractedRay(comps.underPoint, direction);
 
-  std::unique_ptr<Geometry::IntersectionParameters> hitCompsBuffer = std::move(hit->comps);
-  glm::dvec3 colour = rayColourAt(refractedRay, world, intersections, hitCompsBuffer, remaining - 1);
-  hit->comps = std::move(hitCompsBuffer);
+  glm::dvec3 colour = rayColourAt(refractedRay, world, intersections, remaining - 1);
+  // hit->comps = std::move(hitCompsBuffer);
 
-  return colour * hit->shapePtr->material->transparency;
+  return colour * transparency;
 }
 
 glm::dvec3 Renderer::lighting(Shape *shape, glm::dvec4 &point)

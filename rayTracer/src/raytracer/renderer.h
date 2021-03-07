@@ -42,25 +42,26 @@ public:
 #endif
   ~Renderer();
 
+  bool isPathTracer = true;
   static const int RAY_BOUNCE_LIMIT = 50;
   static const int RAYS_PER_PIXEL = 200;
   // TODO static constexpr below
   int sqrtRaysPerPixel = (int)std::sqrt(RAYS_PER_PIXEL);
   double halfSubPixelSize = 1.0 / (double)sqrtRaysPerPixel / 2.0;
 
-  bool isPathTracer = true;
-
   Canvas canvas;
 
-  glm::dvec3 rayColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, std::unique_ptr<Geometry::IntersectionParameters> &hitCompsBuffer, short remaining);
-  glm::dvec3 pathColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, std::unique_ptr<Geometry::IntersectionParameters> &hitCompsBuffer, short remaining);
-  glm::dvec3 reflectColour(Geometry::Intersection<Shape> *hit, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
+  glm::dvec3 rayColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
+  glm::dvec3 pathColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
+  glm::dvec3 reflectColour(Geometry::IntersectionParameters &comps, double reflective,
+                           World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
   glm::dvec3 lighting(Shape *shape, std::shared_ptr<PointLight> &light,
                       glm::dvec4 &point, glm::dvec4 &eyev, glm::dvec4 &normalv,
                       bool &inShadow);
   glm::dvec3 lighting(Shape *shape, glm::dvec4 &point);
-  glm::dvec3 shadeHit(Geometry::Intersection<Shape> *hit, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
-  glm::dvec3 refractedColour(Geometry::Intersection<Shape> *hit, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
+  glm::dvec3 shadeHit(Geometry::Intersection<Shape> *hit, Geometry::IntersectionParameters &comps, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
+  glm::dvec3 refractedColour(Geometry::IntersectionParameters &comps, double transparency,
+                             World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
   bool isShadowed(glm::dvec4 &point, std::vector<Geometry::Intersection<Shape>> &intersections, World &world, std::shared_ptr<PointLight> &light);
 
   void render(World &world);

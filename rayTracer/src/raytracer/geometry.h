@@ -26,6 +26,12 @@
 
 namespace Geometry
 {
+  // unsigned int unique_id()
+  // {
+  //   static unsigned int n = 0;
+  //   return ++n;
+  // }
+
   static const double EPSILON = 0.000000001;
   // static const double EPSILON = std::numeric_limits<double>::epsilon();
   struct IntersectionParameters
@@ -47,12 +53,37 @@ namespace Geometry
     double t;
     T *shapePtr;
     glm::dvec2 uv;
-    std::unique_ptr<IntersectionParameters> comps;
+//    unsigned int id;
+//    IntersectionParameters *comps;
+
+    // Intersection(double t, T *shapePtr, glm::dvec2 uv)
+    // {
+    //   this->t = t;
+    //   this->shapePtr = shapePtr;
+    //   this->uv = uv;
+    //   this->id = unique_id();
+    // }
+
+    // Intersection(double t, T *shapePtr)
+    // {
+    //   this->t = t;
+    //   this->shapePtr = shapePtr;
+    //   this->id = unique_id();
+    // }
+
+    // Intersection(const Intersection &intersection)
+    // {
+    //   this->t = intersection.t;
+    //   this->shapePtr = intersection.shapePtr;
+    //   this->uv = intersection.uv;
+    //   this->id = intersection.id;
+    //   this->comps = std::move(intersection.comps);
+    // }
   };
 
   template <typename T>
   void getRefractiveIndexFromTo(std::vector<Intersection<T>> &intersections,
-                                Intersection<T> &hit)
+                                Intersection<T> &hit, IntersectionParameters &comps)
   {
     std::vector<T *> objects;
 
@@ -61,9 +92,9 @@ namespace Geometry
       if (&intersection == &hit)
       {
         if (objects.empty())
-          intersection.comps->n1 = 1.0;
+            comps.n1 = 1.0;
         else
-          intersection.comps->n1 = objects.back()->material->refractiveIndex;
+            comps.n1 = objects.back()->material->refractiveIndex;
       }
 
       typename std::vector<T *>::iterator position =
@@ -76,44 +107,47 @@ namespace Geometry
       if (&intersection == &hit)
       {
         if (objects.empty())
-          intersection.comps->n2 = 1.0;
+          comps.n2 = 1.0;
         else
-          intersection.comps->n2 = objects.back()->material->refractiveIndex;
+            comps.n2 = objects.back()->material->refractiveIndex;
         break;
       }
     }
   }
 
   template <typename T>
-  void getIntersectionParameters(Intersection<T> &intersection, glm::dvec4 &rayOrigin, glm::dvec4 &rayDirection,
+  IntersectionParameters getIntersectionParameters(Intersection<T> &intersection, glm::dvec4 &rayOrigin, glm::dvec4 &rayDirection,
                                  std::vector<Intersection<T>> &intersections)
   {
     // intersection.comps = std::make_unique<IntersectionParameters>();
-    intersection.comps->point =
+      IntersectionParameters comps = {};
+    comps.point =
         rayOrigin + glm::normalize(rayDirection) * intersection.t;
     // TODO check that uv only null have using none-uv normalAt version
-    intersection.comps->normalv =
-        intersection.shapePtr->normalAt(intersection.comps->point, intersection.uv);
-    intersection.comps->eyev = -rayDirection;
+    comps.normalv =
+        intersection.shapePtr->normalAt(comps.point, intersection.uv);
+      comps.eyev = -rayDirection;
 
-    if (glm::dot(intersection.comps->normalv, intersection.comps->eyev) < 0)
+    if (glm::dot(comps.normalv, comps.eyev) < 0)
     {
       // intersection.comps->inside = true;
-      intersection.comps->normalv = -intersection.comps->normalv;
+        comps.normalv = -comps.normalv;
     }
     // else
     // {
     //   intersection.comps->inside = false;
     // }
 
-    intersection.comps->reflectv =
-        glm::reflect(rayDirection, intersection.comps->normalv);
-    intersection.comps->overPoint =
-        intersection.comps->point + intersection.comps->normalv * EPSILON;
-    intersection.comps->underPoint =
-        intersection.comps->point - intersection.comps->normalv * EPSILON;
+      comps.reflectv =
+        glm::reflect(rayDirection, comps.normalv);
+      comps.overPoint =
+      comps.point + comps.normalv * EPSILON;
+      comps.underPoint =
+      comps.point - comps.normalv * EPSILON;
 
-    getRefractiveIndexFromTo<T>(intersections, intersection);
+    getRefractiveIndexFromTo<T>(intersections, intersection, comps);
+      
+      return comps;
   }
 
   template <typename T>
@@ -157,12 +191,12 @@ namespace Geometry
   }
 
   template <typename T>
-  double schlick(std::unique_ptr<IntersectionParameters> &comps)
+  double schlick(IntersectionParameters& comps)
   {
-    double cos = glm::dot(comps->eyev, comps->normalv);
-    if (comps->n1 > comps->n2)
+    double cos = glm::dot(comps.eyev, comps.normalv);
+    if (comps.n1 > comps.n2)
     {
-      double n = comps->n1 / comps->n2;
+      double n = comps.n1 / comps.n2;
       double sin2T = std::pow(n, 2) * (1.0 - std::pow(cos, 2));
       if (sin2T > 1.0)
         return 1.0;
@@ -170,7 +204,7 @@ namespace Geometry
       double cosT = std::sqrt(1.0 - sin2T);
       cos = cosT;
     }
-    double r0 = std::pow((comps->n1 - comps->n2) / (comps->n1 + comps->n2), 2);
+    double r0 = std::pow((comps.n1 - comps.n2) / (comps.n1 + comps.n2), 2);
     return r0 + (1.0 - r0) * std::pow(1.0 - cos, 5);
   }
 
