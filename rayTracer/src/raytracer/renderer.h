@@ -42,9 +42,9 @@ public:
 #endif
   ~Renderer();
 
-  bool isPathTracer = true;
-  static const int RAY_BOUNCE_LIMIT = 50;
-  static const int RAYS_PER_PIXEL = 200;
+  bool isPathTracer = false;
+  static const int RAY_BOUNCE_LIMIT = 1;
+  static const int RAYS_PER_PIXEL = 4;
   // TODO static constexpr below
   int sqrtRaysPerPixel = (int)std::sqrt(RAYS_PER_PIXEL);
   double halfSubPixelSize = 1.0 / (double)sqrtRaysPerPixel / 2.0;
