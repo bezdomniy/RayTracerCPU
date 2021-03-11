@@ -44,7 +44,8 @@ Renderer::~Renderer()
 
 void Renderer::render(World &world)
 {
-#ifdef WITH_THREADS
+
+#if !defined(__EMSCRIPTEN__) || defined(WITH_THREADS)
   moodycamel::ConcurrentQueue<std::pair<int, int>> q;
   // std::cout << "height and width: " << this->canvas.height << ", " << this->canvas.width << std::endl;
   for (int y = 0; y < this->canvas.height; y++)
@@ -116,7 +117,7 @@ void Renderer::render(World &world)
   {
     renderPixel(world, *it);
   }
-#endif // WITH_THREADS
+#endif
 }
 
 void Renderer::renderPixel(World &world, const std::pair<int, int> &pixel)
