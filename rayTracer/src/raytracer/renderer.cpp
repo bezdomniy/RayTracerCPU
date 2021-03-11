@@ -44,18 +44,9 @@ Renderer::~Renderer()
 
 void Renderer::render(World &world)
 {
-  // std::vector<std::pair<int, int>> pixels;
-  // pixels.reserve(this->canvas.height * this->canvas.width);
-
-  // for (int y = 0; y < this->canvas.height; y++)
-  // {
-  //   for (int x = 0; x < this->canvas.width; x++)
-  //   {
-  //     pixels.push_back(std::make_pair(x, y));
-  //   }
-  // }
-
+#ifdef WITH_THREADS
   moodycamel::ConcurrentQueue<std::pair<int, int>> q;
+  // std::cout << "height and width: " << this->canvas.height << ", " << this->canvas.width << std::endl;
   for (int y = 0; y < this->canvas.height; y++)
   {
     for (int x = 0; x < this->canvas.width; x++)
@@ -64,62 +55,11 @@ void Renderer::render(World &world)
     }
   }
 
-  // std::random_device rd;
-  // std::mt19937 g(rd());
-
-  // std::shuffle(pixels.begin(), pixels.end(), g);
-
-#ifdef __EMSCRIPTEN__
-#ifdef WITH_THREADS
   size_t t = std::thread::hardware_concurrency();
   std::thread threads[t];
-  for (int i = 0; i < t; ++i)
-  {
-    threads[i] = std::thread([&]() {
-      std::pair<int, int> pixel;
-      while (q.try_dequeue(pixel))
-      {
-        renderPixel(world, pixel);
-      }
-    });
-  }
 
-  // Wait for all threads
-  for (int i = 0; i < t; ++i)
-  {
-    threads[i].join();
-  }
+  std::cout << "using " << t << " threads" << std::endl;
 
-  std::pair<int, int> pixel;
-  while (q.try_dequeue(pixel))
-  {
-    renderPixel(world, pixel);
-  }
-  // tf::Executor executor;
-  // tf::Taskflow taskflow;
-
-  // taskflow.for_each(
-  //     pixels.begin(), pixels.end(),
-  //     [this, &world](auto &pixel) {
-  //       std::cout << "rendering: " << pixel.first << ", " << pixel.second << std::endl;
-  //       // this->renderPixel(world, pixel);
-  //     });
-  // std::cout << "starting thread" << std::endl;
-  // // executor.run(taskflow).wait();
-  // executor.run(taskflow);
-  // executor.wait_for_all();
-  // std::cout << "done thread" << std::endl;
-#else
-  for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
-       it != pixels.end(); ++it)
-  {
-    renderPixel(world, *it);
-  }
-#endif // WITH_THREADS
-#else
-
-  size_t t = std::thread::hardware_concurrency();
-  std::thread threads[t];
   for (int i = 0; i < t; ++i)
   {
     threads[i] = std::thread([&]() {
@@ -148,20 +88,35 @@ void Renderer::render(World &world)
   //     [this, &world](auto &&pixel) {
   //       renderPixel(world, pixel);
   //     });
-  //
-  // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
-  //      it != pixels.end(); ++it)
-  // {
-  //   renderPixel(world, *it);
-  // }
-  //
   // #pragma omp parallel for
   // for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
   //     it < pixels.end(); ++it)
   // {
   //     renderPixel(world, *it);
   // }
-#endif
+#else
+  std::vector<std::pair<int, int>> pixels;
+  pixels.reserve(this->canvas.height * this->canvas.width);
+
+  for (int y = 0; y < this->canvas.height; y++)
+  {
+    for (int x = 0; x < this->canvas.width; x++)
+    {
+      pixels.push_back(std::make_pair(x, y));
+    }
+  }
+
+  std::random_device rd;
+  std::mt19937 g(rd());
+
+  std::shuffle(pixels.begin(), pixels.end(), g);
+
+  for (std::vector<std::pair<int, int>>::iterator it = pixels.begin();
+       it != pixels.end(); ++it)
+  {
+    renderPixel(world, *it);
+  }
+#endif // WITH_THREADS
 }
 
 void Renderer::renderPixel(World &world, const std::pair<int, int> &pixel)

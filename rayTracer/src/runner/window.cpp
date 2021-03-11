@@ -7,18 +7,6 @@
 Window::Window()
 {
     this->nWorkers = 1;
-
-#ifndef WITH_THREADS
-    // const auto processor_count = std::thread::hardware_concurrency();
-
-    // if (processor_count > 0)
-    // {
-    //     // if (processor_count > 6)
-    //     //     this->nWorkers = 6;
-    //     // else
-    //     this->nWorkers = processor_count;
-    // }
-#endif //WITH_THREADS
 }
 
 void Window::processScene(const std::string &sceneDesc)
@@ -138,17 +126,22 @@ Window::Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<Worl
     initWindow();
 }
 
-Window::Window(const std::string &sceneDesc)
+#endif //__EMSCRIPTEN__
+
+void Window::initWindow(const std::string &sceneDesc)
 {
     ObjectLoader objectLoader;
     std::tie(this->camera, this->world) = objectLoader.loadYaml(sceneDesc);
     this->rayTraceRenderer = Renderer(this->camera);
 
+    this->width = this->camera->hsize;
+    this->height = this->camera->vsize;
+
     this->originalCameraPosition = this->camera->position;
 
-    initWindow();
+    initSDL();
 }
-#endif
+
 Window::~Window()
 {
 }
@@ -164,7 +157,7 @@ Window::~Window()
 //     update();
 // }
 
-void Window::initWindow()
+void Window::initSDL()
 {
 
 #ifdef __EMSCRIPTEN__
@@ -184,13 +177,13 @@ void Window::initWindow()
 
     // SDL_CreateWindowAndRenderer(this->camera->hsize, this->camera->vsize, 0, &this->window, &this->renderer);
 
-#ifdef __EMSCRIPTEN__
+#if defined(__EMSCRIPTEN__) && !defined(WITH_THREADS)
     this->texTarget = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888,
                                         SDL_TEXTUREACCESS_TARGET, this->width, this->height);
 #endif
 
     // this->running = true;
-    this->initialised = true;
+
     this->somethingChanged = true;
 
     std::cout << "Created window." << std::endl;
@@ -204,9 +197,10 @@ void Window::step()
 
     if (somethingChanged && !running)
     {
+        std::cout << "something changed and running\n";
         somethingChanged = false;
         update();
-#ifndef __EMSCRIPTEN__
+#ifdef WITH_THREADS
         draw();
 #endif
     }
@@ -214,6 +208,7 @@ void Window::step()
 
 void Window::run()
 {
+    this->initialised = true;
     while (this->initialised)
     {
         step();
@@ -252,40 +247,6 @@ void Window::handleEvents()
     {
         moveDown();
     }
-
-    // while (SDL_PollEvent(&event))
-    // {
-    //     // SDL_WaitEvent(&event);
-    //     switch (event.type)
-    //     {
-    //     case SDL_QUIT:
-    //         this->initialised = false;
-    //         break;
-    //     case SDL_KEYDOWN:
-    //         switch (event.key.keysym.sym)
-    //         {
-    //         case SDLK_ESCAPE:
-    //             this->initialised = false;
-    //             break;
-    //         case SDLK_LEFT:
-    //             moveLeft();
-    //             break;
-    //         case SDLK_RIGHT:
-    //             moveRight();
-    //             break;
-    //         case SDLK_UP:
-    //             moveUp();
-    //             break;
-    //         case SDLK_DOWN:
-    //             moveDown();
-    //             break;
-    //             // cases for other keypresses
-    //         }
-    //         break;
-    //     default:
-    //         break;
-    //     }
-    // }
 }
 
 void Window::moveLeft() { moveCamera(STEP_SIZE, 1); }
@@ -304,7 +265,7 @@ void Window::moveCamera(float posChange, uint8_t axis)
         this->yRotation += posChange;
     }
 
-#ifndef __EMSCRIPTEN__
+#if !defined(__EMSCRIPTEN__) || defined(WITH_THREADS)
     glm::dmat4 rotationX =
         glm::rotate(glm::dmat4(1.0), (double)this->xRotation, glm::dvec3(1.0, 0.0, 0.0));
 
@@ -346,18 +307,20 @@ std::vector<uint8_t> floatToByteArray(float d)
 
 void Window::update()
 {
-
-    // std::cout << "update?" << std::endl;
-    // if (somethingChanged && !running)
-    // {
-
+    std::cout << "Starting render." << std::endl;
     SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
     SDL_RenderClear(this->renderer);
     // std::cout << "update" << std::endl;
     this->running = true;
 
 #ifdef __EMSCRIPTEN__
-
+#ifdef WITH_THREADS
+    // this->updateSize();
+    std::cout << "Starting render." << std::endl;
+    this->rayTraceRenderer.render(*world);
+    std::cout << "Render finished." << std::endl;
+    this->running = false;
+#else
     // std::cout << "Send rotations: " << this->xRotation << " " << this->yRotation << std::endl;
 
     std::vector<uint8_t> xRotationBytes = floatToByteArray(this->xRotation);
@@ -388,21 +351,16 @@ void Window::update()
     // float *yRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 6);
 
     int worker = 0;
+
     for (auto &renderWorker : this->workers)
     {
-        // rotation info
-
         this->busyWorkers.at(worker) = true;
         this->sceneBinary[i] = ((char)worker);
-#ifdef WITH_THREADS
-        emscripten_call_worker(renderWorker, "renderSceneThreaded", &this->sceneBinary[0], this->sceneBinary.size(), renderCback, (void *)42);
-#else
+
         emscripten_call_worker(renderWorker, "renderScene", &this->sceneBinary[0], this->sceneBinary.size(), renderCback, (void *)42);
-#endif //WITH_THREADS \
-    // std::cout << "Receive Rotations: " << *xRotationp << " " << *yRotationp << std::endl;
         worker++;
-        // this->somethingChanged = false;
     }
+#endif //WITH_THREADS
 
 #else
     this->rayTraceRenderer.render(*world);
@@ -410,9 +368,11 @@ void Window::update()
 #endif //__EMSCRIPTEN__
 }
 
-#ifndef __EMSCRIPTEN__
 void Window::draw()
 {
+#if defined(__EMSCRIPTEN__) && !defined(WITH_THREADS)
+    SDL_SetRenderTarget(this->renderer, this->texTarget);
+#endif
     SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
     SDL_RenderClear(this->renderer);
 
@@ -426,8 +386,11 @@ void Window::draw()
         }
     }
 
+#if defined(__EMSCRIPTEN__) && !defined(WITH_THREADS)
+    SDL_SetRenderTarget(this->renderer, NULL);
+    SDL_RenderCopy(this->renderer, this->texTarget, NULL, NULL);
+#endif
     SDL_RenderPresent(this->renderer);
 
     // SDL_Delay(1000/30);
 }
-#endif

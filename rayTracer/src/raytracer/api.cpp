@@ -57,31 +57,8 @@ extern "C"
 {
     void processScene(char *data, int size)
     {
-
-        // ObjectLoader objectLoader;
         const std::string sceneDesc(data, size);
-
-        // std::tie(camera, world) = objectLoader.loadYaml(sceneDesc);
-        // std::stringstream ss;
-
-        // {
-        //     cereal::BinaryOutputArchive oarchive(ss);
-        //     oarchive(camera, world);
-        // }
-        // scene = ss.str();
-
-        // std::vector<char> byteBuffer = std::vector<char>(scene.begin(), scene.end());
-
-        // uint8_t *widthBytePointer = reinterpret_cast<uint8_t *>(&(camera->hsize));
-        // std::vector<uint8_t> widthBytes(widthBytePointer, widthBytePointer + sizeof(int));
-        // byteBuffer.insert(byteBuffer.end(), widthBytes.begin(), widthBytes.end());
-
-        // uint8_t *heightBytePointer = reinterpret_cast<uint8_t *>(&(camera->vsize));
-        // std::vector<uint8_t> heightBytes(heightBytePointer, heightBytePointer + sizeof(int));
-        // byteBuffer.insert(byteBuffer.end(), heightBytes.begin(), heightBytes.end());
-
         std::vector<char> byteBuffer = __processScene(sceneDesc);
-
         emscripten_worker_respond(&byteBuffer[0], byteBuffer.size());
     }
 
@@ -172,52 +149,52 @@ extern "C"
         emscripten_worker_respond(&byteBuffer[0], bufferLength + 1);
     }
 
-    void renderSceneThreaded(char *data, int size)
-    {
-        uint8_t *workerId = reinterpret_cast<uint8_t *>(data + size - 1);
-        uint8_t *nWorkers = reinterpret_cast<uint8_t *>(data + size - 2);
+    // void renderSceneThreaded(char *data, int size)
+    // {
+    //     uint8_t *workerId = reinterpret_cast<uint8_t *>(data + size - 1);
+    //     uint8_t *nWorkers = reinterpret_cast<uint8_t *>(data + size - 2);
 
-        float *xRotation = reinterpret_cast<float *>(data + size - 10);
-        float *yRotation = reinterpret_cast<float *>(data + size - 6);
-        membuf sbuf(data, data + size - 10);
-        std::istream iss(&sbuf);
+    //     float *xRotation = reinterpret_cast<float *>(data + size - 10);
+    //     float *yRotation = reinterpret_cast<float *>(data + size - 6);
+    //     membuf sbuf(data, data + size - 10);
+    //     std::istream iss(&sbuf);
 
-        std::shared_ptr<World> world;
-        std::shared_ptr<Camera> camera;
+    //     std::shared_ptr<World> world;
+    //     std::shared_ptr<Camera> camera;
 
-        cereal::BinaryInputArchive iarchive(iss);
-        iarchive(camera, world);
+    //     cereal::BinaryInputArchive iarchive(iss);
+    //     iarchive(camera, world);
 
-        glm::dmat4 rotationX =
-            glm::rotate(glm::dmat4(1.0), (double)*xRotation, glm::dvec3(1.0, 0.0, 0.0));
+    //     glm::dmat4 rotationX =
+    //         glm::rotate(glm::dmat4(1.0), (double)*xRotation, glm::dvec3(1.0, 0.0, 0.0));
 
-        glm::dmat4 rotationY =
-            glm::rotate(glm::dmat4(1.0), (double)*yRotation, glm::dvec3(0.0, 1.0, 0.0));
+    //     glm::dmat4 rotationY =
+    //         glm::rotate(glm::dmat4(1.0), (double)*yRotation, glm::dvec3(0.0, 1.0, 0.0));
 
-        // glm::dmat4 rotationZ =
-        //     glm::rotate(glm::dmat4(1.0), posChange,
-        //                 glm::dvec3(0.0, 0.0, 1.0));
+    //     // glm::dmat4 rotationZ =
+    //     //     glm::rotate(glm::dmat4(1.0), posChange,
+    //     //                 glm::dvec3(0.0, 0.0, 1.0));
 
-        camera->position = rotationX * camera->position;
-        camera->position = rotationY * camera->position;
+    //     camera->position = rotationX * camera->position;
+    //     camera->position = rotationY * camera->position;
 
-        camera->updateTransform();
+    //     camera->updateTransform();
 
-        Renderer renderer(camera);
+    //     Renderer renderer(camera);
 
-        // int sqrtRaysPerPixel = (int)std::sqrt(Renderer::RAYS_PER_PIXEL);
-        // double halfSubPixelSize = 1.0 / (double)(sqrtRaysPerPixel) / 2.0;
+    //     // int sqrtRaysPerPixel = (int)std::sqrt(Renderer::RAYS_PER_PIXEL);
+    //     // double halfSubPixelSize = 1.0 / (double)(sqrtRaysPerPixel) / 2.0;
 
-        renderer.render(*world);
+    //     renderer.render(*world);
 
-        std::vector<char> byteBuffer;
-        size_t bufferLength;
-        std::tie(byteBuffer, bufferLength) = renderer.canvas.writeToRGBA(false);
+    //     std::vector<char> byteBuffer;
+    //     size_t bufferLength;
+    //     std::tie(byteBuffer, bufferLength) = renderer.canvas.writeToRGBA(false);
 
-        byteBuffer.push_back(*(data + size - 1));
+    //     byteBuffer.push_back(*(data + size - 1));
 
-        emscripten_worker_respond(&byteBuffer[0], bufferLength + 1);
-    }
+    //     emscripten_worker_respond(&byteBuffer[0], bufferLength + 1);
+    // }
 }
 // #else
 

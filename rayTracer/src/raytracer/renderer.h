@@ -10,16 +10,10 @@
 #include "ray.h"
 #include "world.h"
 
-#ifdef __EMSCRIPTEN__
 #ifdef WITH_THREADS
 #include "concurrentqueue.h"
-// #include <taskflow/taskflow.hpp>
-#endif //WITH_THREADS
-#else
-// #include <execution>
-#include "concurrentqueue.h"
 #include <thread>
-#endif
+#endif //WITH_THREADS
 
 #include <algorithm>
 #include <glm/glm.hpp>

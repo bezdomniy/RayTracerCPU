@@ -3,8 +3,10 @@
 #ifdef _WIN32
 #define SDL_MAIN_HANDLED
 #include <SDL2/SDL.h>
-#else
+#elif __APPLE__
 #include <SDL.h>
+#else
+#include <SDL2/SDL.h>
 #endif
 #include <vector>
 #include <cmath>
@@ -19,6 +21,14 @@
 #include <emscripten.h>
 void processCback(char *data, int size, void *arg);
 void renderCback(char *data, int size, void *arg);
+
+#ifdef WITH_THREADS
+#include "../raytracer/camera.h"
+#include "../raytracer/renderer.h"
+#include "../raytracer/world.h"
+#include "../raytracer/objectLoader.h"
+#endif //WITH_THREADS
+
 #else
 #include "../raytracer/camera.h"
 #include "../raytracer/renderer.h"
@@ -34,12 +44,15 @@ private:
 #ifdef __EMSCRIPTEN__
     SDL_Texture *texTarget;
     std::vector<worker_handle> workers;
-#else
+#endif
+
+#ifdef WITH_THREADS
     glm::dvec4 originalCameraPosition;
     std::shared_ptr<Camera> camera;
     Renderer rayTraceRenderer;
     std::shared_ptr<World> world;
 #endif
+
     // static const int PIXELS_PER_BATCH = 20000;
     SDL_Event event;
     const Uint8 *keystate = SDL_GetKeyboardState(NULL);
@@ -70,9 +83,11 @@ public:
 
 #ifndef __EMSCRIPTEN__
     Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<World> &world);
-    Window(const std::string &sceneDesc);
 #endif
+    // Window();
     ~Window();
+
+    void initWindow(const std::string &sceneDesc);
 
     bool initialised = false;
     bool running = false;
@@ -94,7 +109,7 @@ public:
     void moveUp();
     void moveDown();
 
-    void initWindow();
+    void initSDL();
 
     void update();
 

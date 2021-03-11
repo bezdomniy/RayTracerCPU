@@ -3,6 +3,7 @@
 
 #ifdef __EMSCRIPTEN__
 #include <emscripten.h>
+#include <emscripten/html5.h>
 // #include <iostream>
 
 Window window;
@@ -20,7 +21,7 @@ void processCback(char *data, int size, void *arg)
   window.height = *reinterpret_cast<int *>(data + size - window.offset + sizeof(int));
 
   if (!window.initialised)
-    window.initWindow();
+    window.initSDL();
   else
     window.updateSize();
 
@@ -47,7 +48,15 @@ void renderCback(char *data, int size, void *arg)
 
 void loop()
 {
+  // std::cout << "here1 " << window.somethingChanged << std::endl;
   window.step();
+}
+
+EM_BOOL loopThreaded(double time, void *userData)
+{
+  // std::cout << "here1 " << window.somethingChanged << std::endl;
+  window.step();
+  return EM_TRUE;
 }
 
 #ifdef __cplusplus
@@ -72,6 +81,21 @@ extern "C"
     if (!window.initialised)
     {
       std::cout << "starting loop" << std::endl;
+      emscripten_set_main_loop(loop, 0, true);
+    }
+  }
+
+  void EMSCRIPTEN_KEEPALIVE drawThreaded(const char *s)
+  {
+    std::string sceneDesc(s);
+    window.initWindow(sceneDesc); //TODO: maybe merge with processScene?
+
+    // window.step();
+    if (!window.initialised)
+    {
+      window.initialised = true;
+      std::cout << "starting loop " << window.somethingChanged << std::endl;
+      // emscripten_request_animation_frame_loop(loopThreaded, 0);
       emscripten_set_main_loop(loop, 0, true);
     }
   }
@@ -116,7 +140,8 @@ void renderToPPM(const std::string &sceneDesc)
 
 void renderToSDL(const std::string &sceneDesc)
 {
-  Window window(sceneDesc);
+  Window window();
+  window.initWindow(sceneDesc);
   window.run();
 }
 

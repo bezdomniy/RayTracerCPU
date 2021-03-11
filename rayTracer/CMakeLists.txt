@@ -7,9 +7,13 @@ if(NOT CMAKE_BUILD_TYPE)
 #   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(USE_THREADS OFF)
+set(USE_THREADS ON)
 
-if (${USE_THREADS})
+if (NOT ${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
+	set(USE_THREADS ON)
+endif()
+
+if (${USE_THREADS} AND ${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 	set(CMAKE_CXX_FLAGS_DEBUG "-g -s USE_PTHREADS=1")
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -flto -s USE_PTHREADS=1")
 else()
@@ -23,24 +27,27 @@ set(CMAKE_EXE_LINKER_FLAGS_RELEASE "")
 set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "")
 
 
-# if(${TO_NATIVE})
+add_subdirectory(yaml-cpp)
+add_subdirectory(glm)
+
+
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 	message(STATUS "Setting compilation target to WASM")
-	add_subdirectory("src/runner")
-	add_subdirectory("src/raytracer")
+	
 	# set(CMAKE_EXECUTABLE_SUFFIX ".html")
 	set(CMAKE_EXECUTABLE_SUFFIX ".wasm.js")
 
-	add_subdirectory(yaml-cpp)
-	add_subdirectory(glm)
+	if (NOT ${USE_THREADS}) 
+		add_subdirectory("src/runner")
+	endif()
 else()
 	message(STATUS "Setting compilation target to native binary")
 
 	find_package(SDL2 CONFIG REQUIRED)
-	add_subdirectory(yaml-cpp)
-	add_subdirectory(glm)
-	add_subdirectory("src/raytracer")
+	message("@@@@@@@@ ${SDL2_INCLUDE_DIRS}")
 endif()
+
+add_subdirectory("src/raytracer")
 
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})

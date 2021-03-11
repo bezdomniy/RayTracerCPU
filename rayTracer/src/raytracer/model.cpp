@@ -240,7 +240,7 @@ std::shared_ptr<Group> Model::recursiveBuild(std::vector<std::shared_ptr<Shape>>
 		}
 		else
 		{
-			if (false)
+			if (false) // This is old equal groups method, abandoned in favour of SAH
 			{
 				mid = (start + end) / 2;
 				std::nth_element(&shapes[start], &shapes[mid],
