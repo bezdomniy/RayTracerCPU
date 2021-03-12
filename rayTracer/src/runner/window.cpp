@@ -177,7 +177,7 @@ void Window::initSDL()
 
     // SDL_CreateWindowAndRenderer(this->camera->hsize, this->camera->vsize, 0, &this->window, &this->renderer);
 
-#if defined(__EMSCRIPTEN__) && !defined(WITH_THREADS)
+#if defined(__EMSCRIPTEN__) && !defined(__EMSCRIPTEN_PTHREADS__)
     this->texTarget = SDL_CreateTexture(this->renderer, SDL_PIXELFORMAT_RGBA8888,
                                         SDL_TEXTUREACCESS_TARGET, this->width, this->height);
 #endif
@@ -200,7 +200,7 @@ void Window::step()
         std::cout << "something changed and running\n";
         somethingChanged = false;
         update();
-#ifdef WITH_THREADS
+#ifdef __EMSCRIPTEN_PTHREADS__
         draw();
 #endif
     }
@@ -265,7 +265,7 @@ void Window::moveCamera(float posChange, uint8_t axis)
         this->yRotation += posChange;
     }
 
-#if !defined(__EMSCRIPTEN__) || defined(WITH_THREADS)
+#if !defined(__EMSCRIPTEN__) || defined(__EMSCRIPTEN_PTHREADS__)
     glm::dmat4 rotationX =
         glm::rotate(glm::dmat4(1.0), (double)this->xRotation, glm::dvec3(1.0, 0.0, 0.0));
 
@@ -314,7 +314,7 @@ void Window::update()
     this->running = true;
 
 #ifdef __EMSCRIPTEN__
-#ifdef WITH_THREADS
+#ifdef __EMSCRIPTEN_PTHREADS__
     // this->updateSize();
     std::cout << "Starting render." << std::endl;
     this->rayTraceRenderer.render(*world);
@@ -360,7 +360,7 @@ void Window::update()
         emscripten_call_worker(renderWorker, "renderScene", &this->sceneBinary[0], this->sceneBinary.size(), renderCback, (void *)42);
         worker++;
     }
-#endif //WITH_THREADS
+#endif //__EMSCRIPTEN_PTHREADS__
 
 #else
     this->rayTraceRenderer.render(*world);
@@ -370,7 +370,7 @@ void Window::update()
 
 void Window::draw()
 {
-#if defined(__EMSCRIPTEN__) && !defined(WITH_THREADS)
+#if defined(__EMSCRIPTEN__) && !defined(__EMSCRIPTEN_PTHREADS__)
     SDL_SetRenderTarget(this->renderer, this->texTarget);
 #endif
     SDL_SetRenderDrawColor(this->renderer, 0, 0, 0, 0);
@@ -386,7 +386,7 @@ void Window::draw()
         }
     }
 
-#if defined(__EMSCRIPTEN__) && !defined(WITH_THREADS)
+#if defined(__EMSCRIPTEN__) && !defined(__EMSCRIPTEN_PTHREADS__)
     SDL_SetRenderTarget(this->renderer, NULL);
     SDL_RenderCopy(this->renderer, this->texTarget, NULL, NULL);
 #endif

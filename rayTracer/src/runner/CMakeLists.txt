@@ -5,9 +5,9 @@ file(GLOB RUNNERSOURCES
 
 add_executable(Runner ${RUNNERSOURCES})
 
-if (${USE_THREADS})
-	add_compile_definitions(WITH_THREADS)
-endif()
+# if (${USE_THREADS})
+# 	add_compile_definitions(WITH_THREADS)
+# endif()
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
     set(CMAKE_EXECUTABLE_SUFFIX ".js")

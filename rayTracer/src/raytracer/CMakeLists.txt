@@ -10,9 +10,10 @@ file(GLOB RUNNERSOURCES
 	../runner/*.cpp
 )
 
-if (${USE_THREADS})
-	add_compile_definitions(WITH_THREADS)
-endif()
+# TODO: use __EMSCRIPTEN_PTHREADS__ instead
+# if (${USE_THREADS})
+# 	add_compile_definitions(WITH_THREADS)
+# endif()
 
 
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
@@ -23,8 +24,8 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 	if (${USE_THREADS})	
 	    set ( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2 " )
 		add_executable(RayTracer ${SOURCES} ${RUNNERSOURCES})
-		set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "-s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency -flto -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -s WASM=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
-		set_target_properties(RayTracer PROPERTIES LINK_FLAGS_DEBUG "-s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency -flto -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
+		set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "-pthread -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency -flto -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -s WASM=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
+		set_target_properties(RayTracer PROPERTIES LINK_FLAGS_DEBUG "-pthread -s PTHREAD_POOL_SIZE=navigator.hardwareConcurrency -flto -s EXTRA_EXPORTED_RUNTIME_METHODS=['ccall','cwrap'] -s WASM=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")
 	else()
 		add_executable(RayTracer ${SOURCES} )
 		set_target_properties(RayTracer PROPERTIES LINK_FLAGS_RELEASE "-s EXPORTED_FUNCTIONS='[_processScene, _renderScene, _renderSceneThreaded]' -flto -s BUILD_AS_WORKER=1 -s WASM=1 -s BINARYEN_METHOD='native-wasm' -s ALLOW_MEMORY_GROWTH=1")

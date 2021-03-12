@@ -22,12 +22,12 @@
 void processCback(char *data, int size, void *arg);
 void renderCback(char *data, int size, void *arg);
 
-#ifdef WITH_THREADS
+#ifdef __EMSCRIPTEN_PTHREADS__
 #include "../raytracer/camera.h"
 #include "../raytracer/renderer.h"
 #include "../raytracer/world.h"
 #include "../raytracer/objectLoader.h"
-#endif //WITH_THREADS
+#endif //__EMSCRIPTEN_PTHREADS__
 
 #else
 #include "../raytracer/camera.h"
@@ -46,12 +46,12 @@ private:
     std::vector<worker_handle> workers;
 #endif
 
-#ifdef WITH_THREADS
+#ifdef __EMSCRIPTEN_PTHREADS__
     glm::dvec4 originalCameraPosition;
     std::shared_ptr<Camera> camera;
     Renderer rayTraceRenderer;
     std::shared_ptr<World> world;
-#endif
+#endif //__EMSCRIPTEN_PTHREADS__
 
     // static const int PIXELS_PER_BATCH = 20000;
     SDL_Event event;

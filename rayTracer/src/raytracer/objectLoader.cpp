@@ -947,6 +947,7 @@ void ObjectLoader::downloadFailed(emscripten_fetch_t *fetch)
 
 void ObjectLoader::downloadAsset(const std::string &assetPath, const std::string &targetPath)
 {
+  std::cout << "download asset called.\n";
   emscripten_fetch_attr_t attr;
   emscripten_fetch_attr_init(&attr);
   strcpy(attr.requestMethod, "GET");
@@ -955,5 +956,6 @@ void ObjectLoader::downloadAsset(const std::string &assetPath, const std::string
   attr.destinationPath = targetPath.c_str();
   attr.onerror = downloadFailed;
   emscripten_fetch(&attr, assetPath.c_str());
+  std::cout << "download asset completed.\n";
 }
 #endif

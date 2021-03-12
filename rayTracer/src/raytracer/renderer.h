@@ -10,10 +10,10 @@
 #include "ray.h"
 #include "world.h"
 
-#ifdef WITH_THREADS
+#ifdef __EMSCRIPTEN_PTHREADS__
 #include "concurrentqueue.h"
 #include <thread>
-#endif //WITH_THREADS
+#endif //__EMSCRIPTEN_PTHREADS__
 
 #include <algorithm>
 #include <glm/glm.hpp>
