@@ -2,8 +2,8 @@
 
 Pattern::Pattern()
 {
-  this->transform = glm::dmat4(1.0);
-  this->inverseTransform = glm::dmat4(1.0);
+  this->transform = Mat4(1.0);
+  this->inverseTransform = Mat4(1.0);
 }
 
 Pattern::Pattern(const Pattern &pattern)
@@ -12,13 +12,13 @@ Pattern::Pattern(const Pattern &pattern)
   this->inverseTransform = pattern.inverseTransform;
 }
 
-void Pattern::setTransform(glm::dmat4 transform)
+void Pattern::setTransform(Mat4 transform)
 {
   this->transform = transform;
   // this->inverseTransform = glm::affineInverse(this->transform);
 }
 
-void Pattern::multiplyTransform(glm::dmat4 &transform)
+void Pattern::multiplyTransform(Mat4 &transform)
 {
   this->transform = transform * this->transform;
   this->inverseTransform = glm::affineInverse(this->transform);
@@ -33,7 +33,7 @@ Pattern::~Pattern() {}
 
 ColourPattern::ColourPattern() : Pattern() {}
 
-ColourPattern::ColourPattern(glm::dvec3 colourA, glm::dvec3 colourB) : Pattern()
+ColourPattern::ColourPattern(Vec3 colourA, Vec3 colourB) : Pattern()
 {
   this->colourA = colourA;
   this->colourB = colourB;
@@ -45,7 +45,7 @@ ColourPattern::ColourPattern(const ColourPattern &colouredPattern) : Pattern()
   this->colourB = colouredPattern.colourB;
 }
 
-void ColourPattern::setColour(glm::dvec3 colour, int index)
+void ColourPattern::setColour(Vec3 colour, int index)
 {
   if (index == 0)
     this->colourA = colour;

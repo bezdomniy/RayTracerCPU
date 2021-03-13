@@ -2,7 +2,7 @@
 
 Group::Group(/* args */) : Shape()
 {
-  this->boundingBox = std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.), glm::dvec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.));
+  this->boundingBox = std::pair<Vec4, Vec4>(Vec4(std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), 1.), Vec4(-std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), 1.));
 }
 
 Group::~Group()
@@ -11,7 +11,7 @@ Group::~Group()
 
 Group::Group(std::vector<std::shared_ptr<Shape>> &shapes) : Shape()
 {
-  this->boundingBox = std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.), glm::dvec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.));
+  this->boundingBox = std::pair<Vec4, Vec4>(Vec4(std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), 1.), Vec4(-std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), 1.));
 
   for (auto &shape : shapes)
   {
@@ -113,14 +113,14 @@ void Group::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &i
   return;
 }
 
-glm::dvec4 Group::normalAt(const glm::dvec4 &point)
+Vec4 Group::normalAt(const Vec4 &point)
 {
   throw std::runtime_error("group shouldn't call normal function");
-  glm::dvec4 objectPoint = this->inverseTransform * point;
-  return glm::normalize(glm::dvec4());
+  Vec4 objectPoint = this->inverseTransform * point;
+  return glm::normalize(Vec4());
 }
 
-glm::dvec4 Group::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
+Vec4 Group::normalAt(const Vec4 &point, const Vec2 &uv)
 {
   return normalAt(point);
 }
@@ -186,34 +186,34 @@ void Group::addChild(std::shared_ptr<Shape> &child)
 
 void Group::updateBoundingBox(std::shared_ptr<Shape> &shape)
 {
-  std::vector<glm::dvec4> points(8);
+  std::vector<Vec4> points(8);
   const auto &bounds = shape->bounds();
   points.at(0) = bounds.first;
-  points.at(1) = glm::dvec4(bounds.first.x, bounds.first.y, bounds.second.z, 1.);
-  points.at(2) = glm::dvec4(bounds.first.x, bounds.second.y, bounds.first.z, 1.);
-  points.at(3) = glm::dvec4(bounds.first.x, bounds.second.y, bounds.second.z, 1.);
-  points.at(4) = glm::dvec4(bounds.second.x, bounds.first.y, bounds.first.z, 1.);
-  points.at(5) = glm::dvec4(bounds.second.x, bounds.first.y, bounds.second.z, 1.);
-  points.at(6) = glm::dvec4(bounds.second.x, bounds.second.y, bounds.first.z, 1.);
+  points.at(1) = Vec4(bounds.first.x, bounds.first.y, bounds.second.z, 1.);
+  points.at(2) = Vec4(bounds.first.x, bounds.second.y, bounds.first.z, 1.);
+  points.at(3) = Vec4(bounds.first.x, bounds.second.y, bounds.second.z, 1.);
+  points.at(4) = Vec4(bounds.second.x, bounds.first.y, bounds.first.z, 1.);
+  points.at(5) = Vec4(bounds.second.x, bounds.first.y, bounds.second.z, 1.);
+  points.at(6) = Vec4(bounds.second.x, bounds.second.y, bounds.first.z, 1.);
   points.at(7) = bounds.second;
 
   for (auto point : points)
   {
-    glm::dvec4 transformedPoint(shape->transform * point);
+    Vec4 transformedPoint(shape->transform * point);
     this->boundingBox.first = glm::min(this->boundingBox.first, transformedPoint);
     this->boundingBox.second = glm::max(this->boundingBox.second, transformedPoint);
   }
 }
 
-std::pair<glm::dvec4, glm::dvec4> Group::bounds()
+std::pair<Vec4, Vec4> Group::bounds()
 {
   return this->boundingBox;
 }
 
 bool Group::boundIntersection(Ray &transformedRay)
 {
-  double t_min = -std::numeric_limits<double>::infinity();
-  double t_max = std::numeric_limits<double>::infinity();
+  Float t_min = -std::numeric_limits<Float>::infinity();
+  Float t_max = std::numeric_limits<Float>::infinity();
 
   for (int a = 0; a < 3; a++)
   {
@@ -229,12 +229,12 @@ bool Group::boundIntersection(Ray &transformedRay)
   }
   return true;
 
-  // std::pair<double, double> xtminmax = Geometry::checkAxis<double>(transformedRay.origin.x, transformedRay.direction.x, this->boundingBox.first.x, this->boundingBox.second.x);
-  // std::pair<double, double> ytminmax = Geometry::checkAxis<double>(transformedRay.origin.y, transformedRay.direction.y, this->boundingBox.first.y, this->boundingBox.second.y);
-  // std::pair<double, double> ztminmax = Geometry::checkAxis<double>(transformedRay.origin.z, transformedRay.direction.z, this->boundingBox.first.z, this->boundingBox.second.z);
+  // std::pair<double, double> xtminmax = Geometry::checkAxis<Float>(transformedRay.origin.x, transformedRay.direction.x, this->boundingBox.first.x, this->boundingBox.second.x);
+  // std::pair<double, double> ytminmax = Geometry::checkAxis<Float>(transformedRay.origin.y, transformedRay.direction.y, this->boundingBox.first.y, this->boundingBox.second.y);
+  // std::pair<double, double> ztminmax = Geometry::checkAxis<Float>(transformedRay.origin.z, transformedRay.direction.z, this->boundingBox.first.z, this->boundingBox.second.z);
 
-  // double tmin = std::max({xtminmax.first, ytminmax.first, ztminmax.first});
-  // double tmax = std::min({xtminmax.second, ytminmax.second, ztminmax.second});
+  // Float tmin = std::max({xtminmax.first, ytminmax.first, ztminmax.first});
+  // Float tmax = std::min({xtminmax.second, ytminmax.second, ztminmax.second});
 
   // return !(tmin > tmax);
 }

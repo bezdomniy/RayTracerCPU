@@ -14,27 +14,27 @@ void Plane::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &i
     if (std::abs(transformedRay.direction.y) < Geometry::EPSILON)
         return;
 
-    double t = -transformedRay.origin.y / transformedRay.direction.y;
+    Float t = -transformedRay.origin.y / transformedRay.direction.y;
 
     intersections.push_back(Geometry::Intersection<Shape>{t, this});
 }
 
-glm::dvec4 Plane::normalAt(const glm::dvec4 &point)
+Vec4 Plane::normalAt(const Vec4 &point)
 {
-    // glm::dvec4 objectPoint = worldToObject(point);
-    glm::dvec4 objectNormal(0.0, 1.0, 0.0, 0.0);
+    // Vec4 objectPoint = worldToObject(point);
+    Vec4 objectNormal(0.0, 1.0, 0.0, 0.0);
 
     return normalToWorld(objectNormal);
 }
 
-glm::dvec4 Plane::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
+Vec4 Plane::normalAt(const Vec4 &point, const Vec2 &uv)
 {
     return normalAt(point);
 }
 
-std::pair<glm::dvec4, glm::dvec4> Plane::bounds()
+std::pair<Vec4, Vec4> Plane::bounds()
 {
-    return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(-std::numeric_limits<double>::infinity(), 0., -std::numeric_limits<double>::infinity(), 1.), glm::dvec4(std::numeric_limits<double>::infinity(), 0., std::numeric_limits<double>::infinity(), 1.));
+    return std::pair<Vec4, Vec4>(Vec4(-std::numeric_limits<Float>::infinity(), 0., -std::numeric_limits<Float>::infinity(), 1.), Vec4(std::numeric_limits<Float>::infinity(), 0., std::numeric_limits<Float>::infinity(), 1.));
 }
 
 std::string Plane::type()

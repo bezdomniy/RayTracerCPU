@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include "types.h"
 #include <ostream>
 
 #include "geometry.h"
@@ -9,17 +9,17 @@ class Ray
 {
 public:
   Ray();
-  Ray(glm::dvec4, glm::dvec4);
+  Ray(Vec4, Vec4);
   ~Ray();
 
-  glm::dvec4 position(double);
+  Vec4 position(Float);
 
-  glm::dvec4 origin;
-  glm::dvec4 direction;
+  Vec4 origin;
+  Vec4 direction;
 
-  Ray transform(glm::dmat4 &m);
-  Ray transform(glm::dmat4 &m, glm::dvec4 newOrigin);
-  void transformInPlace(glm::dmat4 &m);
+  Ray transform(Mat4 &m);
+  Ray transform(Mat4 &m, Vec4 newOrigin);
+  void transformInPlace(Mat4 &m);
 
 private:
 };

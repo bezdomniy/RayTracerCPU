@@ -21,8 +21,8 @@ private:
   // template <class Archive>
   // static void load_and_construct(Archive &archive, cereal::construct<StripedPattern> &construct)
   // {
-  //   glm::dvec3 colourA;
-  //   glm::dvec3 colourB;
+  //   Vec3 colourA;
+  //   Vec3 colourB;
 
   //   archive(colourA, colourB);
   //   construct(colourA, colourB);
@@ -30,9 +30,9 @@ private:
 
 public:
   StripedPattern() {}
-  StripedPattern(glm::dvec3 colourA, glm::dvec3 colourB);
+  StripedPattern(Vec3 colourA, Vec3 colourB);
   ~StripedPattern();
-  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
+  virtual Vec3 patternAt(const Vec4 &point) override;
 };
 
 class GradientPattern : public ColourPattern
@@ -48,8 +48,8 @@ private:
   // template <class Archive>
   // static void load_and_construct(Archive &archive, cereal::construct<GradientPattern> &construct)
   // {
-  //   glm::dvec3 colourA;
-  //   glm::dvec3 colourB;
+  //   Vec3 colourA;
+  //   Vec3 colourB;
 
   //   archive(colourA, colourB);
   //   construct(colourA, colourB);
@@ -57,9 +57,9 @@ private:
 
 public:
   GradientPattern() {}
-  GradientPattern(glm::dvec3 colourA, glm::dvec3 colourB);
+  GradientPattern(Vec3 colourA, Vec3 colourB);
   ~GradientPattern();
-  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
+  virtual Vec3 patternAt(const Vec4 &point) override;
 };
 
 class RingPattern : public ColourPattern
@@ -75,8 +75,8 @@ private:
   // template <class Archive>
   // static void load_and_construct(Archive &archive, cereal::construct<RingPattern> &construct)
   // {
-  //   glm::dvec3 colourA;
-  //   glm::dvec3 colourB;
+  //   Vec3 colourA;
+  //   Vec3 colourB;
 
   //   archive(colourA, colourB);
   //   construct(colourA, colourB);
@@ -84,9 +84,9 @@ private:
 
 public:
   RingPattern() {}
-  RingPattern(glm::dvec3 colourA, glm::dvec3 colourB);
+  RingPattern(Vec3 colourA, Vec3 colourB);
   ~RingPattern();
-  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
+  virtual Vec3 patternAt(const Vec4 &point) override;
 };
 
 class CheckedPattern : public ColourPattern
@@ -102,8 +102,8 @@ private:
   // template <class Archive>
   // static void load_and_construct(Archive &archive, cereal::construct<CheckedPattern> &construct)
   // {
-  //   glm::dvec3 colourA;
-  //   glm::dvec3 colourB;
+  //   Vec3 colourA;
+  //   Vec3 colourB;
 
   //   archive(colourA, colourB);
   //   construct(colourA, colourB);
@@ -111,9 +111,9 @@ private:
 
 public:
   CheckedPattern() {}
-  CheckedPattern(glm::dvec3 colourA, glm::dvec3 colourB);
+  CheckedPattern(Vec3 colourA, Vec3 colourB);
   ~CheckedPattern();
-  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
+  virtual Vec3 patternAt(const Vec4 &point) override;
 };
 
 class BlendedPattern : public Pattern
@@ -143,7 +143,7 @@ public:
   BlendedPattern(const BlendedPattern &blendedPattern);
   ~BlendedPattern();
 
-  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
+  virtual Vec3 patternAt(const Vec4 &point) override;
 
   std::shared_ptr<Pattern> patternA;
   std::shared_ptr<Pattern> patternB;
@@ -163,7 +163,7 @@ private:
   // static void load_and_construct(Archive &archive, cereal::construct<PerturbedPattern> &construct)
   // {
   //   std::shared_ptr<Pattern> pattern;
-  //   double perturbedCoeff;
+  //   Float perturbedCoeff;
 
   //   archive(pattern, perturbedCoeff);
   //   construct(pattern, perturbedCoeff);
@@ -171,14 +171,14 @@ private:
 
 public:
   PerturbedPattern() {}
-  PerturbedPattern(std::shared_ptr<Pattern> &pattern, double perturbedCoeff);
+  PerturbedPattern(std::shared_ptr<Pattern> &pattern, Float perturbedCoeff);
   PerturbedPattern(const PerturbedPattern &perturbedPattern);
   ~PerturbedPattern();
 
-  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
+  virtual Vec3 patternAt(const Vec4 &point) override;
 
   std::shared_ptr<Pattern> pattern;
-  double perturbedCoeff;
+  Float perturbedCoeff;
 };
 
 class MappedPattern : public Pattern
@@ -207,7 +207,7 @@ public:
   MappedPattern(const MappedPattern &mappedPattern);
   ~MappedPattern();
 
-  virtual glm::dvec3 patternAt(const glm::dvec4 &point) override;
+  virtual Vec3 patternAt(const Vec4 &point) override;
 
   std::shared_ptr<UVTexture> uvTexture;
   std::shared_ptr<TextureMap> textureMap;

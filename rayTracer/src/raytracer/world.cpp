@@ -34,7 +34,7 @@ void World::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &r
   // return ret;
 }
 
-bool World::intersectRayShadow(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersectionBuffer, double distance)
+bool World::intersectRayShadow(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersectionBuffer, Float distance)
 {
   intersectionBuffer.clear();
   for (auto &shape : this->shapes)

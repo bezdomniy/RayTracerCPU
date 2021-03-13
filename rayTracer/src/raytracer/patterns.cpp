@@ -1,36 +1,36 @@
 #include "patterns.h"
 
-StripedPattern::StripedPattern(glm::dvec3 colourA, glm::dvec3 colourB)
+StripedPattern::StripedPattern(Vec3 colourA, Vec3 colourB)
     : ColourPattern(colourA, colourB) {}
 
 StripedPattern::~StripedPattern() {}
 
-glm::dvec3 StripedPattern::patternAt(const glm::dvec4 &point)
+Vec3 StripedPattern::patternAt(const Vec4 &point)
 {
   if ((int)(std::floor(point.x)) % 2 == 0)
     return this->colourA;
   return this->colourB;
 }
 
-GradientPattern::GradientPattern(glm::dvec3 colourA, glm::dvec3 colourB)
+GradientPattern::GradientPattern(Vec3 colourA, Vec3 colourB)
     : ColourPattern(colourA, colourB) {}
 
 GradientPattern::~GradientPattern() {}
 
-glm::dvec3 GradientPattern::patternAt(const glm::dvec4 &point)
+Vec3 GradientPattern::patternAt(const Vec4 &point)
 {
-  glm::dvec3 distance = this->colourB - this->colourA;
-  double fraction = point.x - std::floor(point.x);
+  Vec3 distance = this->colourB - this->colourA;
+  Float fraction = point.x - std::floor(point.x);
 
   return this->colourA + distance * fraction;
 }
 
-RingPattern::RingPattern(glm::dvec3 colourA, glm::dvec3 colourB)
+RingPattern::RingPattern(Vec3 colourA, Vec3 colourB)
     : ColourPattern(colourA, colourB) {}
 
 RingPattern::~RingPattern() {}
 
-glm::dvec3 RingPattern::patternAt(const glm::dvec4 &point)
+Vec3 RingPattern::patternAt(const Vec4 &point)
 {
   if ((int)std::floor(std::sqrt(point.x * point.x + point.z * point.z)) % 2 ==
       0)
@@ -38,12 +38,12 @@ glm::dvec3 RingPattern::patternAt(const glm::dvec4 &point)
   return this->colourB;
 }
 
-CheckedPattern::CheckedPattern(glm::dvec3 colourA, glm::dvec3 colourB)
+CheckedPattern::CheckedPattern(Vec3 colourA, Vec3 colourB)
     : ColourPattern(colourA, colourB) {}
 
 CheckedPattern::~CheckedPattern() {}
 
-glm::dvec3 CheckedPattern::patternAt(const glm::dvec4 &point)
+Vec3 CheckedPattern::patternAt(const Vec4 &point)
 {
   if (((int)(std::floor(point.x) + std::floor(point.y) + std::floor(point.z))) % 2 == 0)
     return this->colourA;
@@ -67,21 +67,21 @@ BlendedPattern::BlendedPattern(const BlendedPattern &blendedPattern)
 
 BlendedPattern::~BlendedPattern() {}
 
-glm::dvec3 BlendedPattern::patternAt(const glm::dvec4 &point)
+Vec3 BlendedPattern::patternAt(const Vec4 &point)
 {
-  glm::dmat4 patternTransformA(patternA->inverseTransform);
-  glm::dvec4 patternPointA = patternTransformA * point;
+  Mat4 patternTransformA(patternA->inverseTransform);
+  Vec4 patternPointA = patternTransformA * point;
 
-  glm::dmat4 patternTransformB(patternB->inverseTransform);
-  glm::dvec4 patternPointB = patternTransformB * point;
+  Mat4 patternTransformB(patternB->inverseTransform);
+  Vec4 patternPointB = patternTransformB * point;
 
   return (this->patternA->patternAt(patternPointA) +
           this->patternB->patternAt(patternPointB)) *
-         0.5;
+         (Float)0.5;
 }
 
 PerturbedPattern::PerturbedPattern(std::shared_ptr<Pattern> &pattern,
-                                   double perturbedCoeff)
+                                   Float perturbedCoeff)
     : Pattern()
 {
   this->pattern = pattern;
@@ -98,14 +98,14 @@ PerturbedPattern::PerturbedPattern(const PerturbedPattern &perturbedPattern)
 PerturbedPattern::~PerturbedPattern() {}
 
 // TODO something to do with this is breaking checkered uv map
-glm::dvec3 PerturbedPattern::patternAt(const glm::dvec4 &point)
+Vec3 PerturbedPattern::patternAt(const Vec4 &point)
 {
-  glm::dmat4 patternTransform(pattern->inverseTransform);
-  glm::dvec4 patternPoint = patternTransform * point;
+  Mat4 patternTransform(pattern->inverseTransform);
+  Vec4 patternPoint = patternTransform * point;
 
-  double value = SimplexNoise::noise(patternPoint.x * perturbedCoeff,
-                                     patternPoint.y * perturbedCoeff,
-                                     patternPoint.z * perturbedCoeff);
+  Float value = SimplexNoise::noise(patternPoint.x * perturbedCoeff,
+                                    patternPoint.y * perturbedCoeff,
+                                    patternPoint.z * perturbedCoeff);
 
   patternPoint.x += value;
   patternPoint.y += value;
@@ -130,9 +130,9 @@ MappedPattern::MappedPattern(const MappedPattern &mappedPattern)
 
 MappedPattern::~MappedPattern() {}
 
-glm::dvec3 MappedPattern::patternAt(const glm::dvec4 &point)
+Vec3 MappedPattern::patternAt(const Vec4 &point)
 {
-  // glm::dvec2 uv = this->textureMap->uv_map(point);
+  // Vec2 uv = this->textureMap->uv_map(point);
   auto uv = this->textureMap->uv_map(point);
 
   return this->uvTexture->patternAt(uv.first, uv.second);

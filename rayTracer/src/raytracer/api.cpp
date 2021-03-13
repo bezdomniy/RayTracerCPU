@@ -92,8 +92,8 @@ extern "C"
 
         // std::cout << "worker id: " << (int)*workerId << "nworkers " << (int)*nWorkers << std::endl;
 
-        float *xRotation = reinterpret_cast<float *>(data + size - 10);
-        float *yRotation = reinterpret_cast<float *>(data + size - 6);
+        Float *xRotation = reinterpret_cast<Float *>(data + size - 10);
+        Float *yRotation = reinterpret_cast<Float *>(data + size - 6);
 
         // std::cout << "Rotations: " << *xRotation << " " << *yRotation << std::endl;
 
@@ -102,7 +102,7 @@ extern "C"
 
         // std::istringstream iss;
         // iss.rdbuf()->pubsetbuf(data, size - 10);
-        membuf sbuf(data, data + size - (sizeof(float) * 2 + sizeof(char) * 2));
+        membuf sbuf(data, data + size - (sizeof(Float) * 2 + sizeof(char) * 2));
         std::istream iss(&sbuf);
 
         // std::vector<std::pair<int, int>> pixelsToRender;
@@ -113,15 +113,15 @@ extern "C"
         cereal::BinaryInputArchive iarchive(iss);
         iarchive(camera, world);
 
-        glm::dmat4 rotationX =
-            glm::rotate(glm::dmat4(1.0), (double)*xRotation, glm::dvec3(1.0, 0.0, 0.0));
+        Mat4 rotationX =
+            glm::rotate(Mat4(1.0), (Float)*xRotation, Vec3(1.0, 0.0, 0.0));
 
-        glm::dmat4 rotationY =
-            glm::rotate(glm::dmat4(1.0), (double)*yRotation, glm::dvec3(0.0, 1.0, 0.0));
+        Mat4 rotationY =
+            glm::rotate(Mat4(1.0), (Float)*yRotation, Vec3(0.0, 1.0, 0.0));
 
-        // glm::dmat4 rotationZ =
-        //     glm::rotate(glm::dmat4(1.0), posChange,
-        //                 glm::dvec3(0.0, 0.0, 1.0));
+        // Mat4 rotationZ =
+        //     glm::rotate(Mat4(1.0), posChange,
+        //                 Vec3(0.0, 0.0, 1.0));
 
         camera->position = rotationX * camera->position;
         camera->position = rotationY * camera->position;
@@ -177,8 +177,8 @@ extern "C"
         uint8_t *workerId = reinterpret_cast<uint8_t *>(data + size - 1);
         uint8_t *nWorkers = reinterpret_cast<uint8_t *>(data + size - 2);
 
-        float *xRotation = reinterpret_cast<float *>(data + size - 10);
-        float *yRotation = reinterpret_cast<float *>(data + size - 6);
+        Float *xRotation = reinterpret_cast<Float *>(data + size - 10);
+        Float *yRotation = reinterpret_cast<Float *>(data + size - 6);
         membuf sbuf(data, data + size - 10);
         std::istream iss(&sbuf);
 
@@ -188,15 +188,15 @@ extern "C"
         cereal::BinaryInputArchive iarchive(iss);
         iarchive(camera, world);
 
-        glm::dmat4 rotationX =
-            glm::rotate(glm::dmat4(1.0), (double)*xRotation, glm::dvec3(1.0, 0.0, 0.0));
+        Mat4 rotationX =
+            glm::rotate(Mat4(1.0), (Float)*xRotation, Vec3(1.0, 0.0, 0.0));
 
-        glm::dmat4 rotationY =
-            glm::rotate(glm::dmat4(1.0), (double)*yRotation, glm::dvec3(0.0, 1.0, 0.0));
+        Mat4 rotationY =
+            glm::rotate(Mat4(1.0), (Float)*yRotation, Vec3(0.0, 1.0, 0.0));
 
-        // glm::dmat4 rotationZ =
-        //     glm::rotate(glm::dmat4(1.0), posChange,
-        //                 glm::dvec3(0.0, 0.0, 1.0));
+        // Mat4 rotationZ =
+        //     glm::rotate(Mat4(1.0), posChange,
+        //                 Vec3(0.0, 0.0, 1.0));
 
         camera->position = rotationX * camera->position;
         camera->position = rotationY * camera->position;
@@ -206,7 +206,7 @@ extern "C"
         Renderer renderer(camera);
 
         // int sqrtRaysPerPixel = (int)std::sqrt(Renderer::RAYS_PER_PIXEL);
-        // double halfSubPixelSize = 1.0 / (double)(sqrtRaysPerPixel) / 2.0;
+        // Float halfSubPixelSize = 1.0 / (Float)(sqrtRaysPerPixel) / 2.0;
 
         renderer.render(*world);
 
@@ -221,7 +221,7 @@ extern "C"
 }
 // #else
 
-// std::vector<glm::dvec3> renderScene(const std::string &sceneDesc)
+// std::vector<Vec3> renderScene(const std::string &sceneDesc)
 // {
 //     std::shared_ptr<World> world;
 //     std::shared_ptr<Camera> camera;

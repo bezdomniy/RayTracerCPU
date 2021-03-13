@@ -2,8 +2,8 @@
 
 Material::Material()
 {
-  this->colour = glm::dvec3(0.0);
-  this->emissiveness = glm::dvec3(0.0);
+  this->colour = Vec3(0.0);
+  this->emissiveness = Vec3(0.0);
   this->ambient = 0.1;
   this->diffuse = 0.9;
   this->specular = 0.9;
@@ -15,8 +15,8 @@ Material::Material()
 }
 
 // TODO make 2 material constructors, 1 with colour, the other with pattern
-Material::Material(glm::dvec3 colour, glm::dvec3 emissiveness, double ambient, double diffuse,
-                   double specular, double shininess)
+Material::Material(Vec3 colour, Vec3 emissiveness, Float ambient, Float diffuse,
+                   Float specular, Float shininess)
 {
   this->colour = colour;
   this->emissiveness = emissiveness;

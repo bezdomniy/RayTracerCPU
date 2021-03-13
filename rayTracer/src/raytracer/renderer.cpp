@@ -18,7 +18,7 @@ Renderer::Renderer(std::shared_ptr<Camera> &c, uint8_t nWorkers)
 void Renderer::renderPixel(World &world, std::pair<int, int> &pixel, uint8_t nWorkers)
 {
   // std::cout << "rendering: " << pixel.first << ", " << pixel.second << std::endl;
-  glm::dvec3 cShape(0.0, 0.0, 0.0);
+  Vec3 cShape(0.0, 0.0, 0.0);
 
   std::vector<Geometry::Intersection<Shape>> intersections;
   intersections.reserve(world.shapes.size() * 2);
@@ -32,7 +32,7 @@ void Renderer::renderPixel(World &world, std::pair<int, int> &pixel, uint8_t nWo
     cShape += rayColourAt(cast, world, intersections, RAY_BOUNCE_LIMIT);
   }
 
-  cShape *= 1.0 / (double)RAYS_PER_PIXEL;
+  cShape *= 1.0 / (Float)RAYS_PER_PIXEL;
 
   this->canvas.writePixel(pixel.first, pixel.second / nWorkers, cShape);
 }
@@ -126,7 +126,7 @@ void Renderer::render(World &world)
 void Renderer::renderPixel(World &world, const std::pair<int, int> &pixel)
 {
   // std::cout << "rendering: " << pixel.first << ", " << pixel.second << std::endl;
-  glm::dvec3 cShape(0.0, 0.0, 0.0);
+  Vec3 cShape(0.0, 0.0, 0.0);
 
   std::vector<Geometry::Intersection<Shape>> intersections;
   intersections.reserve(world.shapes.size() * 2);
@@ -147,23 +147,23 @@ void Renderer::renderPixel(World &world, const std::pair<int, int> &pixel)
 
   if (isPathTracer)
   {
-    auto scale = 1.0 / (double)RAYS_PER_PIXEL;
+    auto scale = 1.0 / (Float)RAYS_PER_PIXEL;
     cShape.r = glm::clamp(std::sqrt(scale * cShape.r), 0.0, 0.999);
     cShape.g = glm::clamp(std::sqrt(scale * cShape.g), 0.0, 0.999);
     cShape.b = glm::clamp(std::sqrt(scale * cShape.b), 0.0, 0.999);
   }
   else
   {
-    cShape /= (double)RAYS_PER_PIXEL;
+    cShape /= (Float)RAYS_PER_PIXEL;
   }
 
   this->canvas.writePixel(pixel.first, pixel.second, cShape);
 }
 
-glm::dvec3 Renderer::pathColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
+Vec3 Renderer::pathColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
 {
   if (remaining < 0)
-    return glm::dvec3(0, 0, 0);
+    return Vec3(0, 0, 0);
 
   // intersections.clear();
 
@@ -176,8 +176,8 @@ glm::dvec3 Renderer::pathColourAt(Ray &ray, World &world, std::vector<Geometry::
   {
     // Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
 
-    // // glm::dvec4 target = hit->comps->point + hit->comps->normalv + glm::dvec4(glm::ballRand(1.0), 0.0);
-    // glm::dvec4 target = hit->comps->point + glm::dvec4(randomInHemisphere(hit->comps->normalv), 0.0);
+    // // Vec4 target = hit->comps->point + hit->comps->normalv + Vec4(glm::ballRand(1.0), 0.0);
+    // Vec4 target = hit->comps->point + Vec4(randomInHemisphere(hit->comps->normalv), 0.0);
     // Ray newRay(hit->comps->point, target - hit->comps->point);
 
     // return 0.5 * colourAt(newRay, world, remaining - 1);
@@ -186,13 +186,13 @@ glm::dvec3 Renderer::pathColourAt(Ray &ray, World &world, std::vector<Geometry::
 
     Geometry::IntersectionParameters comps = Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
     // TODO: check if this scatter function is right
-    auto scatterDirection = comps.normalv + glm::dvec4(glm::normalize(glm::ballRand(1.0)), 0.0);
+    auto scatterDirection = comps.normalv + Vec4(glm::normalize(glm::ballRand(1.0)), 0.0);
 
     // TODO: catch near zero case
 
     Ray newRay(comps.overPoint, scatterDirection);
 
-    glm::dvec3 hitColour = lighting(hit->shapePtr, comps.overPoint);
+    Vec3 hitColour = lighting(hit->shapePtr, comps.overPoint);
     // hitCompsBuffer = std::move(hit->comps);
     // intersections.clear();
     return hit->shapePtr->material->emissiveness + hitColour * pathColourAt(newRay, world, intersections, remaining - 1);
@@ -201,10 +201,10 @@ glm::dvec3 Renderer::pathColourAt(Ray &ray, World &world, std::vector<Geometry::
   }
 
   // Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
-  // auto scatterDirection = hit->comps->normalv + glm::dvec4(glm::normalize(glm::sphericalRand(1.0)), 0.0);
+  // auto scatterDirection = hit->comps->normalv + Vec4(glm::normalize(glm::sphericalRand(1.0)), 0.0);
 
   // Ray newRay(hit->comps->point, scatterDirection);
-  // glm::dvec3 effectiveColour;
+  // Vec3 effectiveColour;
 
   // if (hit->shapePtr->material->pattern == nullptr)
   //   effectiveColour = hit->shapePtr->material->colour;
@@ -212,16 +212,16 @@ glm::dvec3 Renderer::pathColourAt(Ray &ray, World &world, std::vector<Geometry::
   //   effectiveColour = hit->shapePtr->patternAt(hit->comps->point);
 
   // Background light
-  return glm::dvec3(0.0, 0.0, 0.0);
+  return Vec3(0.0, 0.0, 0.0);
 
-  // glm::dvec3 unit_direction = glm::normalize(ray.direction);
+  // Vec3 unit_direction = glm::normalize(ray.direction);
   // auto t = 0.5 * (unit_direction.y + 1.0);
-  // return (1.0 - t) * glm::dvec3(1.0, 1.0, 1.0) + t * glm::dvec3(0.5, 0.7, 1.0);
+  // return (1.0 - t) * Vec3(1.0, 1.0, 1.0) + t * Vec3(0.5, 0.7, 1.0);
 
-  // return glm::dvec3(0.0, 0.0, 0.0);
+  // return Vec3(0.0, 0.0, 0.0);
 }
 
-glm::dvec3 Renderer::rayColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
+Vec3 Renderer::rayColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
 {
   // intersections.clear();
   // std::vector<Geometry::Intersection<Shape>> intersections =
@@ -232,24 +232,24 @@ glm::dvec3 Renderer::rayColourAt(Ray &ray, World &world, std::vector<Geometry::I
   {
     // TODO: Geometry::getRefractiveIndexFromTo no longer working because this is now a copy, so pointer equality breaks!
     Geometry::IntersectionParameters comps = Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
-    glm::dvec3 hitColour = shadeHit(hit, comps, world, intersections, remaining);
+    Vec3 hitColour = shadeHit(hit, comps, world, intersections, remaining);
     return hitColour;
   }
-  return glm::dvec3(0.0, 0.0, 0.0);
+  return Vec3(0.0, 0.0, 0.0);
 }
 
 // Geometry::Intersection<Shape> hitCopy{hit->t, hit->shapePtr, hit->uv};
 // hitCopy.comps = std::move(hitCompsBuffer);
 // Geometry::getIntersectionParameters<Shape>(hitCopy, ray.origin, ray.direction, intersections);
-// glm::dvec3 hitColour = shadeHit(&hitCopy, world, intersections, remaining);
+// Vec3 hitColour = shadeHit(&hitCopy, world, intersections, remaining);
 // hitCompsBuffer = std::move(hitCopy.comps);
 
-glm::dvec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, Geometry::IntersectionParameters &comps, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
+Vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, Geometry::IntersectionParameters &comps, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
 {
-  glm::dvec3 surface(0.0);
+  Vec3 surface(0.0);
 
-  double reflective = hit->shapePtr->material->reflective;
-  double transparency = hit->shapePtr->material->transparency;
+  Float reflective = hit->shapePtr->material->reflective;
+  Float transparency = hit->shapePtr->material->transparency;
   Shape *shapePtr = hit->shapePtr;
 
   for (auto &light : world.lights)
@@ -261,12 +261,12 @@ glm::dvec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, Geometry::Inte
   }
 
   bool doSchlick = reflective > 0 && transparency > 0;
-  double reflectance = 0.0;
+  Float reflectance = 0.0;
   if (doSchlick)
     reflectance = Geometry::schlick<Shape>(comps);
 
-  glm::dvec3 reflection = reflectColour(comps, reflective, world, intersections, remaining);
-  glm::dvec3 refraction = refractedColour(comps, transparency, world, intersections, remaining);
+  Vec3 reflection = reflectColour(comps, reflective, world, intersections, remaining);
+  Vec3 refraction = refractedColour(comps, transparency, world, intersections, remaining);
 
   if (doSchlick)
   {
@@ -275,55 +275,55 @@ glm::dvec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, Geometry::Inte
   return surface + reflection + refraction;
 }
 
-glm::dvec3 Renderer::reflectColour(Geometry::IntersectionParameters &comps, double reflective,
-                                   World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
+Vec3 Renderer::reflectColour(Geometry::IntersectionParameters &comps, Float reflective,
+                             World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
 {
   //  intersections.clear();
   if (reflective == 0 || remaining <= 0)
-    return glm::dvec3(0.0, 0.0, 0.0);
+    return Vec3(0.0, 0.0, 0.0);
 
   Ray reflectRay = Ray(comps.overPoint, comps.reflectv);
 
   // std::unique_ptr<Geometry::IntersectionParameters> hitCompsBuffer = std::move(hit->comps);
-  glm::dvec3 reflectionColour = rayColourAt(reflectRay, world, intersections, remaining - 1) *
-                                reflective;
+  Vec3 reflectionColour = rayColourAt(reflectRay, world, intersections, remaining - 1) *
+                          reflective;
   // hit->comps = std::move(hitCompsBuffer);
 
   return reflectionColour;
 }
 
-glm::dvec3 Renderer::refractedColour(Geometry::IntersectionParameters &comps, double transparency,
-                                     World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
+Vec3 Renderer::refractedColour(Geometry::IntersectionParameters &comps, Float transparency,
+                               World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining)
 {
   if (transparency == 0 || remaining <= 0)
   {
-    return glm::dvec3(0.0, 0.0, 0.0);
+    return Vec3(0.0, 0.0, 0.0);
   }
 
-  double nRatio = comps.n1 / comps.n2;
-  double cosI = glm::dot(comps.eyev, comps.normalv);
-  double sin2T = (nRatio * nRatio) * (1 - (cosI * cosI));
+  Float nRatio = comps.n1 / comps.n2;
+  Float cosI = glm::dot(comps.eyev, comps.normalv);
+  Float sin2T = (nRatio * nRatio) * (1 - (cosI * cosI));
 
   if (sin2T > 1)
   {
-    return glm::dvec3(0.0, 0.0, 0.0);
+    return Vec3(0.0, 0.0, 0.0);
   }
 
-  double cosT = std::sqrt(1.0 - sin2T);
-  glm::dvec4 direction = comps.normalv * ((nRatio * cosI) - cosT) -
-                         (comps.eyev * nRatio);
+  Float cosT = std::sqrt(1.0 - sin2T);
+  Vec4 direction = comps.normalv * ((nRatio * cosI) - cosT) -
+                   (comps.eyev * nRatio);
 
   Ray refractedRay(comps.underPoint, direction);
 
-  glm::dvec3 colour = rayColourAt(refractedRay, world, intersections, remaining - 1);
+  Vec3 colour = rayColourAt(refractedRay, world, intersections, remaining - 1);
   // hit->comps = std::move(hitCompsBuffer);
 
   return colour * transparency;
 }
 
-glm::dvec3 Renderer::lighting(Shape *shape, glm::dvec4 &point)
+Vec3 Renderer::lighting(Shape *shape, Vec4 &point)
 {
-  glm::dvec3 effectiveColour;
+  Vec3 effectiveColour;
 
   if (shape->material->pattern == nullptr)
     effectiveColour = shape->material->colour;
@@ -333,14 +333,13 @@ glm::dvec3 Renderer::lighting(Shape *shape, glm::dvec4 &point)
   return effectiveColour;
 }
 
-glm::dvec3
-Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
-                   glm::dvec4 &point, glm::dvec4 &eyev,
-                   glm::dvec4 &normalv, bool &inShadow)
+Vec3 Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
+                        Vec4 &point, Vec4 &eyev,
+                        Vec4 &normalv, bool &inShadow)
 {
-  glm::dvec3 diffuse;
-  glm::dvec3 specular;
-  glm::dvec3 effectiveColour;
+  Vec3 diffuse;
+  Vec3 specular;
+  Vec3 effectiveColour;
 
   // combine the surface color with the light's color/intensity​
   if (shape->material->pattern == nullptr)
@@ -349,21 +348,21 @@ Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
     effectiveColour = shape->patternAt(point) * light->intensity;
 
   // compute the ambient contribution​
-  glm::dvec3 ambient = effectiveColour * shape->material->ambient;
+  Vec3 ambient = effectiveColour * shape->material->ambient;
   if (inShadow)
     return ambient;
 
-  glm::dvec4 lightv = glm::normalize(light->position - point);
+  Vec4 lightv = glm::normalize(light->position - point);
 
   // light_dot_normal represents the cosine of the angle between the​
   // light vector and the normal vector. A negative number means the​
   // light is on the other side of the surface.​
 
-  double lightDotNormal = glm::dot(lightv, normalv);
+  Float lightDotNormal = glm::dot(lightv, normalv);
   if (lightDotNormal < 0)
   {
-    diffuse = glm::dvec3(0.0, 0.0, 0.0);
-    specular = glm::dvec3(0.0, 0.0, 0.0);
+    diffuse = Vec3(0.0, 0.0, 0.0);
+    specular = Vec3(0.0, 0.0, 0.0);
   }
   else
   {
@@ -373,17 +372,17 @@ Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
     // reflect_dot_eye represents the cosine of the angle between the
     // reflection vector and the eye vector. A negative number means the
     // light reflects away from the eye.​
-    glm::dvec4 reflectv = glm::reflect(-lightv, normalv);
-    double reflectDotEye = glm::dot(reflectv, eyev);
+    Vec4 reflectv = glm::reflect(-lightv, normalv);
+    Float reflectDotEye = glm::dot(reflectv, eyev);
 
     if (reflectDotEye <= 0)
     {
-      specular = glm::dvec3(0.0, 0.0, 0.0);
+      specular = Vec3(0.0, 0.0, 0.0);
     }
     else
     {
       // compute the specular contribution​
-      double factor = std::pow(reflectDotEye, shape->material->shininess);
+      Float factor = std::pow(reflectDotEye, shape->material->shininess);
       specular = light->intensity * shape->material->specular * factor;
     }
   }
@@ -391,13 +390,13 @@ Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
   return ambient + diffuse + specular;
 }
 
-bool Renderer::isShadowed(glm::dvec4 &point, std::vector<Geometry::Intersection<Shape>> &intersections, World &world,
+bool Renderer::isShadowed(Vec4 &point, std::vector<Geometry::Intersection<Shape>> &intersections, World &world,
                           std::shared_ptr<PointLight> &light)
 {
   // intersections.clear();
-  glm::dvec4 v = light->position - point;
-  double distance = glm::length(v);
-  glm::dvec4 direction = glm::normalize(v);
+  Vec4 v = light->position - point;
+  Float distance = glm::length(v);
+  Vec4 direction = glm::normalize(v);
 
   Ray ray = Ray(point, direction);
   return world.intersectRayShadow(ray, intersections, distance);

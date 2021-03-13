@@ -40,6 +40,9 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 	
 else()
 	add_executable(RayTracer ${SOURCES} ${RUNNERSOURCES})
+
+	mathfu_configure_flags(RayTracer)
+
 	target_include_directories(RayTracer PRIVATE ${SDL2_INCLUDE_DIRS} ../../include ../../glm ../../yaml-cpp/include)
 	if (WIN32)
 		# target_link_libraries(RayTracer PRIVATE glm yaml-cpp TBB::tbb)

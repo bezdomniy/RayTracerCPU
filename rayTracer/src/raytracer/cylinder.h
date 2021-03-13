@@ -9,19 +9,19 @@ class Cylinder : public Shape
 {
 public:
   Cylinder();
-  Cylinder(double minimum, double maximum, bool capped);
+  Cylinder(Float minimum, Float maximum, bool capped);
 
   Cylinder(const Cylinder &c2);
   ~Cylinder();
 
   virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
-  virtual glm::dvec4 normalAt(const glm::dvec4 &point) override;
-  virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) override;
-  virtual std::pair<glm::dvec4, glm::dvec4> bounds() override;
+  virtual Vec4 normalAt(const Vec4 &point) override;
+  virtual Vec4 normalAt(const Vec4 &point, const Vec2 &uv) override;
+  virtual std::pair<Vec4, Vec4> bounds() override;
   virtual std::string type() override;
 
-  double minimum;
-  double maximum;
+  Float minimum;
+  Float maximum;
   bool capped;
 
 private:
@@ -32,7 +32,7 @@ private:
     archive(cereal::virtual_base_class<Shape>(this), minimum, maximum, capped);
   }
 
-  bool checkCap(Ray &ray, double t);
+  bool checkCap(Ray &ray, Float t);
 
   void intersectCaps(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections);
 };

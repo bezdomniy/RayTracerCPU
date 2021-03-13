@@ -2,7 +2,7 @@
 
 #include "shape.h"
 #include "geometry.h"
-#include <glm/glm.hpp>
+#include "types.h"
 
 class Triangle : public Shape
 {
@@ -17,9 +17,9 @@ private:
     // template <class Archive>
     // static void load_and_construct(Archive &archive, cereal::construct<Triangle> &construct)
     // {
-    //     glm::dvec3 p1;
-    //     glm::dvec3 p2;
-    //     glm::dvec3 p3;
+    //     Vec3 p1;
+    //     Vec3 p2;
+    //     Vec3 p3;
 
     //     archive(p1, p2, p3);
     //     construct(p1, p2, p3);
@@ -27,22 +27,22 @@ private:
 
 public:
     Triangle() {}
-    Triangle(glm::dvec3 p1, glm::dvec3 p2, glm::dvec3 p3);
+    Triangle(Vec3 p1, Vec3 p2, Vec3 p3);
     ~Triangle();
 
     virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
-    virtual glm::dvec4 normalAt(const glm::dvec4 &point) override;
-    virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) override;
-    virtual std::pair<glm::dvec4, glm::dvec4> bounds() override;
+    virtual Vec4 normalAt(const Vec4 &point) override;
+    virtual Vec4 normalAt(const Vec4 &point, const Vec2 &uv) override;
+    virtual std::pair<Vec4, Vec4> bounds() override;
     virtual std::string type() override;
 
 protected:
-    glm::dvec4 normal;
-    glm::dvec3 p1;
-    glm::dvec3 p2;
-    glm::dvec3 p3;
-    glm::dvec3 e1;
-    glm::dvec3 e2;
+    Vec4 normal;
+    Vec3 p1;
+    Vec3 p2;
+    Vec3 p3;
+    Vec3 e1;
+    Vec3 e2;
 };
 
 CEREAL_REGISTER_TYPE(Triangle);

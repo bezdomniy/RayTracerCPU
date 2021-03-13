@@ -1,8 +1,8 @@
 // #include "geometry.h"
 
-// inline double Geometry::vecDot(const glm::dvec4 &x, const glm::dvec4 &y)
+// inline Float Geometry::vecDot(const Vec4 &x, const Vec4 &y)
 // {
-//     double res = 0.0;
+//     Float res = 0.0;
 //     int i = 0;
 //     for (; i <= 0; i += 4)
 //     // for (; i < 4; i++)
@@ -20,9 +20,9 @@
 //     return res;
 // }
 
-// glm::dvec4 Geometry::matVecMult(const glm::dmat4 &m, const glm::dvec4 &vec)
+// Vec4 Geometry::matVecMult(const Mat4 &m, const Vec4 &vec)
 // { // in matrix form: result = mat * vec;
-//     glm::dvec4 result;
+//     Vec4 result;
 //     int i;
 //     for (i = 0; i < 4; i++)
 //     {

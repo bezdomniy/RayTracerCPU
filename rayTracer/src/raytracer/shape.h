@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include "types.h"
 #include <glm/gtc/matrix_inverse.hpp>
 #include <unordered_map>
 #include <vector>
@@ -29,28 +29,28 @@ public:
   virtual ~Shape() = 0;
 
   virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) = 0;
-  virtual glm::dvec4 normalAt(const glm::dvec4 &point) = 0;
-  virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) = 0;
+  virtual Vec4 normalAt(const Vec4 &point) = 0;
+  virtual Vec4 normalAt(const Vec4 &point, const Vec2 &uv) = 0;
   virtual std::string type() = 0;
-  virtual std::pair<glm::dvec4, glm::dvec4> bounds() = 0;
+  virtual std::pair<Vec4, Vec4> bounds() = 0;
 
-  glm::dmat4 transform;
-  glm::dmat4 inverseTransform;
+  Mat4 transform;
+  Mat4 inverseTransform;
 
-  glm::dvec4 boundsCentroid();
+  Vec4 boundsCentroid();
   std::shared_ptr<Shape> parent = nullptr;
   std::shared_ptr<Material> material;
   // bool materialSet = false; //TODO get rid of bool
 
-  // std::pair<glm::dvec4,glm::dvec4> boundingMinMax;
+  // std::pair<Vec4,Vec4> boundingMinMax;
 
   virtual void setMaterial(std::shared_ptr<Material> &mat);
-  glm::dvec3 patternAt(const glm::dvec4 &point);
-  void multiplyTransform(glm::dmat4 &transform);
+  Vec3 patternAt(const Vec4 &point);
+  void multiplyTransform(Mat4 &transform);
   void calculateInverseTranform();
 
-  glm::dvec4 worldToObject(const glm::dvec4 &point);
-  glm::dvec4 normalToWorld(const glm::dvec4 &normal);
+  Vec4 worldToObject(const Vec4 &point);
+  Vec4 normalToWorld(const Vec4 &normal);
 
   Ray transformRay(Ray &ray);
   void transformRayInPlace(Ray &ray);

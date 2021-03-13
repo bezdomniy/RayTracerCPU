@@ -19,7 +19,7 @@
 #include "yaml-cpp/yaml.h"
 #include "fstream"
 #include <filesystem>
-#include <glm/glm.hpp>
+#include "types.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <string>
@@ -38,8 +38,8 @@ class ObjectLoader
 private:
   struct Value
   {
-    double scalar;
-    glm::dvec3 vector;
+    Float scalar;
+    Vec3 vector;
   };
 
   // TODO why do I even use a definition? Why not just make the shapes and add copies to the world?

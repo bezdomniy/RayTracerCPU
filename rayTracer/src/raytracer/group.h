@@ -34,7 +34,7 @@ public:
     ~Group();
 
     std::vector<std::shared_ptr<Shape>> children;
-    std::pair<glm::dvec4, glm::dvec4> boundingBox;
+    std::pair<Vec4, Vec4> boundingBox;
 
     void updateBoundingBox(std::shared_ptr<Shape> &shape);
 
@@ -42,9 +42,9 @@ public:
     void setMaterial(std::shared_ptr<Material> &mat) override;
 
     virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
-    virtual glm::dvec4 normalAt(const glm::dvec4 &point) override;
-    virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) override;
-    virtual std::pair<glm::dvec4, glm::dvec4> bounds() override;
+    virtual Vec4 normalAt(const Vec4 &point) override;
+    virtual Vec4 normalAt(const Vec4 &point, const Vec2 &uv) override;
+    virtual std::pair<Vec4, Vec4> bounds() override;
     virtual std::string type() override;
 };
 
