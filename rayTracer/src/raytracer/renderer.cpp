@@ -185,7 +185,10 @@ glm::dvec3 Renderer::pathColourAt(Ray &ray, World &world, std::vector<Geometry::
     // TODO: this does a lot of memory allocation. Make intersectionparameters once and reuse.
 
     Geometry::IntersectionParameters comps = Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
+    // TODO: check if this scatter function is right
     auto scatterDirection = comps.normalv + glm::dvec4(glm::normalize(glm::ballRand(1.0)), 0.0);
+
+    // TODO: catch near zero case
 
     Ray newRay(comps.overPoint, scatterDirection);
 
