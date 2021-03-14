@@ -14,8 +14,14 @@ if (${USE_THREADS})
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -flto -s USE_PTHREADS=1")
 else()
 	#set(CMAKE_CXX_FLAGS "-openmp-simd")
-	set(CMAKE_CXX_FLAGS_DEBUG "-g")
-	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -flto") # -Wpadded
+	# set(CMAKE_CXX_FLAGS_DEBUG "-g")
+
+	if (WIN32)
+		set(CMAKE_CXX_FLAGS_RELEASE "/O2 /fp:fast /GL /arch:AVX2")
+	else()
+		set(CMAKE_CXX_FLAGS_DEBUG "-g")
+		set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -flto") # -Wpadded
+	endif()
 endif()
 
 set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "")

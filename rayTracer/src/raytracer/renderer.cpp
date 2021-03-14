@@ -56,16 +56,17 @@ void Renderer::render(World &world)
   }
 
   size_t t = std::thread::hardware_concurrency();
-  std::thread threads[t];
+  std::vector<std::thread> threads;
+  threads.reserve(t);
   for (int i = 0; i < t; ++i)
   {
-    threads[i] = std::thread([&]() {
+    threads.push_back(std::thread([&]() {
       std::pair<int, int> pixel;
       while (q.try_dequeue(pixel))
       {
         renderPixel(world, pixel);
       }
-    });
+    }));
   }
 
   // Wait for all threads
