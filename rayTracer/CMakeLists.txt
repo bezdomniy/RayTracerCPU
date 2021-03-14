@@ -39,6 +39,10 @@ else()
 	find_package(SDL2 CONFIG REQUIRED)
 	add_subdirectory(yaml-cpp)
 	add_subdirectory(glm)
+
+	set(mathfu_build_benchmarks OFF CACHE BOOL "")
+	set(mathfu_build_tests oFF CACHE BOOL "")
+	add_subdirectory(./mathfu)
 	add_subdirectory("src/raytracer")
 endif()
 
