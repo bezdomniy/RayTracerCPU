@@ -1,5 +1,7 @@
 #include "model.h"
 
+// TODO: refactor this to be a Shape with corresponding interface,
+//       and implement an array based bvh
 Model::Model()
 {
 }
@@ -377,7 +379,7 @@ std::shared_ptr<Group> Model::buildBoundingVolumeHierarchy(std::vector<std::shar
 	return root;
 }
 
-std::pair<glm::dvec4, glm::dvec4> Model::mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const std::pair<glm::dvec4, glm::dvec4> b2)
+std::pair<glm::dvec4, glm::dvec4> Model::mergeBounds(const std::pair<glm::dvec4, glm::dvec4> &b1, const std::pair<glm::dvec4, glm::dvec4> &b2)
 {
 	return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::min(b1.first.x, b2.first.x),
 														std::min(b1.first.y, b2.first.y),
@@ -387,7 +389,7 @@ std::pair<glm::dvec4, glm::dvec4> Model::mergeBounds(const std::pair<glm::dvec4,
 														std::max(b1.second.z, b2.second.z), 1.));
 }
 
-std::pair<glm::dvec4, glm::dvec4> Model::mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const glm::dvec4 p)
+std::pair<glm::dvec4, glm::dvec4> Model::mergeBounds(const std::pair<glm::dvec4, glm::dvec4> &b1, const glm::dvec4 &p)
 {
 	return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::min(b1.first.x, p.x),
 														std::min(b1.first.y, p.y),

@@ -32,6 +32,8 @@ public:
   virtual glm::dvec4 normalAt(const glm::dvec4 &point) = 0;
   virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) = 0;
   virtual std::string type() = 0;
+    
+//    TODO change to return const reference (const std::pair & )
   virtual std::pair<glm::dvec4, glm::dvec4> bounds() = 0;
 
   glm::dmat4 transform;
