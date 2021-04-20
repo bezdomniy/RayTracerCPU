@@ -32,20 +32,21 @@ public:
   virtual glm::dvec4 normalAt(const glm::dvec4 &point) = 0;
   virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) = 0;
   virtual std::string type() = 0;
-    
-//    TODO change to return const reference (const std::pair & )
-  virtual std::pair<glm::dvec4, glm::dvec4> bounds() = 0;
+
+  //    TODO change to return const reference (const std::pair & )
+  virtual std::pair<glm::dvec4, glm::dvec4> bounds() const = 0;
 
   glm::dmat4 transform;
   glm::dmat4 inverseTransform;
 
-  glm::dvec4 boundsCentroid();
+  glm::dvec4 boundsCentroid() const;
   std::shared_ptr<Shape> parent = nullptr;
   std::shared_ptr<Material> material;
   // bool materialSet = false; //TODO get rid of bool
 
   // std::pair<glm::dvec4,glm::dvec4> boundingMinMax;
 
+  std::shared_ptr<Material> &getMaterial();
   virtual void setMaterial(std::shared_ptr<Material> &mat);
   glm::dvec3 patternAt(const glm::dvec4 &point);
   void multiplyTransform(glm::dmat4 &transform);

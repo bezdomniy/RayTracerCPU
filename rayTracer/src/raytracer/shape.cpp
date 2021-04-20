@@ -22,15 +22,22 @@ void Shape::setMaterial(std::shared_ptr<Material> &mat)
   // this->materialSet = true;
 }
 
+std::shared_ptr<Material> &Shape::getMaterial()
+{
+  if (parent)
+    return parent->getMaterial();
+  return material;
+}
+
 glm::dvec3 Shape::patternAt(const glm::dvec4 &point)
 {
   // glm::dmat4 shapeTransformInverse(glm::affineInverse(this->transform));
   glm::dvec4 objectPoint = this->inverseTransform * point;
 
-  glm::dmat4 patternTransformInverse(glm::affineInverse(this->material->pattern->transform));
+  glm::dmat4 patternTransformInverse(glm::affineInverse(getMaterial()->pattern->transform));
   glm::dvec4 patternPoint = patternTransformInverse * objectPoint;
 
-  return this->material->pattern->patternAt(patternPoint);
+  return getMaterial()->pattern->patternAt(patternPoint);
 }
 
 void Shape::multiplyTransform(glm::dmat4 &transform)
@@ -70,9 +77,10 @@ glm::dvec4 Shape::normalToWorld(const glm::dvec4 &normal)
   return ret;
 }
 
-glm::dvec4 Shape::boundsCentroid()
+glm::dvec4 Shape::boundsCentroid() const
 {
-  return .5 * this->bounds().first + .5 * this->bounds().second;
+  const std::pair<glm::dvec4, glm::dvec4> b = bounds();
+  return .5 * b.first + .5 * b.second;
 }
 
 Shape::~Shape()

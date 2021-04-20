@@ -74,7 +74,7 @@ glm::dvec4 Camera::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
   return normalAt(point);
 }
 
-std::pair<glm::dvec4, glm::dvec4> Camera::bounds()
+std::pair<glm::dvec4, glm::dvec4> Camera::bounds() const
 {
   return std::pair<glm::dvec4, glm::dvec4>();
 }

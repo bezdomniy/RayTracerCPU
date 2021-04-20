@@ -147,11 +147,9 @@ std::shared_ptr<Shape> ObjectLoader::shapeFromDefinition(ShapeDefinition &shapeD
     if (!std::__fs::filesystem::exists(shapeDefinition.filePath))
       downloadAsset(shapeDefinition.filePath, shapeDefinition.filePath);
 #endif
-
-    Model model;
-    model.build(shapeDefinition.filePath, true);
-
-    ret = model.mesh;
+    std::shared_ptr<Model> model = std::make_shared<Model>();
+    model->build(shapeDefinition.filePath);
+    ret = std::dynamic_pointer_cast<Shape>(model);
   }
   else if (shapeDefinition.shapeType == "camera")
   {

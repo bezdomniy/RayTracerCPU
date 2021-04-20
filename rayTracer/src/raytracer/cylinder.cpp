@@ -84,7 +84,7 @@ glm::dvec4 Cylinder::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
   return normalAt(point);
 }
 
-std::pair<glm::dvec4, glm::dvec4> Cylinder::bounds()
+std::pair<glm::dvec4, glm::dvec4> Cylinder::bounds() const
 {
   return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(-1., this->minimum, -1., 1.), glm::dvec4(1., this->maximum, 1., 1.));
 }

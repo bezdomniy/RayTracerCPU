@@ -8,6 +8,7 @@
 #include "smoothTriangle.h"
 #include "cylinder.h"
 #include "cone.h"
+#include "model.h"
 
 #include <vector>
 #include <memory>
@@ -25,11 +26,14 @@ private:
     }
 
     bool boundIntersection(Ray &transformedRay);
-    std::shared_ptr<Group> getptr();
+
+    std::pair<glm::dvec4, glm::dvec4> mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const std::pair<glm::dvec4, glm::dvec4> b2);
+    std::pair<glm::dvec4, glm::dvec4> mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const glm::dvec4 p);
+    std::shared_ptr<Group> recursiveBuild(std::vector<std::shared_ptr<Shape>> &shapes, uint32_t start, uint32_t end);
 
 public:
     Group();
-    Group(std::vector<std::shared_ptr<Shape>> &shapes);
+    Group(std::vector<std::shared_ptr<Shape>> &shapes, bool bvh);
     Group(const Group &group);
     ~Group();
 
@@ -44,7 +48,7 @@ public:
     virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
     virtual glm::dvec4 normalAt(const glm::dvec4 &point) override;
     virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) override;
-    virtual std::pair<glm::dvec4, glm::dvec4> bounds() override;
+    virtual std::pair<glm::dvec4, glm::dvec4> bounds() const override;
     virtual std::string type() override;
 };
 

@@ -208,7 +208,7 @@ glm::dvec3 Renderer::pathColourAt(Ray &ray, World &world, std::vector<Geometry::
     glm::dvec3 hitColour = lighting(hit->shapePtr, comps.overPoint);
     // hitCompsBuffer = std::move(hit->comps);
     // intersections.clear();
-    return hit->shapePtr->material->emissiveness + hitColour * pathColourAt(newRay, world, intersections, remaining - 1);
+    return hit->shapePtr->getMaterial()->emissiveness + hitColour * pathColourAt(newRay, world, intersections, remaining - 1);
 
     // return shadeHit(hit, world, remaining);
   }
@@ -261,8 +261,8 @@ glm::dvec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, Geometry::Inte
 {
   glm::dvec3 surface(0.0);
 
-  double reflective = hit->shapePtr->material->reflective;
-  double transparency = hit->shapePtr->material->transparency;
+  double reflective = hit->shapePtr->getMaterial()->reflective;
+  double transparency = hit->shapePtr->getMaterial()->transparency;
   Shape *shapePtr = hit->shapePtr;
 
   for (auto &light : world.lights)
@@ -338,8 +338,8 @@ glm::dvec3 Renderer::lighting(Shape *shape, glm::dvec4 &point)
 {
   glm::dvec3 effectiveColour;
 
-  if (shape->material->pattern == nullptr)
-    effectiveColour = shape->material->colour;
+  if (shape->getMaterial()->pattern == nullptr)
+    effectiveColour = shape->getMaterial()->colour;
   else
     effectiveColour = shape->patternAt(point);
 
@@ -356,13 +356,13 @@ Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
   glm::dvec3 effectiveColour;
 
   // combine the surface color with the light's color/intensity​
-  if (shape->material->pattern == nullptr)
-    effectiveColour = shape->material->colour * light->intensity;
+  if (shape->getMaterial()->pattern == nullptr)
+    effectiveColour = shape->getMaterial()->colour * light->intensity;
   else
     effectiveColour = shape->patternAt(point) * light->intensity;
 
   // compute the ambient contribution​
-  glm::dvec3 ambient = effectiveColour * shape->material->ambient;
+  glm::dvec3 ambient = effectiveColour * shape->getMaterial()->ambient;
   if (inShadow)
     return ambient;
 
@@ -381,7 +381,7 @@ Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
   else
   {
     // compute the diffuse contribution​
-    diffuse = effectiveColour * shape->material->diffuse * lightDotNormal;
+    diffuse = effectiveColour * shape->getMaterial()->diffuse * lightDotNormal;
 
     // reflect_dot_eye represents the cosine of the angle between the
     // reflection vector and the eye vector. A negative number means the
@@ -396,8 +396,8 @@ Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
     else
     {
       // compute the specular contribution​
-      double factor = std::pow(reflectDotEye, shape->material->shininess);
-      specular = light->intensity * shape->material->specular * factor;
+      double factor = std::pow(reflectDotEye, shape->getMaterial()->shininess);
+      specular = light->intensity * shape->getMaterial()->specular * factor;
     }
   }
 
