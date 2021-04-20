@@ -24,7 +24,7 @@ void Shape::setMaterial(std::shared_ptr<Material> &mat)
 
 std::shared_ptr<Material> &Shape::getMaterial()
 {
-  if (parent)
+  if (parent && !material)
     return parent->getMaterial();
   return material;
 }

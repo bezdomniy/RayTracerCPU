@@ -9,7 +9,7 @@ Group::~Group()
 {
 }
 
-Group::Group(std::vector<std::shared_ptr<Shape>> &shapes, bool bvh) : Shape()
+void Group::build(std::vector<std::shared_ptr<Shape>> &shapes, bool bvh)
 {
   if (bvh)
   {

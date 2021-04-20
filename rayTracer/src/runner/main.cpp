@@ -221,10 +221,12 @@ std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> rayTracerInOneWeekend
   // world->addShape(sphere3);
   shapes.push_back(sphere3);
 
-  mesh = std::make_shared<Group>(shapes, true);
+  mesh = std::make_shared<Group>();
+  mesh->build(shapes, true);
 
   // TODO: this is a hack - top level group in bvh should not need material, but does otherwise you get seg fault. fix this
-  std::shared_ptr<Material> material = std::make_shared<Material>();
+  std::shared_ptr<Material>
+      material = std::make_shared<Material>();
   material->colour = glm::dvec3(0.8, 0.8, 0.8);
   mesh->setMaterial(material);
 

@@ -149,7 +149,7 @@ std::shared_ptr<Shape> ObjectLoader::shapeFromDefinition(ShapeDefinition &shapeD
 #endif
     std::shared_ptr<Model> model = std::make_shared<Model>();
     model->build(shapeDefinition.filePath);
-    ret = std::dynamic_pointer_cast<Shape>(model);
+    ret = model;
   }
   else if (shapeDefinition.shapeType == "camera")
   {

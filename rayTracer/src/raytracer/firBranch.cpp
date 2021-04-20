@@ -70,7 +70,8 @@ std::shared_ptr<Group> FirBranch::build()
         }
     }
 
-    std::shared_ptr<Group> root = std::make_shared<Group>(shapes, true);
+    std::shared_ptr<Group> root = std::make_shared<Group>();
+    root->build(shapes, true);
     std::shared_ptr<Material> rootMaterial = std::make_shared<Material>();
     root->setMaterial(rootMaterial);
 

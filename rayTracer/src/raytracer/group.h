@@ -33,7 +33,7 @@ private:
 
 public:
     Group();
-    Group(std::vector<std::shared_ptr<Shape>> &shapes, bool bvh);
+    void build(std::vector<std::shared_ptr<Shape>> &shapes, bool bvh);
     Group(const Group &group);
     ~Group();
 
