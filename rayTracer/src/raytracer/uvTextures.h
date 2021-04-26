@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include "types.h"
 
 #include <string>
 #include <cmath>
@@ -38,7 +38,7 @@ public:
     virtual void loadFront(std::string const &path) = 0;
     virtual void loadBack(std::string const &path) = 0;
 
-    virtual glm::dvec3 patternAt(glm::dvec2 uv, int faceIndex = 0) = 0;
+    virtual Vec3 patternAt(Vec2 uv, int faceIndex = 0) = 0;
 };
 
 class CheckeredTexture : public UVTexture
@@ -60,12 +60,12 @@ private:
 
 public:
     CheckeredTexture();
-    CheckeredTexture(glm::dvec3 colourA, glm::dvec3 colourB, int width, int height);
+    CheckeredTexture(Vec3 colourA, Vec3 colourB, int width, int height);
     ~CheckeredTexture();
-    virtual glm::dvec3 patternAt(glm::dvec2 uv, int faceIndex = 0) override;
+    virtual Vec3 patternAt(Vec2 uv, int faceIndex = 0) override;
 
-    glm::dvec3 colourA;
-    glm::dvec3 colourB;
+    Vec3 colourA;
+    Vec3 colourB;
     int width;
     int height;
 };
@@ -105,7 +105,7 @@ private:
         archive(cereal::virtual_base_class<UVTexture>(this), textures, width, height);
     }
 
-    glm::dvec3 rgbFromSurface(std::unique_ptr<Surface> &surface, int x, int y);
+    Vec3 rgbFromSurface(std::unique_ptr<Surface> &surface, int x, int y);
 
 public:
     ImageTexture();
@@ -119,7 +119,7 @@ public:
     virtual void loadFront(std::string const &path) override;
     virtual void loadBack(std::string const &path) override;
 
-    virtual glm::dvec3 patternAt(glm::dvec2 uv, int faceIndex = 0) override;
+    virtual Vec3 patternAt(Vec2 uv, int faceIndex = 0) override;
 
     std::vector<std::unique_ptr<Surface>> textures;
     int width;

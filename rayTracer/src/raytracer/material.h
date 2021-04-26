@@ -1,7 +1,7 @@
 #pragma once
 
 #include "patterns.h"
-#include <glm/glm.hpp>
+#include "types.h"
 #include <memory>
 
 #include <cereal/archives/binary.hpp>
@@ -29,22 +29,22 @@ private:
 
 public:
   Material();
-  Material(glm::dvec3 colour, glm::dvec3 emissiveness, double ambient, double diffuse, double specular,
-           double shininess);
+  Material(Vec3 colour, Vec3 emissiveness, Float ambient, Float diffuse, Float specular,
+           Float shininess);
 
   Material(const Material &material);
 
   ~Material();
 
-  glm::dvec3 colour;
-  glm::dvec3 emissiveness;
-  double ambient;
-  double diffuse;
-  double specular;
-  double shininess;
-  double reflective;
-  double transparency;
-  double refractiveIndex;
+  Vec3 colour;
+  Vec3 emissiveness;
+  Float ambient;
+  Float diffuse;
+  Float specular;
+  Float shininess;
+  Float reflective;
+  Float transparency;
+  Float refractiveIndex;
 
   std::shared_ptr<Pattern> pattern;
   bool shadow; //TODO find way to remove

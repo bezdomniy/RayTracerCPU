@@ -2,12 +2,12 @@
 
 Cylinder::Cylinder() : Shape()
 {
-  this->minimum = -std::numeric_limits<double>::infinity();
-  this->maximum = std::numeric_limits<double>::infinity();
+  this->minimum = -std::numeric_limits<Float>::infinity();
+  this->maximum = std::numeric_limits<Float>::infinity();
   this->capped = false;
 }
 
-Cylinder::Cylinder(double minimum, double maximum, bool capped) : Shape()
+Cylinder::Cylinder(Float minimum, Float maximum, bool capped) : Shape()
 {
   this->minimum = minimum;
   this->maximum = maximum;
@@ -21,7 +21,7 @@ Cylinder::Cylinder(const Cylinder &c2)
   this->minimum = c2.minimum;
   this->capped = c2.capped;
   this->inverseTransform = c2.inverseTransform;
-  this->transform = c2.transform;
+  // this->transform = c2.transform;
   this->parent = c2.parent;
 }
 
@@ -31,72 +31,72 @@ void Cylinder::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>>
 {
   Ray transformedRay = transformRay(ray);
 
-  double a = std::pow(transformedRay.direction.x, 2) +
-             std::pow(transformedRay.direction.z, 2);
+  Float a = std::pow(transformedRay.direction.x, (Float)2) +
+            std::pow(transformedRay.direction.z, (Float)2);
 
   if (std::abs(a) < Geometry::EPSILON)
     return;
 
-  double b = (2 * transformedRay.origin.x * transformedRay.direction.x) +
-             (2 * transformedRay.origin.z * transformedRay.direction.z);
+  Float b = ((Float)2 * transformedRay.origin.x * transformedRay.direction.x) +
+            ((Float)2 * transformedRay.origin.z * transformedRay.direction.z);
 
-  double c = std::pow(transformedRay.origin.x, 2) +
-             std::pow(transformedRay.origin.z, 2) - 1;
+  Float c = std::pow(transformedRay.origin.x, (Float)2) +
+            std::pow(transformedRay.origin.z, (Float)2) - 1;
 
-  double discriminant = std::pow(b, 2) - 4 * a * c;
+  Float discriminant = std::pow(b, (Float)2) - (Float)4 * a * c;
 
   if (discriminant < 0)
     return;
 
-  double t1 = (-b - std::sqrt(discriminant)) / (2 * a);
-  double t2 = (-b + std::sqrt(discriminant)) / (2 * a);
+  Float t1 = (-b - std::sqrt(discriminant)) / ((Float)2 * a);
+  Float t2 = (-b + std::sqrt(discriminant)) / ((Float)2 * a);
 
-  double y1 = transformedRay.origin.y + t1 * transformedRay.direction.y;
+  Float y1 = transformedRay.origin.y + t1 * transformedRay.direction.y;
   if (this->minimum < y1 && y1 < this->maximum)
     intersections.push_back(Geometry::Intersection<Shape>{t1, this});
 
-  double y2 = transformedRay.origin.y + t2 * transformedRay.direction.y;
+  Float y2 = transformedRay.origin.y + t2 * transformedRay.direction.y;
   if (this->minimum < y2 && y2 < this->maximum)
     intersections.push_back(Geometry::Intersection<Shape>{t2, this});
 
   intersectCaps(transformedRay, intersections);
 }
 
-glm::dvec4 Cylinder::normalAt(const glm::dvec4 &point)
+Vec4 Cylinder::normalAt(const Vec4 &point)
 {
-  glm::dvec4 objectPoint = worldToObject(point);
+  Vec4 objectPoint = worldToObject(point);
 
-  double dist = std::pow(objectPoint.x, 2) + std::pow(objectPoint.z, 2);
-  glm::dvec4 objectNormal;
+  Float dist = std::pow(objectPoint.x, (Float)2) + std::pow(objectPoint.z, (Float)2);
+  Vec4 objectNormal;
 
   if (dist < 1 && objectPoint.y >= (this->maximum - Geometry::EPSILON))
-    objectNormal = glm::dvec4(0.0, 1.0, 0.0, 0.0);
+    objectNormal = Vec4((Float)0.0, (Float)1.0, (Float)0.0, (Float)0.0);
   else if (dist < 1 && objectPoint.y <= (this->minimum + Geometry::EPSILON))
-    objectNormal = glm::dvec4(0.0, -1.0, 0.0, 0.0);
+    objectNormal = Vec4((Float)0.0, (Float)-1.0, (Float)0.0, (Float)0.0);
   else
-    objectNormal = glm::dvec4(objectPoint.x, 0.0, objectPoint.z, 0.0);
+    objectNormal = Vec4(objectPoint.x, (Float)0.0, objectPoint.z, (Float)0.0);
 
   return normalToWorld(objectNormal);
 }
 
-glm::dvec4 Cylinder::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
+Vec4 Cylinder::normalAt(const Vec4 &point, const Vec2 &uv)
 {
   return normalAt(point);
 }
 
-std::pair<glm::dvec4, glm::dvec4> Cylinder::bounds()
+std::pair<Vec4, Vec4> Cylinder::bounds() const
 {
-  return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(-1., this->minimum, -1., 1.), glm::dvec4(1., this->maximum, 1., 1.));
+  return std::pair<Vec4, Vec4>(Vec4(-1., this->minimum, (Float)-1., (Float)1.), Vec4(1., this->maximum, (Float)1., (Float)1.));
 }
 
 std::string Cylinder::type() { return "Cylinder"; }
 
-bool Cylinder::checkCap(Ray &ray, double t)
+bool Cylinder::checkCap(Ray &ray, Float t)
 {
-  double x = ray.origin.x + t * ray.direction.x;
-  double z = ray.origin.z + t * ray.direction.z;
+  Float x = ray.origin.x + t * ray.direction.x;
+  Float z = ray.origin.z + t * ray.direction.z;
 
-  return (std::pow(x, 2) + std::pow(z, 2)) <= 1;
+  return (std::pow(x, (Float)2) + std::pow(z, (Float)2)) <= 1;
 }
 
 void Cylinder::intersectCaps(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections)
@@ -104,11 +104,11 @@ void Cylinder::intersectCaps(Ray &ray, std::vector<Geometry::Intersection<Shape>
   if (!this->capped || std::abs(ray.direction.y) < Geometry::EPSILON)
     return;
 
-  double t1 = (this->minimum - ray.origin.y) / ray.direction.y;
+  Float t1 = (this->minimum - ray.origin.y) / ray.direction.y;
   if (checkCap(ray, t1))
     intersections.push_back(Geometry::Intersection<Shape>{t1, this});
 
-  double t2 = (this->maximum - ray.origin.y) / ray.direction.y;
+  Float t2 = (this->maximum - ray.origin.y) / ray.direction.y;
   if (checkCap(ray, t2))
     intersections.push_back(Geometry::Intersection<Shape>{t2, this});
 }

@@ -2,7 +2,9 @@
 
 #include "shape.h"
 #include "geometry.h"
-#include <glm/glm.hpp>
+#include "types.h"
+
+#include "cereal/types/utility.hpp"
 
 class Triangle : public Shape
 {
@@ -11,38 +13,32 @@ private:
     template <class Archive>
     void serialize(Archive &archive)
     {
-        archive(cereal::virtual_base_class<Shape>(this), p1, p2, p3, e1, e2, normal);
+        archive(cereal::virtual_base_class<Shape>(this), boundsv);
     }
-
-    // template <class Archive>
-    // static void load_and_construct(Archive &archive, cereal::construct<Triangle> &construct)
-    // {
-    //     glm::dvec3 p1;
-    //     glm::dvec3 p2;
-    //     glm::dvec3 p3;
-
-    //     archive(p1, p2, p3);
-    //     construct(p1, p2, p3);
-    // }
 
 public:
     Triangle() {}
-    Triangle(glm::dvec3 p1, glm::dvec3 p2, glm::dvec3 p3);
+    Triangle(Vec3 p1, Vec3 p2, Vec3 p3);
     ~Triangle();
 
+    //    TODO: change this to a precalculated value in all and remove the function call
+    std::pair<Vec4, Vec4> boundsv;
+
     virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
-    virtual glm::dvec4 normalAt(const glm::dvec4 &point) override;
-    virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) override;
-    virtual std::pair<glm::dvec4, glm::dvec4> bounds() override;
+    virtual Vec4 normalAt(const Vec4 &point) override;
+    virtual Vec4 normalAt(const Vec4 &point, const Vec2 &uv) override;
+    virtual std::pair<Vec4, Vec4> bounds() const final override;
     virtual std::string type() override;
 
 protected:
-    glm::dvec4 normal;
-    glm::dvec3 p1;
-    glm::dvec3 p2;
-    glm::dvec3 p3;
-    glm::dvec3 e1;
-    glm::dvec3 e2;
+    // TODO: merge normal and n1 in smooth triangle to save space
+    // glm::dvec3 p1;
+    // glm::dvec3 p2;
+    // glm::dvec3 p3;
+    // glm::dvec3 n1;
+    // // TODO: remove e1 and e2
+    // Vec3 e1;
+    // Vec3 e2;
 };
 
 CEREAL_REGISTER_TYPE(Triangle);

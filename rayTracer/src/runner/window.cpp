@@ -173,7 +173,7 @@ void Window::initSDL()
                                     SDL_WINDOWPOS_UNDEFINED, this->camera->hsize, this->camera->vsize, 0);
 #endif
     this->renderer = SDL_CreateRenderer(this->window, -1,
-                                        SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+                                        SDL_RENDERER_SOFTWARE | SDL_RENDERER_TARGETTEXTURE);
 
     // SDL_CreateWindowAndRenderer(this->camera->hsize, this->camera->vsize, 0, &this->window, &this->renderer);
 
@@ -254,7 +254,7 @@ void Window::moveRight() { moveCamera(-STEP_SIZE, 1); }
 void Window::moveUp() { moveCamera(-STEP_SIZE, 0); }
 void Window::moveDown() { moveCamera(STEP_SIZE, 0); }
 
-void Window::moveCamera(float posChange, uint8_t axis)
+void Window::moveCamera(Float posChange, uint8_t axis)
 {
     if (axis == 0)
     {
@@ -266,15 +266,15 @@ void Window::moveCamera(float posChange, uint8_t axis)
     }
 
 #if !defined(__EMSCRIPTEN__) || defined(__EMSCRIPTEN_PTHREADS__)
-    glm::dmat4 rotationX =
-        glm::rotate(glm::dmat4(1.0), (double)this->xRotation, glm::dvec3(1.0, 0.0, 0.0));
+    Mat4 rotationX =
+        glm::rotate(Mat4(1.0), (Float)this->xRotation, Vec3(1.0, 0.0, 0.0));
 
-    glm::dmat4 rotationY =
-        glm::rotate(glm::dmat4(1.0), (double)this->yRotation, glm::dvec3(0.0, 1.0, 0.0));
+    Mat4 rotationY =
+        glm::rotate(Mat4(1.0), (Float)this->yRotation, Vec3(0.0, 1.0, 0.0));
 
-    // glm::dmat4 rotationZ =
-    //     glm::rotate(glm::dmat4(1.0), posChange,
-    //                 glm::dvec3(0.0, 0.0, 1.0));
+    // Mat4 rotationZ =
+    //     glm::rotate(Mat4(1.0), posChange,
+    //                 Vec3(0.0, 0.0, 1.0));
 
     this->camera->position = rotationX * this->originalCameraPosition;
     this->camera->position = rotationY * this->camera->position;
@@ -284,12 +284,12 @@ void Window::moveCamera(float posChange, uint8_t axis)
     this->somethingChanged = true;
 
     // // old from here - move to raytracer module
-    // glm::dmat4 rotationY =
-    //     glm::rotate(glm::dmat4(1.0), posChange, axis);
+    // Mat4 rotationY =
+    //     glm::rotate(Mat4(1.0), posChange, axis);
 
-    // // glm::dmat4 rotationZ =
-    // //     glm::rotate(glm::dmat4(1.0), posChange,
-    // //                 glm::dvec3(0.0, 0.0, 1.0));
+    // // Mat4 rotationZ =
+    // //     glm::rotate(Mat4(1.0), posChange,
+    // //                 Vec3(0.0, 0.0, 1.0));
 
     // this->camera->position = rotationY * this->camera->position;
 
@@ -299,10 +299,10 @@ void Window::moveCamera(float posChange, uint8_t axis)
     // this->camera->updateTransform();
 }
 
-std::vector<uint8_t> floatToByteArray(float d)
+std::vector<uint8_t> floatToByteArray(Float d)
 {
     uint8_t *bytePointer = reinterpret_cast<uint8_t *>(&d);
-    return std::vector<uint8_t>(bytePointer, bytePointer + sizeof(float));
+    return std::vector<uint8_t>(bytePointer, bytePointer + sizeof(Float));
 }
 
 void Window::update()
@@ -347,8 +347,8 @@ void Window::update()
     // std::cout << "nworkers " << (int)nWorkers << std::endl;
 
     // TODO fix ints to sizes of floats
-    // float *xRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 10);
-    // float *yRotationp = reinterpret_cast<float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 6);
+    // Float *xRotationp = reinterpret_cast<Float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 10);
+    // Float *yRotationp = reinterpret_cast<Float *>(&this->sceneBinary[0] + this->sceneBinary.size() - 6);
 
     int worker = 0;
 

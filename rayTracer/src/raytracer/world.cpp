@@ -29,12 +29,11 @@ void World::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &r
     shape->intersectRay(ray, ret);
   }
 
-  std::sort(ret.begin(), ret.end(), Geometry::compareIntersection<Shape>);
-
+  
   // return ret;
 }
 
-bool World::intersectRayShadow(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersectionBuffer, double distance)
+bool World::intersectRayShadow(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersectionBuffer, Float distance)
 {
   intersectionBuffer.clear();
   for (auto &shape : this->shapes)

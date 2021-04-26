@@ -4,7 +4,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <glm/glm.hpp>
+#include "types.h"
 // #include <glm/gtx/intersect.hpp>
 
 #include <glm/gtc/matrix_access.hpp>
@@ -22,6 +22,7 @@
 #include <limits>
 #include <memory>
 
+// TODO: figure out way to get rid of templates and just include Shape
 // class Shape;
 
 namespace Geometry
@@ -32,31 +33,31 @@ namespace Geometry
   //   return ++n;
   // }
 
-  static const double EPSILON = 0.000000001;
-  // static const double EPSILON = std::numeric_limits<double>::epsilon();
+  static const Float EPSILON = 0.000000001;
+  // static const Float EPSILON = std::numeric_limits<Float>::epsilon();
   struct IntersectionParameters
   {
-    glm::dvec4 point;
-    glm::dvec4 normalv;
-    glm::dvec4 eyev;
-    glm::dvec4 reflectv;
-    glm::dvec4 overPoint;
-    glm::dvec4 underPoint;
-    double n1;
-    double n2;
+    Vec4 point;
+    Vec4 normalv;
+    Vec4 eyev;
+    Vec4 reflectv;
+    Vec4 overPoint;
+    Vec4 underPoint;
+    Float n1;
+    Float n2;
     // bool inside; //TODO find way to remove
   };
 
   template <typename T>
   struct Intersection
   {
-    double t;
+    Float t;
     T *shapePtr;
-    glm::dvec2 uv;
-//    unsigned int id;
-//    IntersectionParameters *comps;
+    Vec2 uv;
+    //    unsigned int id;
+    //    IntersectionParameters *comps;
 
-    // Intersection(double t, T *shapePtr, glm::dvec2 uv)
+    // Intersection(Float t, T *shapePtr, Vec2 uv)
     // {
     //   this->t = t;
     //   this->shapePtr = shapePtr;
@@ -64,7 +65,7 @@ namespace Geometry
     //   this->id = unique_id();
     // }
 
-    // Intersection(double t, T *shapePtr)
+    // Intersection(Float t, T *shapePtr)
     // {
     //   this->t = t;
     //   this->shapePtr = shapePtr;
@@ -92,9 +93,9 @@ namespace Geometry
       if (&intersection == &hit)
       {
         if (objects.empty())
-            comps.n1 = 1.0;
+          comps.n1 = 1.0;
         else
-            comps.n1 = objects.back()->material->refractiveIndex;
+          comps.n1 = objects.back()->getMaterial()->refractiveIndex;
       }
 
       typename std::vector<T *>::iterator position =
@@ -109,45 +110,45 @@ namespace Geometry
         if (objects.empty())
           comps.n2 = 1.0;
         else
-            comps.n2 = objects.back()->material->refractiveIndex;
+          comps.n2 = objects.back()->getMaterial()->refractiveIndex;
         break;
       }
     }
   }
 
   template <typename T>
-  IntersectionParameters getIntersectionParameters(Intersection<T> &intersection, glm::dvec4 &rayOrigin, glm::dvec4 &rayDirection,
-                                 std::vector<Intersection<T>> &intersections)
+  IntersectionParameters getIntersectionParameters(Intersection<T> &intersection, Vec4 &rayOrigin, Vec4 &rayDirection,
+                                                   std::vector<Intersection<T>> &intersections)
   {
     // intersection.comps = std::make_unique<IntersectionParameters>();
-      IntersectionParameters comps = {};
+    IntersectionParameters comps = {};
     comps.point =
         rayOrigin + glm::normalize(rayDirection) * intersection.t;
     // TODO check that uv only null have using none-uv normalAt version
     comps.normalv =
         intersection.shapePtr->normalAt(comps.point, intersection.uv);
-      comps.eyev = -rayDirection;
+    comps.eyev = -rayDirection;
 
     if (glm::dot(comps.normalv, comps.eyev) < 0)
     {
       // intersection.comps->inside = true;
-        comps.normalv = -comps.normalv;
+      comps.normalv = -comps.normalv;
     }
     // else
     // {
     //   intersection.comps->inside = false;
     // }
 
-      comps.reflectv =
+    comps.reflectv =
         glm::reflect(rayDirection, comps.normalv);
-      comps.overPoint =
-      comps.point + comps.normalv * EPSILON;
-      comps.underPoint =
-      comps.point - comps.normalv * EPSILON;
+    comps.overPoint =
+        comps.point + comps.normalv * EPSILON;
+    comps.underPoint =
+        comps.point - comps.normalv * EPSILON;
 
     getRefractiveIndexFromTo<T>(intersections, intersection, comps);
-      
-      return comps;
+
+    return comps;
   }
 
   template <typename T>
@@ -159,6 +160,7 @@ namespace Geometry
   template <typename T>
   Intersection<T> *hit(std::vector<Intersection<T>> &intersections)
   {
+    std::sort(intersections.begin(), intersections.end(), Geometry::compareIntersection<T>);
     // int retIndex = -1;
 
     for (auto &intersection : intersections)
@@ -191,48 +193,37 @@ namespace Geometry
   }
 
   template <typename T>
-  double schlick(IntersectionParameters& comps)
+  Float schlick(IntersectionParameters &comps)
   {
-    double cos = glm::dot(comps.eyev, comps.normalv);
+    Float cos = glm::dot(comps.eyev, comps.normalv);
     if (comps.n1 > comps.n2)
     {
-      double n = comps.n1 / comps.n2;
-      double sin2T = std::pow(n, 2) * (1.0 - std::pow(cos, 2));
+      Float n = comps.n1 / comps.n2;
+      Float sin2T = std::pow(n, 2) * (1.0 - std::pow(cos, 2));
       if (sin2T > 1.0)
         return 1.0;
 
-      double cosT = std::sqrt(1.0 - sin2T);
+      Float cosT = std::sqrt(1.0 - sin2T);
       cos = cosT;
     }
-    double r0 = std::pow((comps.n1 - comps.n2) / (comps.n1 + comps.n2), 2);
+    Float r0 = std::pow((comps.n1 - comps.n2) / (comps.n1 + comps.n2), 2);
     return r0 + (1.0 - r0) * std::pow(1.0 - cos, 5);
   }
 
-  template <typename T>
-  std::pair<double, double> checkAxis(double origin, double direction, double lowerBound = -1.0, double upperBound = 1.0)
+  struct BucketInfo
   {
-    double tmin_numerator = lowerBound - origin;
-    double tmax_numerator = upperBound - origin;
+    int count = 0;
+    std::pair<Vec4, Vec4> bounds;
+  };
 
-    std::pair<double, double> ret;
+  Vec4 offset(const Vec4 &p, const std::pair<Vec4, Vec4> &bounds);
 
-    if (std::abs(direction) >= EPSILON)
-    {
-      ret.first = tmin_numerator / direction;
-      ret.second = tmax_numerator / direction;
-    }
-    else
-    {
-      ret.first = tmin_numerator * std::numeric_limits<double>::infinity();
-      ret.second = tmax_numerator * std::numeric_limits<double>::infinity();
-    }
-    if (ret.first > ret.second)
-      std::swap(ret.first, ret.second);
+  Vec4 diagonal(const std::pair<Vec4, Vec4> &bounds);
 
-    return ret;
-  }
+  Float surfaceArea(const std::pair<Vec4, Vec4> &bounds);
 
-  // inline double vecDot(const glm::dvec4 &x, const glm::dvec4 &y);
-  // glm::dvec4 matVecMult(const glm::dmat4 &m, const glm::dvec4 &vec);
+  uint32_t nextPowerOfTwo(uint32_t v);
+
+  uint32_t log2int(uint32_t val);
 
 } // namespace Geometry

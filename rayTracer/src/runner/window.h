@@ -47,7 +47,7 @@ private:
 #endif
 
 #ifdef __EMSCRIPTEN_PTHREADS__
-    glm::dvec4 originalCameraPosition;
+    Vec4 originalCameraPosition;
     std::shared_ptr<Camera> camera;
     Renderer rayTraceRenderer;
     std::shared_ptr<World> world;
@@ -56,7 +56,7 @@ private:
     // static const int PIXELS_PER_BATCH = 20000;
     SDL_Event event;
     const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-    const float STEP_SIZE = 0.01f;
+    const Float STEP_SIZE = 0.01f;
 
     // std::string sceneDesc;
     // std::vector<uint8_t> byteBuffer;
@@ -64,7 +64,7 @@ private:
 
     void handleEvents();
 
-    void moveCamera(float posChange, uint8_t axis);
+    void moveCamera(Float posChange, uint8_t axis);
 
     // void _drawTest();
 
@@ -78,8 +78,8 @@ public:
     int width;
     int height;
 
-    float xRotation = 0.0f;
-    float yRotation = 0.0f;
+    Float xRotation = 0.0f;
+    Float yRotation = 0.0f;
 
 #ifndef __EMSCRIPTEN__
     Window(const std::shared_ptr<Camera> &camera, const std::shared_ptr<World> &world);

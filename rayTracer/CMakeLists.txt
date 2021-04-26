@@ -18,8 +18,14 @@ if (${USE_THREADS} AND ${CMAKE_SYSTEM_NAME} STREQUAL "Emscripten")
 	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -flto -pthread -s PROXY_TO_PTHREAD")
 else()
 	#set(CMAKE_CXX_FLAGS "-openmp-simd")
-	set(CMAKE_CXX_FLAGS_DEBUG "-g")
-	set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -flto") # -Wpadded
+	# set(CMAKE_CXX_FLAGS_DEBUG "-g")
+
+	if (WIN32)
+		set(CMAKE_CXX_FLAGS_RELEASE "/O2 /fp:fast /GL /arch:AVX2")
+	else()
+		set(CMAKE_CXX_FLAGS_DEBUG "-g")
+		set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffast-math -flto") # -Wpadded
+	endif()
 endif()
 
 set(CMAKE_MODULE_LINKER_FLAGS_RELEASE "")
@@ -44,7 +50,13 @@ else()
 	message(STATUS "Setting compilation target to native binary")
 
 	find_package(SDL2 CONFIG REQUIRED)
-	message("@@@@@@@@ ${SDL2_INCLUDE_DIRS}")
+	add_subdirectory(yaml-cpp)
+	add_subdirectory(glm)
+
+	set(mathfu_build_benchmarks OFF CACHE BOOL "")
+	set(mathfu_build_tests oFF CACHE BOOL "")
+	add_subdirectory(./mathfu)
+	add_subdirectory("src/raytracer")
 endif()
 
 add_subdirectory("src/raytracer")

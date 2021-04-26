@@ -13,7 +13,7 @@ Canvas::~Canvas()
 {
 }
 
-void Canvas::writePixel(unsigned int x, unsigned int y, glm::dvec3 colour)
+void Canvas::writePixel(unsigned int x, unsigned int y, Vec3 colour)
 {
   // if (height >= width)
   pixels[y * width + x] = colour;
@@ -21,7 +21,7 @@ void Canvas::writePixel(unsigned int x, unsigned int y, glm::dvec3 colour)
   //   pixels[x * height + y] = colour;
 }
 
-glm::dvec3 Canvas::getPixel(unsigned int x, unsigned int y)
+Vec3 Canvas::getPixel(unsigned int x, unsigned int y)
 {
   // if (height >= width)
   return pixels[y * width + x];
@@ -30,11 +30,11 @@ glm::dvec3 Canvas::getPixel(unsigned int x, unsigned int y)
 
 glm::ivec3 Canvas::getPixelInt(unsigned int x, unsigned int y)
 {
-  glm::dvec3 pixel(getPixel(x, y));
+  Vec3 pixel(getPixel(x, y));
   return glm::ivec3(rbgdoubleToInt(pixel.x), rbgdoubleToInt(pixel.y), rbgdoubleToInt(pixel.z));
 }
 
-void Canvas::clear(glm::dvec3 colour)
+void Canvas::clear(Vec3 colour)
 {
   for (int i = 0; i < width * height; i++)
   {
@@ -42,7 +42,7 @@ void Canvas::clear(glm::dvec3 colour)
   }
 }
 
-uint8_t Canvas::rbgdoubleToInt(double f)
+uint8_t Canvas::rbgdoubleToInt(Float f)
 {
   uint8_t c;
   if (f < 0.0)
@@ -61,7 +61,7 @@ uint8_t Canvas::rbgdoubleToInt(double f)
   return c;
 }
 
-void Canvas::_writeRgbString(double f, bool &newLine, int &charsInLine,
+void Canvas::_writeRgbString(Float f, bool &newLine, int &charsInLine,
                              std::ofstream *streamPtr)
 {
   std::string c = std::to_string(rbgdoubleToInt(f));

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include "types.h"
 #include <glm/gtc/matrix_inverse.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 // #include <glm/gtx/string_cast.hpp>
@@ -21,47 +21,47 @@ private:
   // template <class Archive>
   // static void load_and_construct(Archive &archive, cereal::construct<Camera> &construct)
   // {
-  //   glm::dvec4 position;
-  //   glm::dvec4 centre;
-  //   glm::dvec4 up;
+  //   Vec4 position;
+  //   Vec4 centre;
+  //   Vec4 up;
 
   //   int hsize;
   //   int vsize;
-  //   double fov;
+  //   Float fov;
 
   //   archive(position, centre, up, hsize, vsize, fov);
   //   construct(position, centre, up, hsize, vsize, fov);
   // }
 
   void setPixelSize();
-  virtual glm::dvec4 normalAt(const glm::dvec4 &point) override;
-  virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) override;
+  virtual Vec4 normalAt(const Vec4 &point) override;
+  virtual Vec4 normalAt(const Vec4 &point, const Vec2 &uv) override;
   virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
-  virtual std::pair<glm::dvec4, glm::dvec4> bounds() override;
+  virtual std::pair<Vec4, Vec4> bounds() const override;
   virtual std::string type() override;
 
 public:
   Camera()
   {
   }
-  Camera(glm::dvec4 position, glm::dvec4 centre, glm::dvec4 up, int hsize,
-         int vsize, double fov);
+  Camera(Vec4 position, Vec4 centre, Vec4 up, int hsize,
+         int vsize, Float fov);
   ~Camera();
 
-  Ray rayForPixel(double px, double py, int currentRayNumber, int sqrtRaysPerPixel, double halfSubPixelSize);
+  Ray rayForPixel(Float px, Float py, int currentRayNumber, int sqrtRaysPerPixel, Float halfSubPixelSize);
   void updateTransform();
 
-  glm::dvec4 position;
-  glm::dvec4 centre;
-  glm::dvec4 up;
+  Vec4 position;
+  Vec4 centre;
+  Vec4 up;
 
   int hsize;
   int vsize;
-  double halfWidth;
-  double halfHeight;
-  double fov;
-  double pixelSize;
-  // glm::dmat4 transform;
+  Float halfWidth;
+  Float halfHeight;
+  Float fov;
+  Float pixelSize;
+  // Mat4 transform;
 };
 
 CEREAL_REGISTER_TYPE(Camera);

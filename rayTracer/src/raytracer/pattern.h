@@ -1,6 +1,6 @@
 #pragma once
 
-#include <glm/glm.hpp>
+#include "types.h"
 #include <glm/gtc/matrix_inverse.hpp>
 #include <string>
 
@@ -25,13 +25,13 @@ public:
   Pattern(const Pattern &pattern);
   virtual ~Pattern() = 0;
 
-  virtual glm::dvec3 patternAt(const glm::dvec4 &point) = 0;
-  void setTransform(glm::dmat4 transform);
-  void multiplyTransform(glm::dmat4 &transform);
+  virtual Vec3 patternAt(const Vec4 &point) = 0;
+  void setTransform(Mat4 transform);
+  void multiplyTransform(Mat4 &transform);
   void calculateInverseTranform();
 
-  glm::dmat4 transform;
-  glm::dmat4 inverseTransform;
+  Mat4 transform;
+  Mat4 inverseTransform;
   // virtual std::string type();
 };
 
@@ -48,13 +48,13 @@ private:
 public:
   ColourPattern();
   ColourPattern(const ColourPattern &colouredPattern);
-  ColourPattern(glm::dvec3 colourA, glm::dvec3 colourB);
+  ColourPattern(Vec3 colourA, Vec3 colourB);
   virtual ~ColourPattern() = 0;
 
-  glm::dvec3 colourA;
-  glm::dvec3 colourB;
+  Vec3 colourA;
+  Vec3 colourB;
 
-  void setColour(glm::dvec3 colour, int index);
+  void setColour(Vec3 colour, int index);
 };
 
 CEREAL_REGISTER_TYPE(ColourPattern);

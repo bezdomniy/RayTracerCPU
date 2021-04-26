@@ -15,7 +15,7 @@ CheckeredTexture::CheckeredTexture()
 {
 }
 
-CheckeredTexture::CheckeredTexture(glm::dvec3 colourA, glm::dvec3 colourB, int width, int height)
+CheckeredTexture::CheckeredTexture(Vec3 colourA, Vec3 colourB, int width, int height)
 {
 
     this->colourA = colourA;
@@ -28,7 +28,7 @@ CheckeredTexture::~CheckeredTexture()
 {
 }
 
-glm::dvec3 CheckeredTexture::patternAt(glm::dvec2 uv, int faceIndex)
+Vec3 CheckeredTexture::patternAt(Vec2 uv, int faceIndex)
 {
     int u2 = (int)std::floor(uv.x * this->width);
     int v2 = (int)std::floor(uv.y * this->height);
@@ -104,7 +104,7 @@ ImageTexture::~ImageTexture()
     // }
 }
 
-glm::dvec3 ImageTexture::rgbFromSurface(std::unique_ptr<Surface> &surface, int x, int y)
+Vec3 ImageTexture::rgbFromSurface(std::unique_ptr<Surface> &surface, int x, int y)
 {
     // unsigned char *p = (uint8_t *)surface->rgb + y * surface->w * surface->bpp + x * surface->bpp;
     unsigned char *p = (uint8_t *)surface->rgb.data() + y * surface->w * surface->bpp + x * surface->bpp;
@@ -114,30 +114,30 @@ glm::dvec3 ImageTexture::rgbFromSurface(std::unique_ptr<Surface> &surface, int x
     // Check little endian
     if (*(char *)&n == 1)
     {
-        double r = (p[0] / 255.);
-        double g = (p[1] / 255.);
-        double b = (p[2] / 255.);
+        Float r = (p[0] / 255.);
+        Float g = (p[1] / 255.);
+        Float b = (p[2] / 255.);
 
-        return glm::dvec3(r, g, b);
+        return Vec3(r, g, b);
     }
 
     else
     {
-        double r = (p[2] / 255.);
-        double g = (p[1] / 255.);
-        double b = (p[0] / 255.);
+        Float r = (p[2] / 255.);
+        Float g = (p[1] / 255.);
+        Float b = (p[0] / 255.);
 
-        return glm::dvec3(r, g, b);
+        return Vec3(r, g, b);
     }
 }
 
-glm::dvec3 ImageTexture::patternAt(glm::dvec2 uv, int faceIndex)
+Vec3 ImageTexture::patternAt(Vec2 uv, int faceIndex)
 {
-    double u = uv.x;
-    double v = 1. - uv.y;
+    Float u = uv.x;
+    Float v = 1. - uv.y;
 
-    double x = u * (this->textures.at(faceIndex)->w - 1);
-    double y = v * (this->textures.at(faceIndex)->h - 1);
+    Float x = u * (this->textures.at(faceIndex)->w - 1);
+    Float y = v * (this->textures.at(faceIndex)->h - 1);
 
     return rgbFromSurface(this->textures.at(faceIndex), (int)std::round(x), (int)std::round(y));
 }
