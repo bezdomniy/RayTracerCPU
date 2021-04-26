@@ -14,7 +14,7 @@
 
 #include "serialisation.h"
 
-class Shape
+class __attribute__((packed)) Shape
 {
 private:
   friend class cereal::access;
