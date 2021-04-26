@@ -198,24 +198,33 @@ void Group::addChild(std::shared_ptr<Shape> &child)
 
 void Group::updateBoundingBox(std::shared_ptr<Shape> &shape)
 {
-  std::vector<glm::dvec4> points(8);
-  const auto &bounds = shape->bounds();
-  points.at(0) = bounds.first;
-  points.at(1) = glm::dvec4(bounds.first.x, bounds.first.y, bounds.second.z, 1.);
-  points.at(2) = glm::dvec4(bounds.first.x, bounds.second.y, bounds.first.z, 1.);
-  points.at(3) = glm::dvec4(bounds.first.x, bounds.second.y, bounds.second.z, 1.);
-  points.at(4) = glm::dvec4(bounds.second.x, bounds.first.y, bounds.first.z, 1.);
-  points.at(5) = glm::dvec4(bounds.second.x, bounds.first.y, bounds.second.z, 1.);
-  points.at(6) = glm::dvec4(bounds.second.x, bounds.second.y, bounds.first.z, 1.);
-  points.at(7) = bounds.second;
-
-  glm::dmat4 transform = glm::affineInverse(shape->inverseTransform);
-
-  for (auto point : points)
+  if (shape->type() == "Triangle")
   {
-    glm::dvec4 transformedPoint(transform * point);
-    this->boundingBox.first = glm::min(this->boundingBox.first, transformedPoint);
-    this->boundingBox.second = glm::max(this->boundingBox.second, transformedPoint);
+    // glm::dvec4 transformedPoint(transform * point);
+    this->boundingBox.first = glm::min(this->boundingBox.first, shape->bounds().first);
+    this->boundingBox.second = glm::max(this->boundingBox.second, shape->bounds().second);
+  }
+  else
+  {
+    std::vector<glm::dvec4> points(8);
+    const auto &bounds = shape->bounds();
+    points.at(0) = bounds.first;
+    points.at(1) = glm::dvec4(bounds.first.x, bounds.first.y, bounds.second.z, 1.);
+    points.at(2) = glm::dvec4(bounds.first.x, bounds.second.y, bounds.first.z, 1.);
+    points.at(3) = glm::dvec4(bounds.first.x, bounds.second.y, bounds.second.z, 1.);
+    points.at(4) = glm::dvec4(bounds.second.x, bounds.first.y, bounds.first.z, 1.);
+    points.at(5) = glm::dvec4(bounds.second.x, bounds.first.y, bounds.second.z, 1.);
+    points.at(6) = glm::dvec4(bounds.second.x, bounds.second.y, bounds.first.z, 1.);
+    points.at(7) = bounds.second;
+
+    glm::dmat4 transform = glm::affineInverse(shape->inverseTransform);
+
+    for (auto point : points)
+    {
+      glm::dvec4 transformedPoint(transform * point);
+      this->boundingBox.first = glm::min(this->boundingBox.first, transformedPoint);
+      this->boundingBox.second = glm::max(this->boundingBox.second, transformedPoint);
+    }
   }
 }
 

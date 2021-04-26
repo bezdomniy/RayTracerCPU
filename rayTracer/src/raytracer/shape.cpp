@@ -31,11 +31,13 @@ std::shared_ptr<Material> &Shape::getMaterial()
 
 glm::dvec3 Shape::patternAt(const glm::dvec4 &point)
 {
-  // glm::dmat4 shapeTransformInverse(glm::affineInverse(this->transform));
-  glm::dvec4 objectPoint = this->inverseTransform * point;
+  glm::dvec4 objectPoint;
+  if (this->type() == "Triangle")
+    objectPoint = point;
+  else
+    objectPoint = this->inverseTransform * point;
 
-  glm::dmat4 patternTransformInverse(glm::affineInverse(getMaterial()->pattern->transform));
-  glm::dvec4 patternPoint = patternTransformInverse * objectPoint;
+  glm::dvec4 patternPoint = getMaterial()->pattern->inverseTransform * objectPoint;
 
   return getMaterial()->pattern->patternAt(patternPoint);
 }
@@ -48,12 +50,18 @@ glm::dvec3 Shape::patternAt(const glm::dvec4 &point)
 
 void Shape::calculateInverseTranform(glm::dmat4 &transform)
 {
+  // if (this->type() == "Triangle")
+  //   throw std::runtime_error("should not use triangle transform");
+
   glm::dmat4 currentTransform = glm::affineInverse(this->inverseTransform);
   this->inverseTransform = glm::affineInverse(transform * currentTransform);
 }
 
 void Shape::calculateInverseTranform(std::vector<glm::dmat4> &transforms)
 {
+  // if (this->type() == "Triangle")
+  //   throw std::runtime_error("should not use triangle transform");
+
   glm::dmat4 currentTransform = glm::affineInverse(this->inverseTransform);
 
   for (auto &mat : transforms)
@@ -78,13 +86,18 @@ glm::dvec4 Shape::worldToObject(const glm::dvec4 &point)
 
 glm::dvec4 Shape::normalToWorld(const glm::dvec4 &normal)
 {
-  glm::dvec4 ret = glm::transpose(this->inverseTransform) * normal;
-  ret.w = 0.0;
-  ret = glm::normalize(ret);
+  glm::dvec4 ret = normal;
+
+  if (this->type() != "Triangle")
+  {
+    ret = glm::transpose(this->inverseTransform) * normal;
+    ret.w = 0.0;
+    ret = glm::normalize(ret);
+  }
 
   if (this->parent)
   {
-    ret = this->parent->normalToWorld(ret);
+    return this->parent->normalToWorld(ret);
   }
 
   return ret;
