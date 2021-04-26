@@ -61,9 +61,6 @@ void Renderer::render(World &world)
   size_t t = std::thread::hardware_concurrency();
   std::vector<std::thread> threads;
   threads.reserve(t);
-
-  //  size_t t = std::thread::hardware_concurrency();
-  //  std::thread threads[t];
   for (int i = 0; i < t; ++i)
   {
     threads.push_back(std::thread([&]() {
