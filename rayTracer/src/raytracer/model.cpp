@@ -1,26 +1,26 @@
 #include "model.h"
 
-NodeBLAS emptyNode{glm::dvec4(-1.0), glm::dvec4(-1.0), glm::dvec4(-1.0), glm::dvec4(-1.0), glm::dvec4(-1.0), glm::dvec4(-1.0)};
-NodeTLAS emptyBounds{glm::dvec4(std::numeric_limits<double>::min()), glm::dvec4(std::numeric_limits<double>::min())};
+NodeBLAS emptyNode{Vec4(-1.0), Vec4(-1.0), Vec4(-1.0), Vec4(-1.0), Vec4(-1.0), Vec4(-1.0)};
+NodeTLAS emptyBounds{Vec4(std::numeric_limits<Float>::min()), Vec4(std::numeric_limits<Float>::min())};
 
 void mergeBounds(NodeTLAS &self, const NodeTLAS &other)
 {
-	self.first = glm::dvec4(std::min(self.first.x, other.first.x),
-							std::min(self.first.y, other.first.y),
-							std::min(self.first.z, other.first.z), 1.);
-	self.second = glm::dvec4(std::max(self.second.x, other.second.x),
-							 std::max(self.second.y, other.second.y),
-							 std::max(self.second.z, other.second.z), 1.);
+	self.first = Vec4(std::min(self.first.x, other.first.x),
+					  std::min(self.first.y, other.first.y),
+					  std::min(self.first.z, other.first.z), 1.);
+	self.second = Vec4(std::max(self.second.x, other.second.x),
+					   std::max(self.second.y, other.second.y),
+					   std::max(self.second.z, other.second.z), 1.);
 }
 
-void mergeBounds(NodeTLAS &self, const glm::dvec4 &p)
+void mergeBounds(NodeTLAS &self, const Vec4 &p)
 {
-	self.first = glm::dvec4(std::min(self.first.x, p.x),
-							std::min(self.first.y, p.y),
-							std::min(self.first.z, p.z), 1.);
-	self.second = glm::dvec4(std::max(self.second.x, p.x),
-							 std::max(self.second.y, p.y),
-							 std::max(self.second.z, p.z), 1.);
+	self.first = Vec4(std::min(self.first.x, p.x),
+					  std::min(self.first.y, p.y),
+					  std::min(self.first.z, p.z), 1.);
+	self.second = Vec4(std::max(self.second.x, p.x),
+					   std::max(self.second.y, p.y),
+					   std::max(self.second.z, p.z), 1.);
 }
 
 // TODO: refactor this to be a Shape with corresponding interface,
@@ -69,15 +69,15 @@ Model::~Model()
 void Model::recursiveBuild(std::vector<NodeBLAS> &unsortedShapes, uint32_t level, uint32_t branch, uint32_t start, uint32_t end, uint32_t tlasHeight)
 {
 	NodeTLAS centroidBounds{
-		glm::dvec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.0),
-		glm::dvec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.0)};
+		Vec4(std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), 1.0),
+		Vec4(-std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), 1.0)};
 
 	for (auto it = unsortedShapes.begin() + start; it != unsortedShapes.begin() + end; ++it)
 	{
 		mergeBounds(centroidBounds, it->bounds());
 	};
 
-	glm::dvec4 diagonal = centroidBounds.second - centroidBounds.first;
+	Vec4 diagonal = centroidBounds.second - centroidBounds.first;
 	uint32_t splitDimension;
 
 	if (diagonal.x > diagonal.y && diagonal.x > diagonal.z)
@@ -171,15 +171,15 @@ void Model::recursiveBuild(std::vector<NodeBLAS> &unsortedShapes, uint32_t level
 // 	}
 
 // 	NodeTLAS centroidBounds{
-// 		glm::dvec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.0),
-// 		glm::dvec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.0)};
+// 		Vec4(std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), 1.0),
+// 		Vec4(-std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), 1.0)};
 
 // 	for (auto it = unsortedShapes.begin() + start; it != unsortedShapes.begin() + end; ++it)
 // 	{
 // 		mergeBounds(centroidBounds, it->boundsCentroid());
 // 	};
 
-// 	glm::dvec4 diagonal = centroidBounds.second - centroidBounds.first;
+// 	Vec4 diagonal = centroidBounds.second - centroidBounds.first;
 // 	uint32_t splitDimension;
 
 // 	if (diagonal.x > diagonal.y && diagonal.x > diagonal.z)
@@ -217,10 +217,10 @@ void Model::recursiveBuild(std::vector<NodeBLAS> &unsortedShapes, uint32_t level
 // 		}
 
 // 		// Compute costs for splitting after each bucket
-// 		double cost[nBuckets - 1];
+// 		Float cost[nBuckets - 1];
 // 		for (int i = 0; i < nBuckets - 1; ++i)
 // 		{
-// 			std::pair<glm::dvec4, glm::dvec4> b0, b1;
+// 			std::pair<Vec4, Vec4> b0, b1;
 // 			int count0 = 0, count1 = 0;
 // 			for (int j = 0; j <= i; ++j)
 // 			{
@@ -233,9 +233,9 @@ void Model::recursiveBuild(std::vector<NodeBLAS> &unsortedShapes, uint32_t level
 // 				count1 += buckets[j].count;
 // 			}
 
-// 			std::pair<glm::dvec4, glm::dvec4> bounds{
-// 				glm::vec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.f),
-// 				glm::vec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.f)};
+// 			std::pair<Vec4, Vec4> bounds{
+// 				glm::vec4(std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), 1.f),
+// 				glm::vec4(-std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), 1.f)};
 
 // 			for (auto it = unsortedShapes.begin() + start; it != unsortedShapes.begin() + end; ++it)
 // 				mergeBounds(bounds, it->bounds());
@@ -247,7 +247,7 @@ void Model::recursiveBuild(std::vector<NodeBLAS> &unsortedShapes, uint32_t level
 // 		}
 
 // 		// Find bucket to split at that minimizes SAH metric
-// 		double minCost = cost[0];
+// 		Float minCost = cost[0];
 // 		int minCostSplitBucket = 0;
 // 		for (int i = 1; i < nBuckets - 1; ++i)
 // 		{
@@ -260,7 +260,7 @@ void Model::recursiveBuild(std::vector<NodeBLAS> &unsortedShapes, uint32_t level
 
 // 		// Either create leaf or split primitives at selected SAH
 // 		// bucket
-// 		double leafCost = nShapes;
+// 		Float leafCost = nShapes;
 // 		if (nShapes > maxPrimsInNode || minCost < leafCost)
 // 		{
 // 			auto pmid = std::partition(
@@ -350,36 +350,36 @@ std::vector<NodeBLAS> Model::parseObjFile(std::string const &path)
 	std::vector<unsigned int> vertexIndices;
 	//    std::vector<unsigned int> uvIndices;
 	std::vector<unsigned int> normalIndices;
-	std::vector<glm::dvec3> temp_vertices;
-	// std::vector<glm::dvec2> temp_uvs;
-	std::vector<glm::dvec3> temp_normals;
+	std::vector<Vec3> temp_vertices;
+	// std::vector<Vec2> temp_uvs;
+	std::vector<Vec3> temp_normals;
 
 	while (std::getline(in, line))
 	{
 		if (line.substr(0, 2) == "v ")
 		{
 			std::istringstream v(line.substr(2));
-			glm::dvec3 vertex;
+			Vec3 vertex;
 
-			double x, y, z;
+			Float x, y, z;
 			v >> x;
 			v >> y;
 			v >> z;
 
-			vertex = glm::dvec3(x, y, z);
+			vertex = Vec3(x, y, z);
 			temp_vertices.push_back(vertex);
 		}
 		else if (line.substr(0, 2) == "vn")
 		{
 			std::istringstream vn(line.substr(3));
-			glm::dvec3 normal;
+			Vec3 normal;
 
-			double x, y, z;
+			Float x, y, z;
 			vn >> x;
 			vn >> y;
 			vn >> z;
 
-			normal = glm::dvec3(x, y, z);
+			normal = Vec3(x, y, z);
 			temp_normals.push_back(normal);
 		}
 		else if (line.substr(0, 2) == "f ")
@@ -425,11 +425,11 @@ std::vector<NodeBLAS> Model::parseObjFile(std::string const &path)
 		else if (line.substr(0, 2) == "vt")
 		{
 			// std::istringstream vt(line.substr(3));
-			// glm::dvec2 uv;
+			// Vec2 uv;
 			// int U, V;
 			// vt >> U;
 			// vt >> V;
-			// uv = glm::dvec2(U, V);
+			// uv = Vec2(U, V);
 			// temp_uvs.push_back(uv);
 		}
 	}
@@ -443,9 +443,9 @@ std::vector<NodeBLAS> Model::parseObjFile(std::string const &path)
 
 		if (temp_normals.empty())
 		{
-			glm::dvec3 e1 = temp_vertices[vertexIndices[i + 1] - 1] - temp_vertices[vertexIndices[i] - 1];
-			glm::dvec3 e2 = temp_vertices[vertexIndices[i + 2] - 1] - temp_vertices[vertexIndices[i] - 1];
-			glm::dvec4 normal = glm::dvec4(glm::normalize(glm::cross(e2, e1)), 0.0);
+			Vec3 e1 = temp_vertices[vertexIndices[i + 1] - 1] - temp_vertices[vertexIndices[i] - 1];
+			Vec3 e2 = temp_vertices[vertexIndices[i + 2] - 1] - temp_vertices[vertexIndices[i] - 1];
+			Vec4 normal = Vec4(glm::normalize(glm::cross(e2, e1)), 0.0);
 
 			nextNode = NodeBLAS(
 				temp_vertices[vertexIndices[i] - 1],
@@ -483,7 +483,7 @@ void Model::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &i
 	Node nextNode{0, 0};
 	stack.push_back(nextNode);
 
-	double resT = -1.0;
+	Float resT = -1.0;
 
 	while (!stack.empty())
 	{
@@ -511,8 +511,8 @@ void Model::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &i
 		{
 			// primitiveIndices[topPrimivitiveIndices] = nextNode.branch * 2;
 			// topPrimivitiveIndices += 1;
-			double t1 = -1.0;
-			double t2 = -1.0;
+			Float t1 = -1.0;
+			Float t2 = -1.0;
 			int primIdx = nextNode.branch * 2;
 
 			blas[primIdx].intersectRay(transformedRay, intersections);
@@ -537,40 +537,40 @@ void Model::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &i
 	}
 }
 
-glm::dvec4 Model::normalAt(const glm::dvec4 &point)
+Vec4 Model::normalAt(const Vec4 &point)
 {
-	glm::dvec4 objectPoint = worldToObject(point);
-	glm::dvec4 objectNormal;
+	Vec4 objectPoint = worldToObject(point);
+	Vec4 objectNormal;
 
-	// double points[3] = {std::abs(objectPoint.x), std::abs(objectPoint.y), std::abs(objectPoint.z)};
+	// Float points[3] = {std::abs(objectPoint.x), std::abs(objectPoint.y), std::abs(objectPoint.z)};
 	// const int N = sizeof(points) / sizeof(double);
 	// int indexMaxC = std::distance(points, std::max_element(points, points + N));
 
 	// if (indexMaxC == 0)
-	// 	objectNormal = glm::normalize(glm::dvec4(objectPoint.x, 0.0, 0.0, 0.0));
+	// 	objectNormal = glm::normalize(Vec4(objectPoint.x, 0.0, 0.0, 0.0));
 	// else if (indexMaxC == 1)
-	// 	objectNormal = glm::normalize(glm::dvec4(0.0, objectPoint.y, 0.0, 0.0));
+	// 	objectNormal = glm::normalize(Vec4(0.0, objectPoint.y, 0.0, 0.0));
 	// else
-	// 	objectNormal = glm::normalize(glm::dvec4(0.0, 0.0, objectPoint.z, 0.0));
+	// 	objectNormal = glm::normalize(Vec4(0.0, 0.0, objectPoint.z, 0.0));
 
 	return normalToWorld(objectNormal);
 }
 
-glm::dvec4 Model::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
+Vec4 Model::normalAt(const Vec4 &point, const Vec2 &uv)
 {
 	return normalAt(point);
 }
 
-std::pair<glm::dvec4, glm::dvec4> Model::bounds() const
+std::pair<Vec4, Vec4> Model::bounds() const
 {
-	return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(-1., -1., -1., 1.), glm::dvec4(1., 1., 1., 1.));
+	return std::pair<Vec4, Vec4>(Vec4(-1., -1., -1., 1.), Vec4(1., 1., 1., 1.));
 }
 
 bool Model::intersectAABB(const Ray &ray, const NodeTLAS &aabb)
 {
-	double t_min = -std::numeric_limits<double>::infinity();
-	double t_max = std::numeric_limits<double>::infinity();
-	double temp, invD, t0, t1;
+	Float t_min = -std::numeric_limits<Float>::infinity();
+	Float t_max = std::numeric_limits<Float>::infinity();
+	Float temp, invD, t0, t1;
 
 	for (int a = 0; a < 3; a++)
 	{

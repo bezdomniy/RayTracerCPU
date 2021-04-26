@@ -11,8 +11,8 @@ void Cube::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &in
 {
     Ray transformedRay = transformRay(ray);
 
-    double tmin = -std::numeric_limits<double>::infinity();
-    double tmax = std::numeric_limits<double>::infinity();
+    Float tmin = -std::numeric_limits<Float>::infinity();
+    Float tmax = std::numeric_limits<Float>::infinity();
 
     for (int a = 0; a < 3; a++)
     {
@@ -31,34 +31,34 @@ void Cube::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &in
     intersections.push_back(Geometry::Intersection<Shape>{tmax, this});
 }
 
-glm::dvec4 Cube::normalAt(const glm::dvec4 &point)
+Vec4 Cube::normalAt(const Vec4 &point)
 {
-    // glm::dmat4 transformInverse(glm::affineInverse(this->transform));
-    glm::dvec4 objectPoint = worldToObject(point);
-    glm::dvec4 objectNormal;
+    // Mat4 transformInverse(glm::affineInverse(this->transform));
+    Vec4 objectPoint = worldToObject(point);
+    Vec4 objectNormal;
 
-    double points[3] = {std::abs(objectPoint.x), std::abs(objectPoint.y), std::abs(objectPoint.z)};
-    const int N = sizeof(points) / sizeof(double);
+    Float points[3] = {std::abs(objectPoint.x), std::abs(objectPoint.y), std::abs(objectPoint.z)};
+    const int N = sizeof(points) / sizeof(Float);
     int indexMaxC = std::distance(points, std::max_element(points, points + N));
 
     if (indexMaxC == 0)
-        objectNormal = glm::normalize(glm::dvec4(objectPoint.x, 0.0, 0.0, 0.0));
+        objectNormal = glm::normalize(Vec4(objectPoint.x, 0.0, 0.0, 0.0));
     else if (indexMaxC == 1)
-        objectNormal = glm::normalize(glm::dvec4(0.0, objectPoint.y, 0.0, 0.0));
+        objectNormal = glm::normalize(Vec4(0.0, objectPoint.y, 0.0, 0.0));
     else
-        objectNormal = glm::normalize(glm::dvec4(0.0, 0.0, objectPoint.z, 0.0));
+        objectNormal = glm::normalize(Vec4(0.0, 0.0, objectPoint.z, 0.0));
 
     return normalToWorld(objectNormal);
 }
 
-glm::dvec4 Cube::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
+Vec4 Cube::normalAt(const Vec4 &point, const Vec2 &uv)
 {
     return normalAt(point);
 }
 
-std::pair<glm::dvec4, glm::dvec4> Cube::bounds() const
+std::pair<Vec4, Vec4> Cube::bounds() const
 {
-    return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(-1., -1., -1., 1.), glm::dvec4(1., 1., 1., 1.));
+    return std::pair<Vec4, Vec4>(Vec4(-1., -1., -1., 1.), Vec4(1., 1., 1., 1.));
 }
 
 std::string Cube::type()

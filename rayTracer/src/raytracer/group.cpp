@@ -2,7 +2,7 @@
 
 Group::Group(/* args */) : Shape()
 {
-  this->boundingBox = std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.), glm::dvec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.));
+  this->boundingBox = std::pair<Vec4, Vec4>(Vec4(std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), 1.), Vec4(-std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), 1.));
 }
 
 Group::~Group()
@@ -23,7 +23,7 @@ void Group::build(std::vector<std::shared_ptr<Shape>> &shapes, bool bvh)
   }
   else
   {
-    this->boundingBox = std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.), glm::dvec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.));
+    this->boundingBox = std::pair<Vec4, Vec4>(Vec4(std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), 1.), Vec4(-std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), 1.));
 
     for (auto &shape : shapes)
     {
@@ -126,14 +126,14 @@ void Group::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &i
   return;
 }
 
-glm::dvec4 Group::normalAt(const glm::dvec4 &point)
+Vec4 Group::normalAt(const Vec4 &point)
 {
   throw std::runtime_error("group shouldn't call normal function");
-  glm::dvec4 objectPoint = this->inverseTransform * point;
-  return glm::normalize(glm::dvec4());
+  Vec4 objectPoint = this->inverseTransform * point;
+  return glm::normalize(Vec4());
 }
 
-glm::dvec4 Group::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
+Vec4 Group::normalAt(const Vec4 &point, const Vec2 &uv)
 {
   return normalAt(point);
 }
@@ -200,43 +200,43 @@ void Group::updateBoundingBox(std::shared_ptr<Shape> &shape)
 {
   if (shape->type() == "Triangle")
   {
-    // glm::dvec4 transformedPoint(transform * point);
+    // Vec4 transformedPoint(transform * point);
     this->boundingBox.first = glm::min(this->boundingBox.first, shape->bounds().first);
     this->boundingBox.second = glm::max(this->boundingBox.second, shape->bounds().second);
   }
   else
   {
-    std::vector<glm::dvec4> points(8);
+    std::vector<Vec4> points(8);
     const auto &bounds = shape->bounds();
     points.at(0) = bounds.first;
-    points.at(1) = glm::dvec4(bounds.first.x, bounds.first.y, bounds.second.z, 1.);
-    points.at(2) = glm::dvec4(bounds.first.x, bounds.second.y, bounds.first.z, 1.);
-    points.at(3) = glm::dvec4(bounds.first.x, bounds.second.y, bounds.second.z, 1.);
-    points.at(4) = glm::dvec4(bounds.second.x, bounds.first.y, bounds.first.z, 1.);
-    points.at(5) = glm::dvec4(bounds.second.x, bounds.first.y, bounds.second.z, 1.);
-    points.at(6) = glm::dvec4(bounds.second.x, bounds.second.y, bounds.first.z, 1.);
+    points.at(1) = Vec4(bounds.first.x, bounds.first.y, bounds.second.z, 1.);
+    points.at(2) = Vec4(bounds.first.x, bounds.second.y, bounds.first.z, 1.);
+    points.at(3) = Vec4(bounds.first.x, bounds.second.y, bounds.second.z, 1.);
+    points.at(4) = Vec4(bounds.second.x, bounds.first.y, bounds.first.z, 1.);
+    points.at(5) = Vec4(bounds.second.x, bounds.first.y, bounds.second.z, 1.);
+    points.at(6) = Vec4(bounds.second.x, bounds.second.y, bounds.first.z, 1.);
     points.at(7) = bounds.second;
 
     glm::dmat4 transform = glm::affineInverse(shape->inverseTransform);
 
     for (auto point : points)
     {
-      glm::dvec4 transformedPoint(transform * point);
+      Vec4 transformedPoint(transform * point);
       this->boundingBox.first = glm::min(this->boundingBox.first, transformedPoint);
       this->boundingBox.second = glm::max(this->boundingBox.second, transformedPoint);
     }
   }
 }
 
-std::pair<glm::dvec4, glm::dvec4> Group::bounds() const
+std::pair<Vec4, Vec4> Group::bounds() const
 {
   return this->boundingBox;
 }
 
 bool Group::boundIntersection(Ray &transformedRay)
 {
-  double t_min = -std::numeric_limits<double>::infinity();
-  double t_max = std::numeric_limits<double>::infinity();
+  Float t_min = -std::numeric_limits<Float>::infinity();
+  Float t_max = std::numeric_limits<Float>::infinity();
 
   for (int a = 0; a < 3; a++)
   {
@@ -252,34 +252,34 @@ bool Group::boundIntersection(Ray &transformedRay)
   }
   return true;
 
-  // std::pair<double, double> xtminmax = Geometry::checkAxis<double>(transformedRay.origin.x, transformedRay.direction.x, this->boundingBox.first.x, this->boundingBox.second.x);
-  // std::pair<double, double> ytminmax = Geometry::checkAxis<double>(transformedRay.origin.y, transformedRay.direction.y, this->boundingBox.first.y, this->boundingBox.second.y);
-  // std::pair<double, double> ztminmax = Geometry::checkAxis<double>(transformedRay.origin.z, transformedRay.direction.z, this->boundingBox.first.z, this->boundingBox.second.z);
+  // std::pair<double, double> xtminmax = Geometry::checkAxis<Float>(transformedRay.origin.x, transformedRay.direction.x, this->boundingBox.first.x, this->boundingBox.second.x);
+  // std::pair<double, double> ytminmax = Geometry::checkAxis<Float>(transformedRay.origin.y, transformedRay.direction.y, this->boundingBox.first.y, this->boundingBox.second.y);
+  // std::pair<double, double> ztminmax = Geometry::checkAxis<Float>(transformedRay.origin.z, transformedRay.direction.z, this->boundingBox.first.z, this->boundingBox.second.z);
 
-  // double tmin = std::max({xtminmax.first, ytminmax.first, ztminmax.first});
-  // double tmax = std::min({xtminmax.second, ytminmax.second, ztminmax.second});
+  // Float tmin = std::max({xtminmax.first, ytminmax.first, ztminmax.first});
+  // Float tmax = std::min({xtminmax.second, ytminmax.second, ztminmax.second});
 
   // return !(tmin > tmax);
 }
 
-std::pair<glm::dvec4, glm::dvec4> Group::mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const std::pair<glm::dvec4, glm::dvec4> b2)
+std::pair<Vec4, Vec4> Group::mergeBounds(const std::pair<Vec4, Vec4> b1, const std::pair<Vec4, Vec4> b2)
 {
-  return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::min(b1.first.x, b2.first.x),
-                                                      std::min(b1.first.y, b2.first.y),
-                                                      std::min(b1.first.z, b2.first.z), 1.),
-                                           glm::dvec4(std::max(b1.second.x, b2.second.x),
-                                                      std::max(b1.second.y, b2.second.y),
-                                                      std::max(b1.second.z, b2.second.z), 1.));
+  return std::pair<Vec4, Vec4>(Vec4(std::min(b1.first.x, b2.first.x),
+                                    std::min(b1.first.y, b2.first.y),
+                                    std::min(b1.first.z, b2.first.z), 1.),
+                               Vec4(std::max(b1.second.x, b2.second.x),
+                                    std::max(b1.second.y, b2.second.y),
+                                    std::max(b1.second.z, b2.second.z), 1.));
 }
 
-std::pair<glm::dvec4, glm::dvec4> Group::mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const glm::dvec4 p)
+std::pair<Vec4, Vec4> Group::mergeBounds(const std::pair<Vec4, Vec4> b1, const Vec4 p)
 {
-  return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(std::min(b1.first.x, p.x),
-                                                      std::min(b1.first.y, p.y),
-                                                      std::min(b1.first.z, p.z), 1.),
-                                           glm::dvec4(std::max(b1.second.x, p.x),
-                                                      std::max(b1.second.y, p.y),
-                                                      std::max(b1.second.z, p.z), 1.));
+  return std::pair<Vec4, Vec4>(Vec4(std::min(b1.first.x, p.x),
+                                    std::min(b1.first.y, p.y),
+                                    std::min(b1.first.z, p.z), 1.),
+                               Vec4(std::max(b1.second.x, p.x),
+                                    std::max(b1.second.y, p.y),
+                                    std::max(b1.second.z, p.z), 1.));
 }
 
 std::shared_ptr<Group> Group::recursiveBuild(std::vector<std::shared_ptr<Shape>> &shapes, uint32_t start, uint32_t end)
@@ -309,16 +309,16 @@ std::shared_ptr<Group> Group::recursiveBuild(std::vector<std::shared_ptr<Shape>>
   }
   else
   {
-    // std::pair<glm::dvec4, glm::dvec4> centroidBounds;
-    std::pair<glm::dvec4, glm::dvec4> centroidBounds{
-        glm::vec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.f),
-        glm::vec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.f)};
+    // std::pair<Vec4, Vec4> centroidBounds;
+    std::pair<Vec4, Vec4> centroidBounds{
+        Vec4(std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), 1.f),
+        Vec4(-std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), 1.f)};
 
     //for (const auto &shape : shapes)
     for (auto it = shapes.begin() + start; it != shapes.begin() + end; ++it)
       centroidBounds = mergeBounds(centroidBounds, (*it)->boundsCentroid());
 
-    glm::dvec4 diagonal = centroidBounds.second - centroidBounds.first;
+    Vec4 diagonal = centroidBounds.second - centroidBounds.first;
     int splitDimension;
 
     if (diagonal.x > diagonal.y && diagonal.x > diagonal.z)
@@ -379,10 +379,10 @@ std::shared_ptr<Group> Group::recursiveBuild(std::vector<std::shared_ptr<Shape>>
           }
 
           // Compute costs for splitting after each bucket
-          double cost[nBuckets - 1];
+          Float cost[nBuckets - 1];
           for (int i = 0; i < nBuckets - 1; ++i)
           {
-            std::pair<glm::dvec4, glm::dvec4> b0, b1;
+            std::pair<Vec4, Vec4> b0, b1;
             int count0 = 0, count1 = 0;
             for (int j = 0; j <= i; ++j)
             {
@@ -395,9 +395,9 @@ std::shared_ptr<Group> Group::recursiveBuild(std::vector<std::shared_ptr<Shape>>
               count1 += buckets[j].count;
             }
 
-            std::pair<glm::dvec4, glm::dvec4> bounds{
-                glm::vec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.f),
-                glm::vec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.f)};
+            std::pair<Vec4, Vec4> bounds{
+                Vec4(std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), 1.f),
+                Vec4(-std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), 1.f)};
 
             for (auto it = shapes.begin() + start; it != shapes.begin() + end; ++it)
               bounds = mergeBounds(bounds, (*it)->bounds());
@@ -409,7 +409,7 @@ std::shared_ptr<Group> Group::recursiveBuild(std::vector<std::shared_ptr<Shape>>
           }
 
           // Find bucket to split at that minimizes SAH metric
-          double minCost = cost[0];
+          Float minCost = cost[0];
           int minCostSplitBucket = 0;
           for (int i = 1; i < nBuckets - 1; ++i)
           {

@@ -1,8 +1,8 @@
 #include "geometry.h"
 
-glm::dvec4 Geometry::offset(const glm::dvec4 &p, const std::pair<glm::dvec4, glm::dvec4> &bounds)
+Vec4 Geometry::offset(const Vec4 &p, const std::pair<Vec4, Vec4> &bounds)
 {
-    glm::dvec4 o = p - bounds.first;
+    Vec4 o = p - bounds.first;
     if (bounds.second.x > bounds.first.x)
         o.x /= bounds.second.x - bounds.first.x;
     if (bounds.second.y > bounds.first.y)
@@ -12,11 +12,11 @@ glm::dvec4 Geometry::offset(const glm::dvec4 &p, const std::pair<glm::dvec4, glm
     return o;
 }
 
-glm::dvec4 Geometry::diagonal(const std::pair<glm::dvec4, glm::dvec4> &bounds) { return bounds.second - bounds.first; }
+Vec4 Geometry::diagonal(const std::pair<Vec4, Vec4> &bounds) { return bounds.second - bounds.first; }
 
-double Geometry::surfaceArea(const std::pair<glm::dvec4, glm::dvec4> &bounds)
+Float Geometry::surfaceArea(const std::pair<Vec4, Vec4> &bounds)
 {
-    glm::dvec4 d = diagonal(bounds);
+    Vec4 d = diagonal(bounds);
     return 2.0 * (d.x * d.y + d.x * d.z + d.y * d.z);
 }
 

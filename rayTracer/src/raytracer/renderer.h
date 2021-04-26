@@ -22,7 +22,7 @@
 #endif
 
 #include <algorithm>
-#include <glm/glm.hpp>
+#include "types.h"
 #include <glm/gtc/quaternion.hpp>
 #include <iostream>
 #include <memory>
@@ -47,22 +47,22 @@ public:
   static const int RAYS_PER_PIXEL = 1;
   // TODO static constexpr below
   int sqrtRaysPerPixel = (int)std::sqrt(RAYS_PER_PIXEL);
-  double halfSubPixelSize = 1.0 / (double)sqrtRaysPerPixel / 2.0;
+  Float halfSubPixelSize = 1.0 / (Float)sqrtRaysPerPixel / 2.0;
 
   Canvas canvas;
 
-  glm::dvec3 rayColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
-  glm::dvec3 pathColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
-  glm::dvec3 reflectColour(Geometry::IntersectionParameters &comps, double reflective,
-                           World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
-  glm::dvec3 lighting(Shape *shape, std::shared_ptr<PointLight> &light,
-                      glm::dvec4 &point, glm::dvec4 &eyev, glm::dvec4 &normalv,
-                      bool &inShadow);
-  glm::dvec3 lighting(Shape *shape, glm::dvec4 &point);
-  glm::dvec3 shadeHit(Geometry::Intersection<Shape> *hit, Geometry::IntersectionParameters &comps, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
-  glm::dvec3 refractedColour(Geometry::IntersectionParameters &comps, double transparency,
-                             World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
-  bool isShadowed(glm::dvec4 &point, std::vector<Geometry::Intersection<Shape>> &intersections, World &world, std::shared_ptr<PointLight> &light);
+  Vec3 rayColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
+  Vec3 pathColourAt(Ray &ray, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
+  Vec3 reflectColour(Geometry::IntersectionParameters &comps, Float reflective,
+                     World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
+  Vec3 lighting(Shape *shape, std::shared_ptr<PointLight> &light,
+                Vec4 &point, Vec4 &eyev, Vec4 &normalv,
+                bool &inShadow);
+  Vec3 lighting(Shape *shape, Vec4 &point);
+  Vec3 shadeHit(Geometry::Intersection<Shape> *hit, Geometry::IntersectionParameters &comps, World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
+  Vec3 refractedColour(Geometry::IntersectionParameters &comps, Float transparency,
+                       World &world, std::vector<Geometry::Intersection<Shape>> &intersections, short remaining);
+  bool isShadowed(Vec4 &point, std::vector<Geometry::Intersection<Shape>> &intersections, World &world, std::shared_ptr<PointLight> &light);
 
   void render(World &world);
   void renderPixel(World &world, const std::pair<int, int> &pixel);

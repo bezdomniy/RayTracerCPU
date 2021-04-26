@@ -3,7 +3,7 @@
 Shape::Shape()
 {
   // this->transform = glm::dmat4(1.0);
-  this->inverseTransform = glm::dmat4(1.0);
+  this->inverseTransform = Mat4(1.0);
 }
 
 Ray Shape::transformRay(Ray &ray)
@@ -29,40 +29,34 @@ std::shared_ptr<Material> &Shape::getMaterial()
   return material;
 }
 
-glm::dvec3 Shape::patternAt(const glm::dvec4 &point)
+Vec3 Shape::patternAt(const Vec4 &point)
 {
-  glm::dvec4 objectPoint;
+  Vec4 objectPoint;
   if (this->type() == "Triangle")
     objectPoint = point;
   else
     objectPoint = this->inverseTransform * point;
 
-  glm::dvec4 patternPoint = getMaterial()->pattern->inverseTransform * objectPoint;
+  Vec4 patternPoint = getMaterial()->pattern->inverseTransform * objectPoint;
 
   return getMaterial()->pattern->patternAt(patternPoint);
 }
 
-// void Shape::multiplyTransform(glm::dmat4 &transform)
-// {
-//   // this->transform = transform * this->transform;
-//   // this->inverseTransform = glm::affineInverse(this->transform);
-// }
-
-void Shape::calculateInverseTranform(glm::dmat4 &transform)
+void Shape::calculateInverseTranform(Mat4 &transform)
 {
   // if (this->type() == "Triangle")
   //   throw std::runtime_error("should not use triangle transform");
 
-  glm::dmat4 currentTransform = glm::affineInverse(this->inverseTransform);
+  Mat4 currentTransform = glm::affineInverse(this->inverseTransform);
   this->inverseTransform = glm::affineInverse(transform * currentTransform);
 }
 
-void Shape::calculateInverseTranform(std::vector<glm::dmat4> &transforms)
+void Shape::calculateInverseTranform(std::vector<Mat4> &transforms)
 {
   // if (this->type() == "Triangle")
   //   throw std::runtime_error("should not use triangle transform");
 
-  glm::dmat4 currentTransform = glm::affineInverse(this->inverseTransform);
+  Mat4 currentTransform = glm::affineInverse(this->inverseTransform);
 
   for (auto &mat : transforms)
   {
@@ -72,7 +66,7 @@ void Shape::calculateInverseTranform(std::vector<glm::dmat4> &transforms)
   this->inverseTransform = glm::affineInverse(currentTransform);
 }
 
-glm::dvec4 Shape::worldToObject(const glm::dvec4 &point)
+Vec4 Shape::worldToObject(const Vec4 &point)
 {
   if (this->parent)
   {
@@ -84,9 +78,9 @@ glm::dvec4 Shape::worldToObject(const glm::dvec4 &point)
   return this->inverseTransform * point;
 }
 
-glm::dvec4 Shape::normalToWorld(const glm::dvec4 &normal)
+Vec4 Shape::normalToWorld(const Vec4 &normal)
 {
-  glm::dvec4 ret = normal;
+  Vec4 ret = normal;
 
   if (this->type() != "Triangle")
   {
@@ -103,10 +97,11 @@ glm::dvec4 Shape::normalToWorld(const glm::dvec4 &normal)
   return ret;
 }
 
-glm::dvec4 Shape::boundsCentroid() const
+Vec4 Shape::boundsCentroid() const
 {
-  const std::pair<glm::dvec4, glm::dvec4> b = bounds();
-  return .5 * b.first + .5 * b.second;
+  const std::pair<Vec4, Vec4> b = bounds();
+  Float half = 0.5;
+  return half * b.first + half * b.second;
 }
 
 Shape::~Shape()

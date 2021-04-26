@@ -4,7 +4,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #define _CRT_SECURE_NO_WARNINGS
 
-#include <glm/glm.hpp>
+#include "types.h"
 // #include <glm/gtx/intersect.hpp>
 
 #include <glm/gtc/matrix_access.hpp>
@@ -33,31 +33,31 @@ namespace Geometry
   //   return ++n;
   // }
 
-  static const double EPSILON = 0.000000001;
-  // static const double EPSILON = std::numeric_limits<double>::epsilon();
+  static const Float EPSILON = 0.000000001;
+  // static const Float EPSILON = std::numeric_limits<Float>::epsilon();
   struct IntersectionParameters
   {
-    glm::dvec4 point;
-    glm::dvec4 normalv;
-    glm::dvec4 eyev;
-    glm::dvec4 reflectv;
-    glm::dvec4 overPoint;
-    glm::dvec4 underPoint;
-    double n1;
-    double n2;
+    Vec4 point;
+    Vec4 normalv;
+    Vec4 eyev;
+    Vec4 reflectv;
+    Vec4 overPoint;
+    Vec4 underPoint;
+    Float n1;
+    Float n2;
     // bool inside; //TODO find way to remove
   };
 
   template <typename T>
   struct Intersection
   {
-    double t;
+    Float t;
     T *shapePtr;
-    glm::dvec2 uv;
+    Vec2 uv;
     //    unsigned int id;
     //    IntersectionParameters *comps;
 
-    // Intersection(double t, T *shapePtr, glm::dvec2 uv)
+    // Intersection(Float t, T *shapePtr, Vec2 uv)
     // {
     //   this->t = t;
     //   this->shapePtr = shapePtr;
@@ -65,7 +65,7 @@ namespace Geometry
     //   this->id = unique_id();
     // }
 
-    // Intersection(double t, T *shapePtr)
+    // Intersection(Float t, T *shapePtr)
     // {
     //   this->t = t;
     //   this->shapePtr = shapePtr;
@@ -117,7 +117,7 @@ namespace Geometry
   }
 
   template <typename T>
-  IntersectionParameters getIntersectionParameters(Intersection<T> &intersection, glm::dvec4 &rayOrigin, glm::dvec4 &rayDirection,
+  IntersectionParameters getIntersectionParameters(Intersection<T> &intersection, Vec4 &rayOrigin, Vec4 &rayDirection,
                                                    std::vector<Intersection<T>> &intersections)
   {
     // intersection.comps = std::make_unique<IntersectionParameters>();
@@ -193,34 +193,34 @@ namespace Geometry
   }
 
   template <typename T>
-  double schlick(IntersectionParameters &comps)
+  Float schlick(IntersectionParameters &comps)
   {
-    double cos = glm::dot(comps.eyev, comps.normalv);
+    Float cos = glm::dot(comps.eyev, comps.normalv);
     if (comps.n1 > comps.n2)
     {
-      double n = comps.n1 / comps.n2;
-      double sin2T = std::pow(n, 2) * (1.0 - std::pow(cos, 2));
+      Float n = comps.n1 / comps.n2;
+      Float sin2T = std::pow(n, 2) * (1.0 - std::pow(cos, 2));
       if (sin2T > 1.0)
         return 1.0;
 
-      double cosT = std::sqrt(1.0 - sin2T);
+      Float cosT = std::sqrt(1.0 - sin2T);
       cos = cosT;
     }
-    double r0 = std::pow((comps.n1 - comps.n2) / (comps.n1 + comps.n2), 2);
+    Float r0 = std::pow((comps.n1 - comps.n2) / (comps.n1 + comps.n2), 2);
     return r0 + (1.0 - r0) * std::pow(1.0 - cos, 5);
   }
 
   struct BucketInfo
   {
     int count = 0;
-    std::pair<glm::dvec4, glm::dvec4> bounds;
+    std::pair<Vec4, Vec4> bounds;
   };
 
-  glm::dvec4 offset(const glm::dvec4 &p, const std::pair<glm::dvec4, glm::dvec4> &bounds);
+  Vec4 offset(const Vec4 &p, const std::pair<Vec4, Vec4> &bounds);
 
-  glm::dvec4 diagonal(const std::pair<glm::dvec4, glm::dvec4> &bounds);
+  Vec4 diagonal(const std::pair<Vec4, Vec4> &bounds);
 
-  double surfaceArea(const std::pair<glm::dvec4, glm::dvec4> &bounds);
+  Float surfaceArea(const std::pair<Vec4, Vec4> &bounds);
 
   uint32_t nextPowerOfTwo(uint32_t v);
 

@@ -27,8 +27,8 @@ private:
 
     bool boundIntersection(Ray &transformedRay);
 
-    std::pair<glm::dvec4, glm::dvec4> mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const std::pair<glm::dvec4, glm::dvec4> b2);
-    std::pair<glm::dvec4, glm::dvec4> mergeBounds(const std::pair<glm::dvec4, glm::dvec4> b1, const glm::dvec4 p);
+    std::pair<Vec4, Vec4> mergeBounds(const std::pair<Vec4, Vec4> b1, const std::pair<Vec4, Vec4> b2);
+    std::pair<Vec4, Vec4> mergeBounds(const std::pair<Vec4, Vec4> b1, const Vec4 p);
     std::shared_ptr<Group> recursiveBuild(std::vector<std::shared_ptr<Shape>> &shapes, uint32_t start, uint32_t end);
 
 public:
@@ -38,7 +38,7 @@ public:
     ~Group();
 
     std::vector<std::shared_ptr<Shape>> children;
-    std::pair<glm::dvec4, glm::dvec4> boundingBox;
+    std::pair<Vec4, Vec4> boundingBox;
 
     void updateBoundingBox(std::shared_ptr<Shape> &shape);
 
@@ -46,9 +46,9 @@ public:
     void setMaterial(std::shared_ptr<Material> &mat) override;
 
     virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
-    virtual glm::dvec4 normalAt(const glm::dvec4 &point) override;
-    virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) override;
-    virtual std::pair<glm::dvec4, glm::dvec4> bounds() const override;
+    virtual Vec4 normalAt(const Vec4 &point) override;
+    virtual Vec4 normalAt(const Vec4 &point, const Vec2 &uv) override;
+    virtual std::pair<Vec4, Vec4> bounds() const override;
     virtual std::string type() override;
 };
 

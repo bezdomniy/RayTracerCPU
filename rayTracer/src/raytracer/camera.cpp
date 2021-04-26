@@ -1,7 +1,7 @@
 #include "camera.h"
 
-Camera::Camera(glm::dvec4 position, glm::dvec4 centre, glm::dvec4 up, int hsize,
-               int vsize, double fov) : Shape()
+Camera::Camera(Vec4 position, Vec4 centre, Vec4 up, int hsize,
+               int vsize, Float fov) : Shape()
 {
   this->position = position;
   this->centre = centre;
@@ -16,8 +16,8 @@ Camera::Camera(glm::dvec4 position, glm::dvec4 centre, glm::dvec4 up, int hsize,
 
 void Camera::updateTransform()
 {
-  glm::dmat4 transform = glm::lookAt(glm::dvec3(position),
-                                     glm::dvec3(this->centre), glm::dvec3(this->up));
+  Mat4 transform = glm::lookAt(Vec3(position),
+                               Vec3(this->centre), Vec3(this->up));
   this->inverseTransform = glm::affineInverse(transform);
 }
 
@@ -25,8 +25,8 @@ Camera::~Camera() {}
 
 void Camera::setPixelSize()
 {
-  double halfView = glm::tan(this->fov / 2);
-  double aspect = (double)this->hsize / (double)this->vsize;
+  Float halfView = glm::tan(this->fov / 2);
+  Float aspect = (Float)this->hsize / (Float)this->vsize;
 
   if (aspect >= 1)
   {
@@ -38,45 +38,45 @@ void Camera::setPixelSize()
     this->halfWidth = halfView * aspect;
     this->halfHeight = halfView;
   }
-  this->pixelSize = (this->halfWidth * 2.0) / (double)this->hsize;
+  this->pixelSize = (this->halfWidth * 2.0) / (Float)this->hsize;
 }
 
-Ray Camera::rayForPixel(double px, double py, int currentRayNumber, int sqrtRaysPerPixel, double halfSubPixelSize)
+Ray Camera::rayForPixel(Float px, Float py, int currentRayNumber, int sqrtRaysPerPixel, Float halfSubPixelSize)
 {
   int subPixelRowNumber = currentRayNumber / sqrtRaysPerPixel;
   int subPixelColNumber = currentRayNumber % sqrtRaysPerPixel;
-  double subPixelxOffset = halfSubPixelSize * subPixelColNumber;
-  double subPixelyOffset = halfSubPixelSize * subPixelRowNumber;
+  Float subPixelxOffset = halfSubPixelSize * subPixelColNumber;
+  Float subPixelyOffset = halfSubPixelSize * subPixelRowNumber;
 
-  double xOffset = (px + subPixelxOffset) * this->pixelSize;
-  double yOffset = (py + subPixelyOffset) * this->pixelSize;
+  Float xOffset = (px + subPixelxOffset) * this->pixelSize;
+  Float yOffset = (py + subPixelyOffset) * this->pixelSize;
 
-  double worldX = this->halfWidth - xOffset;
-  double worldY = this->halfHeight - yOffset;
+  Float worldX = this->halfWidth - xOffset;
+  Float worldY = this->halfHeight - yOffset;
 
-  glm::dvec4 pixel = this->inverseTransform *
-                     glm::dvec4(worldX, worldY, -1.0, 1.0);
-  glm::dvec4 origin =
-      this->inverseTransform * glm::dvec4(0.0, 0.0, 0.0, 1.0);
-  glm::dvec4 direction = glm::normalize(pixel - origin);
-  // glm::dvec4 direction = pixel - origin;
+  Vec4 pixel = this->inverseTransform *
+               Vec4(worldX, worldY, -1.0, 1.0);
+  Vec4 origin =
+      this->inverseTransform * Vec4(0.0, 0.0, 0.0, 1.0);
+  Vec4 direction = glm::normalize(pixel - origin);
+  // Vec4 direction = pixel - origin;
 
   return Ray(origin, direction);
 }
 
-glm::dvec4 Camera::normalAt(const glm::dvec4 &point)
+Vec4 Camera::normalAt(const Vec4 &point)
 {
-  return glm::dvec4();
+  return Vec4();
 }
 
-glm::dvec4 Camera::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
+Vec4 Camera::normalAt(const Vec4 &point, const Vec2 &uv)
 {
   return normalAt(point);
 }
 
-std::pair<glm::dvec4, glm::dvec4> Camera::bounds() const
+std::pair<Vec4, Vec4> Camera::bounds() const
 {
-  return std::pair<glm::dvec4, glm::dvec4>();
+  return std::pair<Vec4, Vec4>();
 }
 
 void Camera::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) { return; }

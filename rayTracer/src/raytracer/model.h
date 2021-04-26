@@ -12,18 +12,18 @@
 #include "cereal/types/vector.hpp"
 #include "cereal/types/utility.hpp"
 
-typedef std::pair<glm::dvec4, glm::dvec4> NodeTLAS;
+typedef std::pair<Vec4, Vec4> NodeTLAS;
 
 typedef SmoothTriangle NodeBLAS;
 
 // struct NodeBLAS
 // {
-// 	glm::dvec4 p1;
-// 	glm::dvec4 p2;
-// 	glm::dvec4 p3;
-// 	glm::dvec4 n1;
-// 	glm::dvec4 n2;
-// 	glm::dvec4 n3;
+// 	Vec4 p1;
+// 	Vec4 p2;
+// 	Vec4 p3;
+// 	Vec4 n1;
+// 	Vec4 n2;
+// 	Vec4 n3;
 
 // 	void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections)
 // 	{
@@ -48,7 +48,7 @@ typedef SmoothTriangle NodeBLAS;
 
 // 		double t = f * glm::dot(e2, originCrossE1);
 
-// 		intersections.push_back(Geometry::Intersection<Shape>{t, this, glm::dvec2(u, v)});
+// 		intersections.push_back(Geometry::Intersection<Shape>{t, this, Vec2(u, v)});
 // 	}
 // };
 
@@ -81,9 +81,9 @@ public:
 	~Model();
 
 	virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
-	virtual glm::dvec4 normalAt(const glm::dvec4 &point) override;
-	virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) override;
-	virtual std::pair<glm::dvec4, glm::dvec4> bounds() const final override;
+	virtual Vec4 normalAt(const Vec4 &point) override;
+	virtual Vec4 normalAt(const Vec4 &point, const Vec2 &uv) override;
+	virtual std::pair<Vec4, Vec4> bounds() const final override;
 	virtual std::string type() override;
 
 protected:
@@ -112,8 +112,8 @@ CEREAL_REGISTER_TYPE(Model);
 // {
 // private:
 // 	static std::shared_ptr<Group> recursiveBuild(std::vector<std::shared_ptr<Shape>> &shapes, uint32_t start, uint32_t end);
-// 	static std::pair<glm::dvec4, glm::dvec4> mergeBounds(const std::pair<glm::dvec4, glm::dvec4>& b1, const std::pair<glm::dvec4, glm::dvec4>& b2);
-// 	static std::pair<glm::dvec4, glm::dvec4> mergeBounds(const std::pair<glm::dvec4, glm::dvec4>& b1, const glm::dvec4& p);
+// 	static std::pair<Vec4, Vec4> mergeBounds(const std::pair<Vec4, Vec4>& b1, const std::pair<Vec4, Vec4>& b2);
+// 	static std::pair<Vec4, Vec4> mergeBounds(const std::pair<Vec4, Vec4>& b1, const Vec4& p);
 
 // public:
 // 	Model();
@@ -126,7 +126,7 @@ CEREAL_REGISTER_TYPE(Model);
 // 	static std::shared_ptr<Group> buildBoundingVolumeHierarchy(std::vector<std::shared_ptr<Shape>> &shapes);
 
 // 	// std::vector<glm::dvec3> vertices;
-// 	// std::vector<glm::dvec2> uvs;
+// 	// std::vector<Vec2> uvs;
 // 	// std::vector<glm::dvec3> normals;
 
 // 	std::shared_ptr<Group> mesh;

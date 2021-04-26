@@ -15,28 +15,28 @@ private:
   // template <class Archive>
   // static void load_and_construct(Archive &archive, cereal::construct<PointLight> &construct)
   // {
-  //   glm::dvec4 position;
-  //   glm::dvec3 intensity;
+  //   Vec4 position;
+  //   Vec3 intensity;
 
   //   archive(position, intensity);
   //   construct(position, intensity);
   // }
 
-  virtual glm::dvec4 normalAt(const glm::dvec4 &point) override;
-  virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) override;
+  virtual Vec4 normalAt(const Vec4 &point) override;
+  virtual Vec4 normalAt(const Vec4 &point, const Vec2 &uv) override;
   virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
-  virtual std::pair<glm::dvec4, glm::dvec4> bounds() const override;
+  virtual std::pair<Vec4, Vec4> bounds() const override;
   virtual std::string type() override;
 
 public:
   PointLight()
   {
   }
-  PointLight(glm::dvec4 position, glm::dvec3 intensity);
+  PointLight(Vec4 position, Vec3 intensity);
   ~PointLight();
 
-  glm::dvec4 position;
-  glm::dvec3 intensity;
+  Vec4 position;
+  Vec3 intensity;
 };
 
 CEREAL_REGISTER_TYPE(PointLight);
