@@ -36,6 +36,7 @@ public:
   //    TODO change to return const reference (const std::pair & )
   virtual std::pair<glm::dvec4, glm::dvec4> bounds() const = 0;
 
+  // TODO: maybe make these into unique_ptrs so as you don't waste memory for shapes that dont use them
   glm::dmat4 transform;
   glm::dmat4 inverseTransform;
 

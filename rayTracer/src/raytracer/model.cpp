@@ -13,6 +13,16 @@ void mergeBounds(NodeTLAS &self, const NodeTLAS &other)
 							 std::max(self.second.z, other.second.z), 1.);
 }
 
+void mergeBounds(NodeTLAS &self, const glm::dvec4 &p)
+{
+	self.first = glm::dvec4(std::min(self.first.x, p.x),
+							std::min(self.first.y, p.y),
+							std::min(self.first.z, p.z), 1.);
+	self.second = glm::dvec4(std::max(self.second.x, p.x),
+							 std::max(self.second.y, p.y),
+							 std::max(self.second.z, p.z), 1.);
+}
+
 // TODO: refactor this to be a Shape with corresponding interface,
 //       and implement an array based bvh
 Model::Model() : Shape()
@@ -58,20 +68,16 @@ Model::~Model()
 
 void Model::recursiveBuild(std::vector<NodeBLAS> &unsortedShapes, uint32_t level, uint32_t branch, uint32_t start, uint32_t end, uint32_t tlasHeight)
 {
-	//    uint32_t node = (std::pow(2, level) - 1) + branch;
-
-	//        NodeTLAS totalBounds{glm::vec4(std::numeric_limits<float>::min()), glm::vec4(std::numeric_limits<float>::max())};
-
 	NodeTLAS centroidBounds{
-		glm::vec4(std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), std::numeric_limits<float>::infinity(), 1.f),
-		glm::vec4(-std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), -std::numeric_limits<float>::infinity(), 1.f)};
+		glm::dvec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.0),
+		glm::dvec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.0)};
 
 	for (auto it = unsortedShapes.begin() + start; it != unsortedShapes.begin() + end; ++it)
 	{
 		mergeBounds(centroidBounds, it->bounds());
 	};
 
-	glm::vec4 diagonal = centroidBounds.second - centroidBounds.first;
+	glm::dvec4 diagonal = centroidBounds.second - centroidBounds.first;
 	uint32_t splitDimension;
 
 	if (diagonal.x > diagonal.y && diagonal.x > diagonal.z)
@@ -81,16 +87,8 @@ void Model::recursiveBuild(std::vector<NodeBLAS> &unsortedShapes, uint32_t level
 	else
 		splitDimension = 2;
 
-	//        int mid = (start + end) / 2;
-
 	if (centroidBounds.first[splitDimension] == centroidBounds.second[splitDimension])
 	{
-		//            TODO figure out if this bit is necessary.
-		//            for (int i = start; i < end; ++i)
-		//            {
-		//                //                node->addChild(shapes.at(i));
-		//
-		//            }
 		return;
 	}
 	else
@@ -155,6 +153,188 @@ void Model::recursiveBuild(std::vector<NodeBLAS> &unsortedShapes, uint32_t level
 
 	return;
 }
+
+// void Model::recursiveBuild(std::vector<NodeBLAS> &unsortedShapes, uint32_t level, uint32_t branch, uint32_t start, uint32_t end, uint32_t tlasHeight)
+// {
+// 	int nShapes = end - start;
+
+// 	if (nShapes == 1)
+// 	{
+// 		// for (int i = start; i < end; ++i)
+// 		// 	node->addChild(shapes.at(i));
+
+// 		// node->addChild(shapes.at(start));
+
+// 		//        if (nShapes == 2)
+// 		//            node->addChild(shapes.at(start + 1));
+// 		return;
+// 	}
+
+// 	NodeTLAS centroidBounds{
+// 		glm::dvec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.0),
+// 		glm::dvec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.0)};
+
+// 	for (auto it = unsortedShapes.begin() + start; it != unsortedShapes.begin() + end; ++it)
+// 	{
+// 		mergeBounds(centroidBounds, it->boundsCentroid());
+// 	};
+
+// 	glm::dvec4 diagonal = centroidBounds.second - centroidBounds.first;
+// 	uint32_t splitDimension;
+
+// 	if (diagonal.x > diagonal.y && diagonal.x > diagonal.z)
+// 		splitDimension = 0;
+// 	else if (diagonal.y > diagonal.z)
+// 		splitDimension = 1;
+// 	else
+// 		splitDimension = 2;
+
+// 	if (centroidBounds.first[splitDimension] == centroidBounds.second[splitDimension])
+// 	{
+// 		// TODO: investigate how this works with offsets
+// 		for (int i = start; i < end; ++i)
+// 			blas.push_back(unsortedShapes.at(i));
+// 		return;
+// 	}
+// 	else
+// 	{
+// 		int mid; // = (start + end) / 2;
+
+// 		// Allocate _BucketInfo_ for SAH partition buckets
+// 		constexpr int nBuckets = 12;
+// 		constexpr int maxPrimsInNode = 2; //Change to 2 to accomodate array based binary tree
+// 		Geometry::BucketInfo buckets[nBuckets];
+
+// 		// Initialize _BucketInfo_ for SAH partition buckets
+// 		for (int i = start; i < end; ++i)
+// 		{
+// 			int b = nBuckets * Geometry::offset(unsortedShapes[i].boundsCentroid(), centroidBounds)[splitDimension];
+// 			if (b == nBuckets)
+// 				b = nBuckets - 1;
+
+// 			buckets[b].count++;
+// 			mergeBounds(buckets[b].bounds, unsortedShapes[i].bounds());
+// 		}
+
+// 		// Compute costs for splitting after each bucket
+// 		double cost[nBuckets - 1];
+// 		for (int i = 0; i < nBuckets - 1; ++i)
+// 		{
+// 			std::pair<glm::dvec4, glm::dvec4> b0, b1;
+// 			int count0 = 0, count1 = 0;
+// 			for (int j = 0; j <= i; ++j)
+// 			{
+// 				mergeBounds(b0, buckets[j].bounds);
+// 				count0 += buckets[j].count;
+// 			}
+// 			for (int j = i + 1; j < nBuckets; ++j)
+// 			{
+// 				mergeBounds(b1, buckets[j].bounds);
+// 				count1 += buckets[j].count;
+// 			}
+
+// 			std::pair<glm::dvec4, glm::dvec4> bounds{
+// 				glm::vec4(std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), std::numeric_limits<double>::infinity(), 1.f),
+// 				glm::vec4(-std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), -std::numeric_limits<double>::infinity(), 1.f)};
+
+// 			for (auto it = unsortedShapes.begin() + start; it != unsortedShapes.begin() + end; ++it)
+// 				mergeBounds(bounds, it->bounds());
+
+// 			cost[i] = 1 +
+// 					  (count0 * Geometry::surfaceArea(b0) +
+// 					   count1 * Geometry::surfaceArea(b1)) /
+// 						  Geometry::surfaceArea(bounds);
+// 		}
+
+// 		// Find bucket to split at that minimizes SAH metric
+// 		double minCost = cost[0];
+// 		int minCostSplitBucket = 0;
+// 		for (int i = 1; i < nBuckets - 1; ++i)
+// 		{
+// 			if (cost[i] < minCost)
+// 			{
+// 				minCost = cost[i];
+// 				minCostSplitBucket = i;
+// 			}
+// 		}
+
+// 		// Either create leaf or split primitives at selected SAH
+// 		// bucket
+// 		double leafCost = nShapes;
+// 		if (nShapes > maxPrimsInNode || minCost < leafCost)
+// 		{
+// 			auto pmid = std::partition(
+// 				&unsortedShapes[start], &unsortedShapes[end - 1] + 1,
+// 				[=](const NodeBLAS &pi) {
+// 					int b = nBuckets *
+// 							Geometry::offset(pi.boundsCentroid(), centroidBounds)[splitDimension];
+// 					if (b == nBuckets)
+// 						b = nBuckets - 1;
+// 					return b <= minCostSplitBucket;
+// 				});
+// 			mid = pmid - &unsortedShapes[0];
+// 		}
+// 		else
+// 		{
+// 			// Create leaf
+// 			for (int i = start; i < end; ++i)
+// 			{
+// 				blas.push_back(unsortedShapes.at(i));
+// 				// node->addChild(shapes.at(i));
+// 			}
+
+// 			return;
+// 		}
+
+// 		if (nShapes > 2)
+// 		{
+// 			uint32_t node = std::pow(2, level) + branch - 1;
+// 			tlas.at(node) = centroidBounds;
+
+// 			recursiveBuild(unsortedShapes, level + 1, branch * 2, start, mid, tlasHeight);
+// 			recursiveBuild(unsortedShapes, level + 1, (branch * 2) + 1, mid, end, tlasHeight);
+// 		}
+// 		else
+// 		{
+// 			std::nth_element(&unsortedShapes[start], &unsortedShapes[mid],
+// 							 &unsortedShapes[end - 1] + 1,
+// 							 [splitDimension](const NodeBLAS &a, const NodeBLAS &b) {
+// 								 return a.boundsCentroid()[splitDimension] < b.boundsCentroid()[splitDimension];
+// 							 });
+
+// 			blas.push_back(unsortedShapes.at(start));
+// 			blas.back().parent = shared_from_this();
+// 			//
+// 			if (nShapes == 2)
+// 			{
+// 				blas.push_back(unsortedShapes.at(start + 1));
+// 				blas.back().parent = shared_from_this();
+// 			}
+// 			else
+// 			{
+// 				blas.push_back(emptyNode);
+// 			}
+
+// 			if (level < tlasHeight)
+// 			{
+// 				level += 1;
+// 				branch *= 2;
+
+// 				uint32_t dummyNode = std::pow(2, level) + branch - 1;
+
+// 				tlas.at(dummyNode) = centroidBounds;
+// 				tlas.at(dummyNode + 1) = emptyBounds;
+
+// 				blas.push_back(emptyNode);
+// 				blas.push_back(emptyNode);
+// 			}
+
+// 			return;
+// 		}
+// 	}
+
+// 	return;
+// }
 
 std::vector<NodeBLAS> Model::parseObjFile(std::string const &path)
 {
@@ -263,9 +443,9 @@ std::vector<NodeBLAS> Model::parseObjFile(std::string const &path)
 
 		if (temp_normals.empty())
 		{
-			glm::vec3 e1 = temp_vertices[vertexIndices[i + 1] - 1] - temp_vertices[vertexIndices[i] - 1];
-			glm::vec3 e2 = temp_vertices[vertexIndices[i + 2] - 1] - temp_vertices[vertexIndices[i] - 1];
-			glm::vec4 normal = glm::vec4(glm::normalize(glm::cross(e2, e1)), 0.0);
+			glm::dvec3 e1 = temp_vertices[vertexIndices[i + 1] - 1] - temp_vertices[vertexIndices[i] - 1];
+			glm::dvec3 e2 = temp_vertices[vertexIndices[i + 2] - 1] - temp_vertices[vertexIndices[i] - 1];
+			glm::dvec4 normal = glm::dvec4(glm::normalize(glm::cross(e2, e1)), 0.0);
 
 			nextNode = NodeBLAS(
 				temp_vertices[vertexIndices[i] - 1],
@@ -287,12 +467,6 @@ std::vector<NodeBLAS> Model::parseObjFile(std::string const &path)
 		}
 
 		triangleParams.push_back(nextNode);
-		//        triangleParams.push_back(temp_vertices[vertexIndices[i] - 1]);
-		//        triangleParams.push_back(temp_vertices[vertexIndices[i + 1] - 1]);
-		//        triangleParams.push_back(temp_vertices[vertexIndices[i + 2] - 1]);
-		//        triangleParams.push_back(temp_normals[normalIndices[i] - 1]);
-		//        triangleParams.push_back(temp_normals[normalIndices[i + 1] - 1]);
-		//        triangleParams.push_back(temp_normals[normalIndices[i + 2] - 1]);
 	}
 
 	return triangleParams;
@@ -337,11 +511,9 @@ void Model::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &i
 		{
 			// primitiveIndices[topPrimivitiveIndices] = nextNode.branch * 2;
 			// topPrimivitiveIndices += 1;
-			float t1 = -1.0;
-			float t2 = -1.0;
+			double t1 = -1.0;
+			double t2 = -1.0;
 			int primIdx = nextNode.branch * 2;
-
-			glm::dvec2 uv;
 
 			blas[primIdx].intersectRay(transformedRay, intersections);
 
@@ -396,9 +568,9 @@ std::pair<glm::dvec4, glm::dvec4> Model::bounds() const
 
 bool Model::intersectAABB(const Ray &ray, const NodeTLAS &aabb)
 {
-	float t_min = -std::numeric_limits<double>::infinity();
-	float t_max = std::numeric_limits<double>::infinity();
-	float temp, invD, t0, t1;
+	double t_min = -std::numeric_limits<double>::infinity();
+	double t_max = std::numeric_limits<double>::infinity();
+	double temp, invD, t0, t1;
 
 	for (int a = 0; a < 3; a++)
 	{
