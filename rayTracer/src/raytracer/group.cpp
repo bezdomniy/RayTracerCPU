@@ -9,14 +9,27 @@ Group::~Group()
 {
 }
 
-Group::Group(std::vector<std::shared_ptr<Shape>> &shapes) : Shape()
+void Group::build(std::vector<std::shared_ptr<Shape>> &shapes, bool bvh)
 {
-  this->boundingBox = std::pair<Vec4, Vec4>(Vec4(std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), 1.), Vec4(-std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), 1.));
-
-  for (auto &shape : shapes)
+  if (bvh)
   {
-    // TODO update this so bounding box is only calculated when all shapes are added
-    this->addChild(shape);
+    auto start = std::chrono::high_resolution_clock::now();
+    // TODO: can't use sharedfromthis in constructor, do differently
+    recursiveBuild(shapes, 0, shapes.size());
+
+    auto stop = std::chrono::high_resolution_clock::now();
+
+    std::cout << "Time to build BVH: " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << std::endl;
+  }
+  else
+  {
+    this->boundingBox = std::pair<Vec4, Vec4>(Vec4(std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), 1.), Vec4(-std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), 1.));
+
+    for (auto &shape : shapes)
+    {
+      // TODO update this so bounding box is only calculated when all shapes are added
+      this->addChild(shape);
+    }
   }
 }
 
@@ -77,7 +90,7 @@ Group::Group(const Group &group)
     nextShape->parent = child->parent;
     nextShape->material = child->material;
     // nextShape->materialSet = child->materialSet;
-    nextShape->transform = child->transform;
+    // nextShape->transform = child->transform;
     nextShape->inverseTransform = child->inverseTransform;
 
     this->children.push_back(nextShape);
@@ -85,7 +98,7 @@ Group::Group(const Group &group)
   this->parent = group.parent;
   this->material = group.material;
   // this->materialSet = group.materialSet;
-  this->transform = group.transform;
+  // this->transform = group.transform;
   this->inverseTransform = group.inverseTransform;
 
   this->boundingBox = group.boundingBox;
@@ -136,14 +149,9 @@ void Group::setMaterial(std::shared_ptr<Material> &mat)
   }
 }
 
-std::shared_ptr<Group> Group::getptr()
-{
-  return shared_from_this();
-}
-
 void Group::addChild(std::shared_ptr<Shape> &child)
 {
-  child->parent = getptr();
+  child->parent = shared_from_this();
 
   if (this->material && !child->material)
     child->setMaterial(this->material);
@@ -176,6 +184,10 @@ void Group::addChild(std::shared_ptr<Shape> &child)
   {
     this->children.push_back(std::dynamic_pointer_cast<Cone>(child));
   }
+  else if (child->type() == "Model")
+  {
+    this->children.push_back(std::dynamic_pointer_cast<Model>(child));
+  }
   else
   {
     throw std::invalid_argument(child->type() + " is not a valid shape for group");
@@ -197,15 +209,17 @@ void Group::updateBoundingBox(std::shared_ptr<Shape> &shape)
   points.at(6) = Vec4(bounds.second.x, bounds.second.y, bounds.first.z, 1.);
   points.at(7) = bounds.second;
 
+  Mat4 transform = glm::affineInverse(shape->inverseTransform);
+
   for (auto point : points)
   {
-    Vec4 transformedPoint(shape->transform * point);
+    Vec4 transformedPoint(transform * point);
     this->boundingBox.first = glm::min(this->boundingBox.first, transformedPoint);
     this->boundingBox.second = glm::max(this->boundingBox.second, transformedPoint);
   }
 }
 
-std::pair<Vec4, Vec4> Group::bounds()
+std::pair<Vec4, Vec4> Group::bounds() const
 {
   return this->boundingBox;
 }
@@ -237,6 +251,207 @@ bool Group::boundIntersection(Ray &transformedRay)
   // Float tmax = std::min({xtminmax.second, ytminmax.second, ztminmax.second});
 
   // return !(tmin > tmax);
+}
+
+std::pair<Vec4, Vec4> Group::mergeBounds(const std::pair<Vec4, Vec4> b1, const std::pair<Vec4, Vec4> b2)
+{
+  return std::pair<Vec4, Vec4>(Vec4(std::min(b1.first.x, b2.first.x),
+                                    std::min(b1.first.y, b2.first.y),
+                                    std::min(b1.first.z, b2.first.z), 1.),
+                               Vec4(std::max(b1.second.x, b2.second.x),
+                                    std::max(b1.second.y, b2.second.y),
+                                    std::max(b1.second.z, b2.second.z), 1.));
+}
+
+std::pair<Vec4, Vec4> Group::mergeBounds(const std::pair<Vec4, Vec4> b1, const Vec4 p)
+{
+  return std::pair<Vec4, Vec4>(Vec4(std::min(b1.first.x, p.x),
+                                    std::min(b1.first.y, p.y),
+                                    std::min(b1.first.z, p.z), 1.),
+                               Vec4(std::max(b1.second.x, p.x),
+                                    std::max(b1.second.y, p.y),
+                                    std::max(b1.second.z, p.z), 1.));
+}
+
+std::shared_ptr<Group> Group::recursiveBuild(std::vector<std::shared_ptr<Shape>> &shapes, uint32_t start, uint32_t end)
+{
+  std::shared_ptr<Group> node;
+  if (start == 0 && end == shapes.size())
+  {
+    node = shared_from_this();
+  }
+  else
+  {
+    node = std::make_shared<Group>();
+  }
+
+  int nShapes = end - start;
+
+  if (nShapes == 1)
+  {
+    // for (int i = start; i < end; ++i)
+    // 	node->addChild(shapes.at(i));
+
+    node->addChild(shapes.at(start));
+
+    //        if (nShapes == 2)
+    //            node->addChild(shapes.at(start + 1));
+    return node;
+  }
+  else
+  {
+    // std::pair<Vec4, Vec4> centroidBounds;
+    std::pair<Vec4, Vec4> centroidBounds{
+        Vec4(std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), 1.f),
+        Vec4(-std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), 1.f)};
+
+    //for (const auto &shape : shapes)
+    for (auto it = shapes.begin() + start; it != shapes.begin() + end; ++it)
+      centroidBounds = mergeBounds(centroidBounds, (*it)->boundsCentroid());
+
+    Vec4 diagonal = centroidBounds.second - centroidBounds.first;
+    int splitDimension;
+
+    if (diagonal.x > diagonal.y && diagonal.x > diagonal.z)
+      splitDimension = 0;
+    else if (diagonal.y > diagonal.z)
+      splitDimension = 1;
+    else
+      splitDimension = 2;
+
+    int mid = (start + end) / 2;
+
+    if (centroidBounds.first[splitDimension] == centroidBounds.second[splitDimension])
+    {
+      for (int i = start; i < end; ++i)
+        node->addChild(shapes.at(i));
+      return node;
+    }
+    else
+    {
+      if (false)
+      {
+        mid = (start + end) / 2;
+        std::nth_element(&shapes[start], &shapes[mid],
+                         &shapes[end - 1] + 1,
+                         [splitDimension](const std::shared_ptr<Shape> &a, const std::shared_ptr<Shape> &b) {
+                           return a->boundsCentroid()[splitDimension] < b->boundsCentroid()[splitDimension];
+                         });
+      }
+      else
+      {
+        // Partition primitives using approximate SAH
+        if (nShapes <= 2)
+        {
+          mid = (start + end) / 2;
+          std::nth_element(&shapes[start], &shapes[mid],
+                           &shapes[end - 1] + 1,
+                           [splitDimension](const std::shared_ptr<Shape> &a, const std::shared_ptr<Shape> &b) {
+                             return a->boundsCentroid()[splitDimension] < b->boundsCentroid()[splitDimension];
+                           });
+        }
+        else
+        {
+          // Allocate _BucketInfo_ for SAH partition buckets
+          constexpr int nBuckets = 12;
+          constexpr int maxPrimsInNode = 4;
+          Geometry::BucketInfo buckets[nBuckets];
+
+          // Initialize _BucketInfo_ for SAH partition buckets
+          for (int i = start; i < end; ++i)
+          {
+            int b = nBuckets * Geometry::offset(shapes[i]->boundsCentroid(), centroidBounds)[splitDimension];
+            if (b == nBuckets)
+              b = nBuckets - 1;
+
+            buckets[b].count++;
+            buckets[b].bounds =
+                mergeBounds(buckets[b].bounds, shapes[i]->bounds());
+          }
+
+          // Compute costs for splitting after each bucket
+          Float cost[nBuckets - 1];
+          for (int i = 0; i < nBuckets - 1; ++i)
+          {
+            std::pair<Vec4, Vec4> b0, b1;
+            int count0 = 0, count1 = 0;
+            for (int j = 0; j <= i; ++j)
+            {
+              b0 = mergeBounds(b0, buckets[j].bounds);
+              count0 += buckets[j].count;
+            }
+            for (int j = i + 1; j < nBuckets; ++j)
+            {
+              b1 = mergeBounds(b1, buckets[j].bounds);
+              count1 += buckets[j].count;
+            }
+
+            std::pair<Vec4, Vec4> bounds{
+                Vec4(std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), std::numeric_limits<Float>::infinity(), 1.f),
+                Vec4(-std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), -std::numeric_limits<Float>::infinity(), 1.f)};
+
+            for (auto it = shapes.begin() + start; it != shapes.begin() + end; ++it)
+              bounds = mergeBounds(bounds, (*it)->bounds());
+
+            cost[i] = 1 +
+                      (count0 * Geometry::surfaceArea(b0) +
+                       count1 * Geometry::surfaceArea(b1)) /
+                          Geometry::surfaceArea(bounds);
+          }
+
+          // Find bucket to split at that minimizes SAH metric
+          Float minCost = cost[0];
+          int minCostSplitBucket = 0;
+          for (int i = 1; i < nBuckets - 1; ++i)
+          {
+            if (cost[i] < minCost)
+            {
+              minCost = cost[i];
+              minCostSplitBucket = i;
+            }
+          }
+
+          // Either create leaf or split primitives at selected SAH
+          // bucket
+          float leafCost = nShapes;
+          if (nShapes > maxPrimsInNode || minCost < leafCost)
+          {
+            auto pmid = std::partition(
+                &shapes[start], &shapes[end - 1] + 1,
+                [=](const std::shared_ptr<Shape> &pi) {
+                  int b = nBuckets *
+                          Geometry::offset(pi->boundsCentroid(), centroidBounds)[splitDimension];
+                  if (b == nBuckets)
+                    b = nBuckets - 1;
+                  return b <= minCostSplitBucket;
+                });
+            mid = pmid - &shapes[0];
+          }
+          else
+          {
+            // Create leaf
+            for (int i = start; i < end; ++i)
+            {
+              node->addChild(shapes.at(i));
+            }
+
+            return node;
+          }
+        }
+      }
+
+      //            if (start !=mid)
+      std::shared_ptr<Shape> leftChild = recursiveBuild(shapes, start, mid);
+
+      //            if (end !=mid)
+      std::shared_ptr<Shape> rightChild = recursiveBuild(shapes, mid, end);
+
+      node->addChild(leftChild);
+      node->addChild(rightChild);
+    }
+  }
+
+  return node;
 }
 
 std::string Group::type() { return "Group"; }

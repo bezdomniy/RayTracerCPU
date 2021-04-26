@@ -56,7 +56,7 @@ Vec4 Cube::normalAt(const Vec4 &point, const Vec2 &uv)
     return normalAt(point);
 }
 
-std::pair<Vec4, Vec4> Cube::bounds()
+std::pair<Vec4, Vec4> Cube::bounds() const
 {
     return std::pair<Vec4, Vec4>(Vec4(-1., -1., -1., 1.), Vec4(1., 1., 1., 1.));
 }

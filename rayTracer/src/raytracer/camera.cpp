@@ -16,9 +16,9 @@ Camera::Camera(Vec4 position, Vec4 centre, Vec4 up, int hsize,
 
 void Camera::updateTransform()
 {
-  this->transform = glm::lookAt(Vec3(position),
-                                Vec3(this->centre), Vec3(this->up));
-  this->inverseTransform = glm::affineInverse(this->transform);
+  Mat4 transform = glm::lookAt(Vec3(position),
+                               Vec3(this->centre), Vec3(this->up));
+  this->inverseTransform = glm::affineInverse(transform);
 }
 
 Camera::~Camera() {}
@@ -55,7 +55,7 @@ Ray Camera::rayForPixel(Float px, Float py, int currentRayNumber, int sqrtRaysPe
   Float worldY = this->halfHeight - yOffset;
 
   Vec4 pixel = this->inverseTransform *
-                     Vec4(worldX, worldY, -1.0, 1.0);
+               Vec4(worldX, worldY, -1.0, 1.0);
   Vec4 origin =
       this->inverseTransform * Vec4(0.0, 0.0, 0.0, 1.0);
   Vec4 direction = glm::normalize(pixel - origin);
@@ -74,7 +74,7 @@ Vec4 Camera::normalAt(const Vec4 &point, const Vec2 &uv)
   return normalAt(point);
 }
 
-std::pair<Vec4, Vec4> Camera::bounds()
+std::pair<Vec4, Vec4> Camera::bounds() const
 {
   return std::pair<Vec4, Vec4>();
 }

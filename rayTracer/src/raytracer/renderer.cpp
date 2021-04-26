@@ -6,6 +6,9 @@ Renderer::Renderer(std::shared_ptr<Camera> &c)
 {
   this->camera = c;
   this->canvas = Canvas(this->camera->hsize, this->camera->vsize);
+
+  //    this->t = std::thread::hardware_concurrency();
+  //    this->threads.reserve(this->t);
 }
 
 #ifdef __EMSCRIPTEN__ //TODO change to if emscripten AND if use_threaded
@@ -56,22 +59,31 @@ void Renderer::render(World &world)
   }
 
   size_t t = std::thread::hardware_concurrency();
-  std::thread threads[t];
+  std::vector<std::thread> threads;
+  threads.reserve(t);
+
+  //  size_t t = std::thread::hardware_concurrency();
+  //  std::thread threads[t];
   for (int i = 0; i < t; ++i)
   {
-    threads[i] = std::thread([&]() {
+    threads.push_back(std::thread([&]() {
       std::pair<int, int> pixel;
       while (q.try_dequeue(pixel))
       {
         renderPixel(world, pixel);
       }
-    });
+    }));
   }
 
   // Wait for all threads
-  for (int i = 0; i < t; ++i)
+  //  for (int i = 0; i < t; ++i)
+  //  {
+  //    threads[i].join();
+  //  }
+  while (!threads.empty())
   {
-    threads[i].join();
+    threads.back().join();
+    threads.pop_back();
   }
 
   std::pair<int, int> pixel;
@@ -195,7 +207,7 @@ Vec3 Renderer::pathColourAt(Ray &ray, World &world, std::vector<Geometry::Inters
     Vec3 hitColour = lighting(hit->shapePtr, comps.overPoint);
     // hitCompsBuffer = std::move(hit->comps);
     // intersections.clear();
-    return hit->shapePtr->material->emissiveness + hitColour * pathColourAt(newRay, world, intersections, remaining - 1);
+    return hit->shapePtr->getMaterial()->emissiveness + hitColour * pathColourAt(newRay, world, intersections, remaining - 1);
 
     // return shadeHit(hit, world, remaining);
   }
@@ -230,7 +242,6 @@ Vec3 Renderer::rayColourAt(Ray &ray, World &world, std::vector<Geometry::Interse
 
   if ((hit = Geometry::hit<Shape>(intersections)))
   {
-    // TODO: Geometry::getRefractiveIndexFromTo no longer working because this is now a copy, so pointer equality breaks!
     Geometry::IntersectionParameters comps = Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
     Vec3 hitColour = shadeHit(hit, comps, world, intersections, remaining);
     return hitColour;
@@ -248,8 +259,8 @@ Vec3 Renderer::shadeHit(Geometry::Intersection<Shape> *hit, Geometry::Intersecti
 {
   Vec3 surface(0.0);
 
-  Float reflective = hit->shapePtr->material->reflective;
-  Float transparency = hit->shapePtr->material->transparency;
+  Float reflective = hit->shapePtr->getMaterial()->reflective;
+  Float transparency = hit->shapePtr->getMaterial()->transparency;
   Shape *shapePtr = hit->shapePtr;
 
   for (auto &light : world.lights)
@@ -325,8 +336,8 @@ Vec3 Renderer::lighting(Shape *shape, Vec4 &point)
 {
   Vec3 effectiveColour;
 
-  if (shape->material->pattern == nullptr)
-    effectiveColour = shape->material->colour;
+  if (shape->getMaterial()->pattern == nullptr)
+    effectiveColour = shape->getMaterial()->colour;
   else
     effectiveColour = shape->patternAt(point);
 
@@ -342,13 +353,13 @@ Vec3 Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
   Vec3 effectiveColour;
 
   // combine the surface color with the light's color/intensity​
-  if (shape->material->pattern == nullptr)
-    effectiveColour = shape->material->colour * light->intensity;
+  if (shape->getMaterial()->pattern == nullptr)
+    effectiveColour = shape->getMaterial()->colour * light->intensity;
   else
     effectiveColour = shape->patternAt(point) * light->intensity;
 
   // compute the ambient contribution​
-  Vec3 ambient = effectiveColour * shape->material->ambient;
+  Vec3 ambient = effectiveColour * shape->getMaterial()->ambient;
   if (inShadow)
     return ambient;
 
@@ -367,7 +378,7 @@ Vec3 Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
   else
   {
     // compute the diffuse contribution​
-    diffuse = effectiveColour * shape->material->diffuse * lightDotNormal;
+    diffuse = effectiveColour * shape->getMaterial()->diffuse * lightDotNormal;
 
     // reflect_dot_eye represents the cosine of the angle between the
     // reflection vector and the eye vector. A negative number means the
@@ -382,8 +393,8 @@ Vec3 Renderer::lighting(Shape *shape, std::shared_ptr<PointLight> &light,
     else
     {
       // compute the specular contribution​
-      Float factor = std::pow(reflectDotEye, shape->material->shininess);
-      specular = light->intensity * shape->material->specular * factor;
+      Float factor = std::pow(reflectDotEye, shape->getMaterial()->shininess);
+      specular = light->intensity * shape->getMaterial()->specular * factor;
     }
   }
 

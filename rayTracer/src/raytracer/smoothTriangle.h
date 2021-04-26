@@ -9,7 +9,7 @@ private:
     template <class Archive>
     void serialize(Archive &archive)
     {
-        archive(cereal::base_class<Triangle>(this), n1, n2, n3);
+        archive(cereal::base_class<Triangle>(this), n2, n3);
     }
 
     // template <class Archive>
@@ -36,7 +36,7 @@ public:
     SmoothTriangle(Vec3 p1, Vec3 p2, Vec3 p3, Vec3 n1, Vec3 n2, Vec3 n3);
     ~SmoothTriangle();
 
-    virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
+    // virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
 
     // TODO make this match with other normalAts..
     virtual Vec4 normalAt(const Vec4 &point, const Vec2 &uv) override;

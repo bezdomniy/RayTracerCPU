@@ -180,7 +180,7 @@ void Window::initWindow()
                                     SDL_WINDOWPOS_UNDEFINED, this->camera->hsize, this->camera->vsize, 0);
 #endif
     this->renderer = SDL_CreateRenderer(this->window, -1,
-                                        SDL_RENDERER_ACCELERATED | SDL_RENDERER_TARGETTEXTURE);
+                                        SDL_RENDERER_SOFTWARE | SDL_RENDERER_TARGETTEXTURE);
 
     // SDL_CreateWindowAndRenderer(this->camera->hsize, this->camera->vsize, 0, &this->window, &this->renderer);
 

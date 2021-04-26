@@ -11,29 +11,29 @@ SmoothTriangle::~SmoothTriangle()
 {
 }
 
-void SmoothTriangle::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections)
-{
-    Ray transformedRay = transformRay(ray);
+// void SmoothTriangle::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections)
+// {
+//     Ray transformedRay = transformRay(ray);
 
-    Vec3 dirCrossE2 = glm::cross(Vec3(transformedRay.direction), this->e2);
-    Float det = glm::dot(this->e1, dirCrossE2);
-    if (std::abs(det) < Geometry::EPSILON)
-        return;
+//     glm::dvec3 dirCrossE2 = glm::cross(glm::dvec3(transformedRay.direction), this->e2);
+//     double det = glm::dot(this->e1, dirCrossE2);
+//     if (std::abs(det) < Geometry::EPSILON)
+//         return;
 
-    Float f = 1.0 / det;
-    Vec3 p1ToOrigin = Vec3(transformedRay.origin) - this->p1;
-    Float u = f * glm::dot(p1ToOrigin, dirCrossE2);
-    if (u < 0 || u > 1)
-        return;
+//     double f = 1.0 / det;
+//     glm::dvec3 p1ToOrigin = glm::dvec3(transformedRay.origin) - this->p1;
+//     double u = f * glm::dot(p1ToOrigin, dirCrossE2);
+//     if (u < 0 || u > 1)
+//         return;
 
-    Vec3 originCrossE1 = glm::cross(p1ToOrigin, this->e1);
-    Float v = f * glm::dot(Vec3(transformedRay.direction), originCrossE1);
-    if (v < 0 || (u + v) > 1)
-        return;
+//     glm::dvec3 originCrossE1 = glm::cross(p1ToOrigin, this->e1);
+//     double v = f * glm::dot(glm::dvec3(transformedRay.direction), originCrossE1);
+//     if (v < 0 || (u + v) > 1)
+//         return;
 
-    Float t = f * glm::dot(this->e2, originCrossE1);
-    intersections.push_back(Geometry::Intersection<Shape>{t, this, Vec2(u, v)});
-}
+//     double t = f * glm::dot(this->e2, originCrossE1);
+//     intersections.push_back(Geometry::Intersection<Shape>{t, this, glm::dvec2(u, v)});
+// }
 
 // Vec4 SmoothTriangle::normalAt(Vec4 point)
 // {

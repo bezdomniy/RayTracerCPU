@@ -42,7 +42,7 @@ Vec4 Sphere::normalAt(const Vec4 &point, const Vec2 &uv)
   return normalAt(point);
 }
 
-std::pair<Vec4, Vec4> Sphere::bounds()
+std::pair<Vec4, Vec4> Sphere::bounds() const
 {
   return std::pair<Vec4, Vec4>(Vec4(-1., -1., -1., 1.), Vec4(1., 1., 1., 1.));
 }

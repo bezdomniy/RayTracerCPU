@@ -21,7 +21,7 @@ Cylinder::Cylinder(const Cylinder &c2)
   this->minimum = c2.minimum;
   this->capped = c2.capped;
   this->inverseTransform = c2.inverseTransform;
-  this->transform = c2.transform;
+  // this->transform = c2.transform;
   this->parent = c2.parent;
 }
 
@@ -84,7 +84,7 @@ Vec4 Cylinder::normalAt(const Vec4 &point, const Vec2 &uv)
   return normalAt(point);
 }
 
-std::pair<Vec4, Vec4> Cylinder::bounds()
+std::pair<Vec4, Vec4> Cylinder::bounds() const
 {
   return std::pair<Vec4, Vec4>(Vec4(-1., this->minimum, (Float)-1., (Float)1.), Vec4(1., this->maximum, (Float)1., (Float)1.));
 }

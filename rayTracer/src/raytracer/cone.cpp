@@ -21,7 +21,7 @@ Cone::Cone(const Cone &c2)
   this->minimum = c2.minimum;
   this->capped = c2.capped;
   this->inverseTransform = c2.inverseTransform;
-  this->transform = c2.transform;
+  // this->transform = c2.transform;
   this->parent = c2.parent;
 }
 
@@ -108,7 +108,7 @@ Vec4 Cone::normalAt(const Vec4 &point, const Vec2 &uv)
   return normalAt(point);
 }
 
-std::pair<Vec4, Vec4> Cone::bounds()
+std::pair<Vec4, Vec4> Cone::bounds() const
 {
   return std::pair<Vec4, Vec4>(Vec4(-1., this->minimum, -1., 1.), Vec4(1., this->maximum, 1., 1.));
 }

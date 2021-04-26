@@ -25,7 +25,7 @@ private:
   virtual Vec4 normalAt(const Vec4 &point) override;
   virtual Vec4 normalAt(const Vec4 &point, const Vec2 &uv) override;
   virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
-  virtual std::pair<Vec4, Vec4> bounds() override;
+  virtual std::pair<Vec4, Vec4> bounds() const override;
   virtual std::string type() override;
 
 public:

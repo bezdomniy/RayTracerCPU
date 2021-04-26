@@ -21,7 +21,7 @@ private:
   template <class Archive>
   void serialize(Archive &archive)
   {
-    archive(parent, transform, inverseTransform, material);
+    archive(parent, inverseTransform, material);
   }
 
 public:
@@ -32,22 +32,28 @@ public:
   virtual Vec4 normalAt(const Vec4 &point) = 0;
   virtual Vec4 normalAt(const Vec4 &point, const Vec2 &uv) = 0;
   virtual std::string type() = 0;
-  virtual std::pair<Vec4, Vec4> bounds() = 0;
 
-  Mat4 transform;
+  //    TODO change to return const reference (const std::pair & )
+  virtual std::pair<Vec4, Vec4> bounds() const = 0;
+
+  // TODO: maybe make these into unique_ptrs so as you don't waste memory for shapes that dont use them
+  // glm::dmat4 transform;
   Mat4 inverseTransform;
-
-  Vec4 boundsCentroid();
   std::shared_ptr<Shape> parent = nullptr;
   std::shared_ptr<Material> material;
+
+  Vec4 boundsCentroid() const;
+
   // bool materialSet = false; //TODO get rid of bool
 
   // std::pair<Vec4,Vec4> boundingMinMax;
 
+  std::shared_ptr<Material> &getMaterial();
   virtual void setMaterial(std::shared_ptr<Material> &mat);
   Vec3 patternAt(const Vec4 &point);
-  void multiplyTransform(Mat4 &transform);
-  void calculateInverseTranform();
+  // void multiplyTransform(glm::dmat4 &transform);
+  void calculateInverseTranform(Mat4 &transform);
+  void calculateInverseTranform(std::vector<Mat4> &transforms);
 
   Vec4 worldToObject(const Vec4 &point);
   Vec4 normalToWorld(const Vec4 &normal);

@@ -22,6 +22,7 @@
 #include <limits>
 #include <memory>
 
+// TODO: figure out way to get rid of templates and just include Shape
 // class Shape;
 
 namespace Geometry
@@ -94,7 +95,7 @@ namespace Geometry
         if (objects.empty())
           comps.n1 = 1.0;
         else
-          comps.n1 = objects.back()->material->refractiveIndex;
+          comps.n1 = objects.back()->getMaterial()->refractiveIndex;
       }
 
       typename std::vector<T *>::iterator position =
@@ -109,7 +110,7 @@ namespace Geometry
         if (objects.empty())
           comps.n2 = 1.0;
         else
-          comps.n2 = objects.back()->material->refractiveIndex;
+          comps.n2 = objects.back()->getMaterial()->refractiveIndex;
         break;
       }
     }
@@ -159,6 +160,7 @@ namespace Geometry
   template <typename T>
   Intersection<T> *hit(std::vector<Intersection<T>> &intersections)
   {
+    std::sort(intersections.begin(), intersections.end(), Geometry::compareIntersection<T>);
     // int retIndex = -1;
 
     for (auto &intersection : intersections)
@@ -208,31 +210,20 @@ namespace Geometry
     return r0 + (1.0 - r0) * std::pow(1.0 - cos, 5);
   }
 
-  template <typename T>
-  std::pair<Float, Float> checkAxis(Float origin, Float direction, Float lowerBound = -1.0, Float upperBound = 1.0)
+  struct BucketInfo
   {
-    Float tmin_numerator = lowerBound - origin;
-    Float tmax_numerator = upperBound - origin;
+    int count = 0;
+    std::pair<Vec4, Vec4> bounds;
+  };
 
-    std::pair<Float, Float> ret;
+  Vec4 offset(const Vec4 &p, const std::pair<Vec4, Vec4> &bounds);
 
-    if (std::abs(direction) >= EPSILON)
-    {
-      ret.first = tmin_numerator / direction;
-      ret.second = tmax_numerator / direction;
-    }
-    else
-    {
-      ret.first = tmin_numerator * std::numeric_limits<Float>::infinity();
-      ret.second = tmax_numerator * std::numeric_limits<Float>::infinity();
-    }
-    if (ret.first > ret.second)
-      std::swap(ret.first, ret.second);
+  Vec4 diagonal(const std::pair<Vec4, Vec4> &bounds);
 
-    return ret;
-  }
+  Float surfaceArea(const std::pair<Vec4, Vec4> &bounds);
 
-  // inline Float vecDot(const Vec4 &x, const Vec4 &y);
-  // Vec4 matVecMult(const Mat4 &m, const Vec4 &vec);
+  uint32_t nextPowerOfTwo(uint32_t v);
+
+  uint32_t log2int(uint32_t val);
 
 } // namespace Geometry

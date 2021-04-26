@@ -2,7 +2,7 @@
 
 Shape::Shape()
 {
-  this->transform = Mat4(1.0);
+  // this->transform = glm::dmat4(1.0);
   this->inverseTransform = Mat4(1.0);
 }
 
@@ -22,26 +22,40 @@ void Shape::setMaterial(std::shared_ptr<Material> &mat)
   // this->materialSet = true;
 }
 
+std::shared_ptr<Material> &Shape::getMaterial()
+{
+  if (parent && !material)
+    return parent->getMaterial();
+  return material;
+}
+
 Vec3 Shape::patternAt(const Vec4 &point)
 {
   // Mat4 shapeTransformInverse(glm::affineInverse(this->transform));
   Vec4 objectPoint = this->inverseTransform * point;
 
-  Mat4 patternTransformInverse(glm::affineInverse(this->material->pattern->transform));
+  Mat4 patternTransformInverse(glm::affineInverse(getMaterial()->pattern->transform));
   Vec4 patternPoint = patternTransformInverse * objectPoint;
 
-  return this->material->pattern->patternAt(patternPoint);
+  return getMaterial()->pattern->patternAt(patternPoint);
 }
 
-void Shape::multiplyTransform(Mat4 &transform)
+void Shape::calculateInverseTranform(Mat4 &transform)
 {
-  this->transform = transform * this->transform;
-  // this->inverseTransform = glm::affineInverse(this->transform);
+  Mat4 currentTransform = glm::affineInverse(this->inverseTransform);
+  this->inverseTransform = glm::affineInverse(transform * currentTransform);
 }
 
-void Shape::calculateInverseTranform()
+void Shape::calculateInverseTranform(std::vector<Mat4> &transforms)
 {
-  this->inverseTransform = glm::affineInverse(this->transform);
+  Mat4 currentTransform = glm::affineInverse(this->inverseTransform);
+
+  for (auto &mat : transforms)
+  {
+    currentTransform = mat * currentTransform;
+  }
+
+  this->inverseTransform = glm::affineInverse(currentTransform);
 }
 
 Vec4 Shape::worldToObject(const Vec4 &point)
@@ -70,9 +84,11 @@ Vec4 Shape::normalToWorld(const Vec4 &normal)
   return ret;
 }
 
-Vec4 Shape::boundsCentroid()
+Vec4 Shape::boundsCentroid() const
 {
-  return (Float).5 * this->bounds().first + (Float).5 * this->bounds().second;
+  const std::pair<Vec4, Vec4> b = bounds();
+  Float half = 0.5;
+  return half * b.first + half * b.second;
 }
 
 Shape::~Shape()

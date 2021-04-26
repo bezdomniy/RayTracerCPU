@@ -17,7 +17,7 @@ Vec4 PointLight::normalAt(const Vec4 &point, const Vec2 &uv)
 
 void PointLight::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) { return; }
 
-std::pair<Vec4, Vec4> PointLight::bounds()
+std::pair<Vec4, Vec4> PointLight::bounds() const
 {
   return std::pair<Vec4, Vec4>();
 }

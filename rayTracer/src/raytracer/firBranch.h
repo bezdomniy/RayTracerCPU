@@ -5,7 +5,6 @@
 #include <random>
 
 #include <vector>
-#include "model.h"
 
 namespace FirBranch
 {

@@ -32,7 +32,7 @@ Vec4 Plane::normalAt(const Vec4 &point, const Vec2 &uv)
     return normalAt(point);
 }
 
-std::pair<Vec4, Vec4> Plane::bounds()
+std::pair<Vec4, Vec4> Plane::bounds() const
 {
     return std::pair<Vec4, Vec4>(Vec4(-std::numeric_limits<Float>::infinity(), 0., -std::numeric_limits<Float>::infinity(), 1.), Vec4(std::numeric_limits<Float>::infinity(), 0., std::numeric_limits<Float>::infinity(), 1.));
 }

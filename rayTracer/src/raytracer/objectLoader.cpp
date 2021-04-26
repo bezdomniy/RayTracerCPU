@@ -147,11 +147,9 @@ std::shared_ptr<Shape> ObjectLoader::shapeFromDefinition(ShapeDefinition &shapeD
     if (!std::__fs::filesystem::exists(shapeDefinition.filePath))
       downloadAsset(shapeDefinition.filePath, shapeDefinition.filePath);
 #endif
-
-    Model model;
-    model.build(shapeDefinition.filePath, true);
-
-    ret = model.mesh;
+    std::shared_ptr<Model> model = std::make_shared<Model>();
+    model->build(shapeDefinition.filePath);
+    ret = model;
   }
   else if (shapeDefinition.shapeType == "camera")
   {
@@ -352,6 +350,8 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
   else
     newMaterial = shapePtr->material;
 
+  std::vector<Mat4> transforms;
+
   for (auto &value : definition.valueOrder)
   {
     if (value == "color")
@@ -403,40 +403,46 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
     {
       Mat4 translation =
           glm::translate(Mat4(1.0), definition.values[value].vector);
-      shapePtr->multiplyTransform(translation);
+      transforms.push_back(translation);
+      // shapePtr->multiplyTransform(translation);
     }
     else if (value.substr(0, 5) == "scale")
     {
       Mat4 scale =
           glm::scale(Mat4(1.0), definition.values[value].vector);
-      shapePtr->multiplyTransform(scale);
+      transforms.push_back(scale);
+      // shapePtr->multiplyTransform(scale);
     }
     else if (value.substr(0, 8) == "rotate-x")
     {
       Mat4 rotation =
           glm::rotate(Mat4(1.0), definition.values[value].scalar,
                       Vec3(1.0, 0.0, 0.0));
-      shapePtr->multiplyTransform(rotation);
+      transforms.push_back(rotation);
+      // shapePtr->multiplyTransform(rotation);
     }
     else if (value.substr(0, 8) == "rotate-y")
     {
       Mat4 rotation =
           glm::rotate(Mat4(1.0), definition.values[value].scalar,
                       Vec3(0.0, 1.0, 0.0));
-      shapePtr->multiplyTransform(rotation);
+      transforms.push_back(rotation);
+      // shapePtr->multiplyTransform(rotation);
     }
     else if (value.substr(0, 8) == "rotate-z")
     {
       Mat4 rotation =
           glm::rotate(Mat4(1.0), definition.values[value].scalar,
                       Vec3(0.0, 0.0, 1.0));
-      shapePtr->multiplyTransform(rotation);
+      transforms.push_back(rotation);
+      // shapePtr->multiplyTransform(rotation);
     }
     else
     {
       throw std::invalid_argument("invalid operator in value statement");
     }
   }
+
   if (definition.pattern)
   {
     newMaterial->setPattern(definition.pattern);
@@ -451,7 +457,7 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
     //   shapePtr->material = newMaterial;
   }
 
-  shapePtr->calculateInverseTranform();
+  shapePtr->calculateInverseTranform(transforms);
 }
 
 // TODO: add patterns
