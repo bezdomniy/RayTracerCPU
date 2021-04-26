@@ -21,7 +21,7 @@ Cylinder::Cylinder(const Cylinder &c2)
   this->minimum = c2.minimum;
   this->capped = c2.capped;
   this->inverseTransform = c2.inverseTransform;
-  this->transform = c2.transform;
+  // this->transform = c2.transform;
   this->parent = c2.parent;
 }
 

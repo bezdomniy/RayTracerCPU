@@ -90,7 +90,7 @@ Group::Group(const Group &group)
     nextShape->parent = child->parent;
     nextShape->material = child->material;
     // nextShape->materialSet = child->materialSet;
-    nextShape->transform = child->transform;
+    // nextShape->transform = child->transform;
     nextShape->inverseTransform = child->inverseTransform;
 
     this->children.push_back(nextShape);
@@ -98,7 +98,7 @@ Group::Group(const Group &group)
   this->parent = group.parent;
   this->material = group.material;
   // this->materialSet = group.materialSet;
-  this->transform = group.transform;
+  // this->transform = group.transform;
   this->inverseTransform = group.inverseTransform;
 
   this->boundingBox = group.boundingBox;
@@ -209,9 +209,11 @@ void Group::updateBoundingBox(std::shared_ptr<Shape> &shape)
   points.at(6) = glm::dvec4(bounds.second.x, bounds.second.y, bounds.first.z, 1.);
   points.at(7) = bounds.second;
 
+  glm::dmat4 transform = glm::affineInverse(shape->inverseTransform);
+
   for (auto point : points)
   {
-    glm::dvec4 transformedPoint(shape->transform * point);
+    glm::dvec4 transformedPoint(transform * point);
     this->boundingBox.first = glm::min(this->boundingBox.first, transformedPoint);
     this->boundingBox.second = glm::max(this->boundingBox.second, transformedPoint);
   }

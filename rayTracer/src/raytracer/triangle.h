@@ -32,10 +32,10 @@ public:
 
 protected:
     // TODO: merge normal and n1 in smooth triangle to save space
-    glm::dvec3 n1;
     glm::dvec3 p1;
     glm::dvec3 p2;
     glm::dvec3 p3;
+    glm::dvec3 n1;
     // // TODO: remove e1 and e2
     // glm::dvec3 e1;
     // glm::dvec3 e2;

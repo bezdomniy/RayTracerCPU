@@ -6,9 +6,9 @@ Renderer::Renderer(std::shared_ptr<Camera> &c)
 {
   this->camera = c;
   this->canvas = Canvas(this->camera->hsize, this->camera->vsize);
-    
-//    this->t = std::thread::hardware_concurrency();
-//    this->threads.reserve(this->t);
+
+  //    this->t = std::thread::hardware_concurrency();
+  //    this->threads.reserve(this->t);
 }
 
 #ifdef __EMSCRIPTEN__ //TODO change to if emscripten AND if use_threaded
@@ -57,14 +57,13 @@ void Renderer::render(World &world)
       q.enqueue(std::make_pair(x, y));
     }
   }
-    
-    size_t t =std::thread::hardware_concurrency();
-    std::vector<std::thread> threads;
-    threads.reserve(t);
-      
 
-//  size_t t = std::thread::hardware_concurrency();
-//  std::thread threads[t];
+  size_t t = std::thread::hardware_concurrency();
+  std::vector<std::thread> threads;
+  threads.reserve(t);
+
+  //  size_t t = std::thread::hardware_concurrency();
+  //  std::thread threads[t];
   for (int i = 0; i < t; ++i)
   {
     threads.push_back(std::thread([&]() {
@@ -77,15 +76,15 @@ void Renderer::render(World &world)
   }
 
   // Wait for all threads
-//  for (int i = 0; i < t; ++i)
-//  {
-//    threads[i].join();
-//  }
-    while (!threads.empty())
-    {
-      threads.back().join();
-        threads.pop_back();
-    }
+  //  for (int i = 0; i < t; ++i)
+  //  {
+  //    threads[i].join();
+  //  }
+  while (!threads.empty())
+  {
+    threads.back().join();
+    threads.pop_back();
+  }
 
   std::pair<int, int> pixel;
   while (q.try_dequeue(pixel))
@@ -243,7 +242,6 @@ glm::dvec3 Renderer::rayColourAt(Ray &ray, World &world, std::vector<Geometry::I
 
   if ((hit = Geometry::hit<Shape>(intersections)))
   {
-    // TODO: Geometry::getRefractiveIndexFromTo no longer working because this is now a copy, so pointer equality breaks!
     Geometry::IntersectionParameters comps = Geometry::getIntersectionParameters<Shape>(*hit, ray.origin, ray.direction, intersections);
     glm::dvec3 hitColour = shadeHit(hit, comps, world, intersections, remaining);
     return hitColour;

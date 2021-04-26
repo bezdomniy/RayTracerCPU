@@ -14,8 +14,8 @@ std::shared_ptr<Group> FirBranch::build()
     glm::dmat4 scale =
         glm::scale(glm::dmat4(1.0), glm::dvec3(radius, 1.0, radius));
 
-    branch->multiplyTransform(scale);
-    branch->calculateInverseTranform();
+    // branch->multiplyTransform(scale);
+    branch->calculateInverseTranform(scale);
 
     std::shared_ptr<Material> branchMaterial = std::make_shared<Material>();
     branchMaterial->colour = glm::dvec3(0.5, 0.35, 0.26);

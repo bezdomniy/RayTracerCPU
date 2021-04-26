@@ -350,6 +350,8 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
   else
     newMaterial = shapePtr->material;
 
+  std::vector<glm::dmat4> transforms;
+
   for (auto &value : definition.valueOrder)
   {
     if (value == "color")
@@ -401,40 +403,46 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
     {
       glm::dmat4 translation =
           glm::translate(glm::dmat4(1.0), definition.values[value].vector);
-      shapePtr->multiplyTransform(translation);
+      transforms.push_back(translation);
+      // shapePtr->multiplyTransform(translation);
     }
     else if (value.substr(0, 5) == "scale")
     {
       glm::dmat4 scale =
           glm::scale(glm::dmat4(1.0), definition.values[value].vector);
-      shapePtr->multiplyTransform(scale);
+      transforms.push_back(scale);
+      // shapePtr->multiplyTransform(scale);
     }
     else if (value.substr(0, 8) == "rotate-x")
     {
       glm::dmat4 rotation =
           glm::rotate(glm::dmat4(1.0), definition.values[value].scalar,
                       glm::dvec3(1.0, 0.0, 0.0));
-      shapePtr->multiplyTransform(rotation);
+      transforms.push_back(rotation);
+      // shapePtr->multiplyTransform(rotation);
     }
     else if (value.substr(0, 8) == "rotate-y")
     {
       glm::dmat4 rotation =
           glm::rotate(glm::dmat4(1.0), definition.values[value].scalar,
                       glm::dvec3(0.0, 1.0, 0.0));
-      shapePtr->multiplyTransform(rotation);
+      transforms.push_back(rotation);
+      // shapePtr->multiplyTransform(rotation);
     }
     else if (value.substr(0, 8) == "rotate-z")
     {
       glm::dmat4 rotation =
           glm::rotate(glm::dmat4(1.0), definition.values[value].scalar,
                       glm::dvec3(0.0, 0.0, 1.0));
-      shapePtr->multiplyTransform(rotation);
+      transforms.push_back(rotation);
+      // shapePtr->multiplyTransform(rotation);
     }
     else
     {
       throw std::invalid_argument("invalid operator in value statement");
     }
   }
+
   if (definition.pattern)
   {
     newMaterial->setPattern(definition.pattern);
@@ -449,7 +457,7 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
     //   shapePtr->material = newMaterial;
   }
 
-  shapePtr->calculateInverseTranform();
+  shapePtr->calculateInverseTranform(transforms);
 }
 
 // TODO: add patterns

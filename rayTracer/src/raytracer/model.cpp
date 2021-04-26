@@ -58,7 +58,7 @@ Model::Model(const Model &model)
 
 	this->parent = model.parent;
 	this->material = model.material;
-	this->transform = model.transform;
+	// this->transform = model.transform;
 	this->inverseTransform = model.inverseTransform;
 }
 

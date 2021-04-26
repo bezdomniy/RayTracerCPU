@@ -2,7 +2,7 @@
 
 Shape::Shape()
 {
-  this->transform = glm::dmat4(1.0);
+  // this->transform = glm::dmat4(1.0);
   this->inverseTransform = glm::dmat4(1.0);
 }
 
@@ -40,15 +40,28 @@ glm::dvec3 Shape::patternAt(const glm::dvec4 &point)
   return getMaterial()->pattern->patternAt(patternPoint);
 }
 
-void Shape::multiplyTransform(glm::dmat4 &transform)
+// void Shape::multiplyTransform(glm::dmat4 &transform)
+// {
+//   // this->transform = transform * this->transform;
+//   // this->inverseTransform = glm::affineInverse(this->transform);
+// }
+
+void Shape::calculateInverseTranform(glm::dmat4 &transform)
 {
-  this->transform = transform * this->transform;
-  // this->inverseTransform = glm::affineInverse(this->transform);
+  glm::dmat4 currentTransform = glm::affineInverse(this->inverseTransform);
+  this->inverseTransform = glm::affineInverse(transform * currentTransform);
 }
 
-void Shape::calculateInverseTranform()
+void Shape::calculateInverseTranform(std::vector<glm::dmat4> &transforms)
 {
-  this->inverseTransform = glm::affineInverse(this->transform);
+  glm::dmat4 currentTransform = glm::affineInverse(this->inverseTransform);
+
+  for (auto &mat : transforms)
+  {
+    currentTransform = mat * currentTransform;
+  }
+
+  this->inverseTransform = glm::affineInverse(currentTransform);
 }
 
 glm::dvec4 Shape::worldToObject(const glm::dvec4 &point)

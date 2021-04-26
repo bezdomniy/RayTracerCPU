@@ -16,9 +16,9 @@ Camera::Camera(glm::dvec4 position, glm::dvec4 centre, glm::dvec4 up, int hsize,
 
 void Camera::updateTransform()
 {
-  this->transform = glm::lookAt(glm::dvec3(position),
-                                glm::dvec3(this->centre), glm::dvec3(this->up));
-  this->inverseTransform = glm::affineInverse(this->transform);
+  glm::dmat4 transform = glm::lookAt(glm::dvec3(position),
+                                     glm::dvec3(this->centre), glm::dvec3(this->up));
+  this->inverseTransform = glm::affineInverse(transform);
 }
 
 Camera::~Camera() {}
