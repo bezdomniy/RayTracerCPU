@@ -8,17 +8,17 @@
 // #include "mathfu/matrix.h"
 #include <glm/glm.hpp>
 
-typedef float Float;
+typedef double Float;
 
 // typedef mathfu::Matrix<Float, 4> Mat4;
 // typedef mathfu::Vector<Float, 4> Vec4;
 // typedef mathfu::Vector<Float, 3> Vec3;
 // typedef mathfu::Vector<Float, 2> Vec2;
 
-typedef glm::mat4 Mat4;
-typedef glm::vec4 Vec4;
-typedef glm::vec3 Vec3;
-typedef glm::vec2 Vec2;
+typedef glm::dmat4 Mat4;
+typedef glm::dvec4 Vec4;
+typedef glm::dvec3 Vec3;
+typedef glm::dvec2 Vec2;
 
 // glm::rotate
 // glm::lookAt
