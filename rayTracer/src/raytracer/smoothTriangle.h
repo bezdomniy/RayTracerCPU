@@ -9,7 +9,7 @@ private:
     template <class Archive>
     void serialize(Archive &archive)
     {
-        archive(cereal::base_class<Triangle>(this), n1, n2, n3);
+        archive(cereal::base_class<Triangle>(this), n2, n3);
     }
 
     // template <class Archive>

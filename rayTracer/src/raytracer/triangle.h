@@ -13,7 +13,7 @@ private:
     template <class Archive>
     void serialize(Archive &archive)
     {
-        archive(cereal::virtual_base_class<Shape>(this), p1, p2, p3, e1, e2, normal, boundsv);
+        archive(cereal::virtual_base_class<Shape>(this), p1, p2, p3, n1, boundsv);
     }
 
 public:
@@ -32,13 +32,13 @@ public:
 
 protected:
     // TODO: merge normal and n1 in smooth triangle to save space
-    glm::dvec4 normal;
+    glm::dvec3 n1;
     glm::dvec3 p1;
     glm::dvec3 p2;
     glm::dvec3 p3;
-    // TODO: remove e1 and e2
-    glm::dvec3 e1;
-    glm::dvec3 e2;
+    // // TODO: remove e1 and e2
+    // glm::dvec3 e1;
+    // glm::dvec3 e2;
 };
 
 CEREAL_REGISTER_TYPE(Triangle);

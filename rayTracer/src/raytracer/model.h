@@ -13,9 +13,47 @@
 #include "cereal/types/utility.hpp"
 
 typedef std::pair<glm::dvec4, glm::dvec4> NodeTLAS;
+
 typedef SmoothTriangle NodeBLAS;
 
-class Model : public Shape, public std::enable_shared_from_this<Model>
+// struct NodeBLAS
+// {
+// 	glm::dvec4 p1;
+// 	glm::dvec4 p2;
+// 	glm::dvec4 p3;
+// 	glm::dvec4 n1;
+// 	glm::dvec4 n2;
+// 	glm::dvec4 n3;
+
+// 	void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections)
+// 	{
+// 		glm::dvec3 e1 = p2 - p1;
+// 		glm::dvec3 e2 = p3 - p1;
+
+// 		glm::dvec3 dirCrossE2 = glm::cross(glm::dvec3(ray.direction), e2);
+// 		double det = glm::dot(e1, dirCrossE2);
+// 		if (std::abs(det) < Geometry::EPSILON)
+// 			return;
+
+// 		double f = 1.0 / det;
+// 		glm::dvec3 p1ToOrigin = ray.origin - p1;
+// 		double u = f * glm::dot(p1ToOrigin, dirCrossE2);
+// 		if (u < 0 || u > 1)
+// 			return;
+
+// 		glm::dvec3 originCrossE1 = glm::cross(p1ToOrigin, e1);
+// 		double v = f * glm::dot(glm::dvec3(ray.direction), originCrossE1);
+// 		if (v < 0 || (u + v) > 1)
+// 			return;
+
+// 		double t = f * glm::dot(e2, originCrossE1);
+
+// 		intersections.push_back(Geometry::Intersection<Shape>{t, this, glm::dvec2(u, v)});
+// 	}
+// };
+
+class Model : public Shape,
+			  public std::enable_shared_from_this<Model>
 {
 private:
 	friend class cereal::access;

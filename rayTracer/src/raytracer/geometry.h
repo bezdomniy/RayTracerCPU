@@ -160,6 +160,7 @@ namespace Geometry
   template <typename T>
   Intersection<T> *hit(std::vector<Intersection<T>> &intersections)
   {
+    std::sort(intersections.begin(), intersections.end(), Geometry::compareIntersection<T>);
     // int retIndex = -1;
 
     for (auto &intersection : intersections)
