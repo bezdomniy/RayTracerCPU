@@ -56,7 +56,7 @@ glm::dvec4 Cube::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
     return normalAt(point);
 }
 
-std::pair<glm::dvec4, glm::dvec4> Cube::bounds()
+std::pair<glm::dvec4, glm::dvec4> Cube::bounds() const
 {
     return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(-1., -1., -1., 1.), glm::dvec4(1., 1., 1., 1.));
 }

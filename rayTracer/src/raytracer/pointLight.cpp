@@ -17,7 +17,7 @@ glm::dvec4 PointLight::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
 
 void PointLight::intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) { return; }
 
-std::pair<glm::dvec4, glm::dvec4> PointLight::bounds()
+std::pair<glm::dvec4, glm::dvec4> PointLight::bounds() const
 {
   return std::pair<glm::dvec4, glm::dvec4>();
 }

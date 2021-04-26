@@ -32,7 +32,7 @@ glm::dvec4 Plane::normalAt(const glm::dvec4 &point, const glm::dvec2 &uv)
     return normalAt(point);
 }
 
-std::pair<glm::dvec4, glm::dvec4> Plane::bounds()
+std::pair<glm::dvec4, glm::dvec4> Plane::bounds() const
 {
     return std::pair<glm::dvec4, glm::dvec4>(glm::dvec4(-std::numeric_limits<double>::infinity(), 0., -std::numeric_limits<double>::infinity(), 1.), glm::dvec4(std::numeric_limits<double>::infinity(), 0., std::numeric_limits<double>::infinity(), 1.));
 }

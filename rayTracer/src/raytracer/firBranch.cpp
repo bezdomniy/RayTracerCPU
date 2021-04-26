@@ -14,8 +14,8 @@ std::shared_ptr<Group> FirBranch::build()
     glm::dmat4 scale =
         glm::scale(glm::dmat4(1.0), glm::dvec3(radius, 1.0, radius));
 
-    branch->multiplyTransform(scale);
-    branch->calculateInverseTranform();
+    // branch->multiplyTransform(scale);
+    branch->calculateInverseTranform(scale);
 
     std::shared_ptr<Material> branchMaterial = std::make_shared<Material>();
     branchMaterial->colour = glm::dvec3(0.5, 0.35, 0.26);
@@ -70,7 +70,8 @@ std::shared_ptr<Group> FirBranch::build()
         }
     }
 
-    std::shared_ptr<Group> root = Model::buildBoundingVolumeHierarchy(shapes);
+    std::shared_ptr<Group> root = std::make_shared<Group>();
+    root->build(shapes, true);
     std::shared_ptr<Material> rootMaterial = std::make_shared<Material>();
     root->setMaterial(rootMaterial);
 

@@ -174,9 +174,10 @@ std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> rayTracerInOneWeekend
         glm::dmat4 translate =
             glm::translate(glm::dmat4(1.0), center);
 
-        sphere->multiplyTransform(scale);
-        sphere->multiplyTransform(translate);
-        sphere->calculateInverseTranform();
+        std::vector<glm::dmat4> transforms{scale, translate};
+        // sphere->multiplyTransform(scale);
+        // sphere->multiplyTransform(translate);
+        sphere->calculateInverseTranform(transforms);
 
         // world->addShape(sphere);
         shapes.push_back(sphere);
@@ -198,8 +199,8 @@ std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> rayTracerInOneWeekend
   sphere1->setMaterial(sphereMaterialRefractive);
   glm::dmat4 translate1 =
       glm::translate(glm::dmat4(1.0), glm::dvec3(0., 1., 0.));
-  sphere1->multiplyTransform(translate1);
-  sphere1->calculateInverseTranform();
+  // sphere1->multiplyTransform(translate1);
+  sphere1->calculateInverseTranform(translate1);
   // world->addShape(sphere1);
   shapes.push_back(sphere1);
 
@@ -207,8 +208,8 @@ std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> rayTracerInOneWeekend
   sphere2->setMaterial(sphereMaterialBase);
   glm::dmat4 translate2 =
       glm::translate(glm::dmat4(1.0), glm::dvec3(-4., 1., 0.));
-  sphere2->multiplyTransform(translate2);
-  sphere2->calculateInverseTranform();
+  // sphere2->multiplyTransform(translate2);
+  sphere2->calculateInverseTranform(translate2);
   // world->addShape(sphere2);
   shapes.push_back(sphere2);
 
@@ -216,15 +217,17 @@ std::pair<std::shared_ptr<Camera>, std::shared_ptr<World>> rayTracerInOneWeekend
   sphere3->setMaterial(sphereMaterial);
   glm::dmat4 translate3 =
       glm::translate(glm::dmat4(1.0), glm::dvec3(4., 1., 0.));
-  sphere3->multiplyTransform(translate3);
-  sphere3->calculateInverseTranform();
+  // sphere3->multiplyTransform(translate3);
+  sphere3->calculateInverseTranform(translate3);
   // world->addShape(sphere3);
   shapes.push_back(sphere3);
 
-  mesh = Model::buildBoundingVolumeHierarchy(shapes);
+  mesh = std::make_shared<Group>();
+  mesh->build(shapes, true);
 
   // TODO: this is a hack - top level group in bvh should not need material, but does otherwise you get seg fault. fix this
-  std::shared_ptr<Material> material = std::make_shared<Material>();
+  std::shared_ptr<Material>
+      material = std::make_shared<Material>();
   material->colour = glm::dvec3(0.8, 0.8, 0.8);
   mesh->setMaterial(material);
 

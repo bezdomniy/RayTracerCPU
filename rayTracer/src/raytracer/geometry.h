@@ -22,6 +22,7 @@
 #include <limits>
 #include <memory>
 
+// TODO: figure out way to get rid of templates and just include Shape
 // class Shape;
 
 namespace Geometry
@@ -53,8 +54,8 @@ namespace Geometry
     double t;
     T *shapePtr;
     glm::dvec2 uv;
-//    unsigned int id;
-//    IntersectionParameters *comps;
+    //    unsigned int id;
+    //    IntersectionParameters *comps;
 
     // Intersection(double t, T *shapePtr, glm::dvec2 uv)
     // {
@@ -92,9 +93,9 @@ namespace Geometry
       if (&intersection == &hit)
       {
         if (objects.empty())
-            comps.n1 = 1.0;
+          comps.n1 = 1.0;
         else
-            comps.n1 = objects.back()->material->refractiveIndex;
+          comps.n1 = objects.back()->getMaterial()->refractiveIndex;
       }
 
       typename std::vector<T *>::iterator position =
@@ -109,7 +110,7 @@ namespace Geometry
         if (objects.empty())
           comps.n2 = 1.0;
         else
-            comps.n2 = objects.back()->material->refractiveIndex;
+          comps.n2 = objects.back()->getMaterial()->refractiveIndex;
         break;
       }
     }
@@ -117,37 +118,37 @@ namespace Geometry
 
   template <typename T>
   IntersectionParameters getIntersectionParameters(Intersection<T> &intersection, glm::dvec4 &rayOrigin, glm::dvec4 &rayDirection,
-                                 std::vector<Intersection<T>> &intersections)
+                                                   std::vector<Intersection<T>> &intersections)
   {
     // intersection.comps = std::make_unique<IntersectionParameters>();
-      IntersectionParameters comps = {};
+    IntersectionParameters comps = {};
     comps.point =
         rayOrigin + glm::normalize(rayDirection) * intersection.t;
     // TODO check that uv only null have using none-uv normalAt version
     comps.normalv =
         intersection.shapePtr->normalAt(comps.point, intersection.uv);
-      comps.eyev = -rayDirection;
+    comps.eyev = -rayDirection;
 
     if (glm::dot(comps.normalv, comps.eyev) < 0)
     {
       // intersection.comps->inside = true;
-        comps.normalv = -comps.normalv;
+      comps.normalv = -comps.normalv;
     }
     // else
     // {
     //   intersection.comps->inside = false;
     // }
 
-      comps.reflectv =
+    comps.reflectv =
         glm::reflect(rayDirection, comps.normalv);
-      comps.overPoint =
-      comps.point + comps.normalv * EPSILON;
-      comps.underPoint =
-      comps.point - comps.normalv * EPSILON;
+    comps.overPoint =
+        comps.point + comps.normalv * EPSILON;
+    comps.underPoint =
+        comps.point - comps.normalv * EPSILON;
 
     getRefractiveIndexFromTo<T>(intersections, intersection, comps);
-      
-      return comps;
+
+    return comps;
   }
 
   template <typename T>
@@ -159,6 +160,7 @@ namespace Geometry
   template <typename T>
   Intersection<T> *hit(std::vector<Intersection<T>> &intersections)
   {
+    std::sort(intersections.begin(), intersections.end(), Geometry::compareIntersection<T>);
     // int retIndex = -1;
 
     for (auto &intersection : intersections)
@@ -191,7 +193,7 @@ namespace Geometry
   }
 
   template <typename T>
-  double schlick(IntersectionParameters& comps)
+  double schlick(IntersectionParameters &comps)
   {
     double cos = glm::dot(comps.eyev, comps.normalv);
     if (comps.n1 > comps.n2)
@@ -208,31 +210,20 @@ namespace Geometry
     return r0 + (1.0 - r0) * std::pow(1.0 - cos, 5);
   }
 
-  template <typename T>
-  std::pair<double, double> checkAxis(double origin, double direction, double lowerBound = -1.0, double upperBound = 1.0)
+  struct BucketInfo
   {
-    double tmin_numerator = lowerBound - origin;
-    double tmax_numerator = upperBound - origin;
+    int count = 0;
+    std::pair<glm::dvec4, glm::dvec4> bounds;
+  };
 
-    std::pair<double, double> ret;
+  glm::dvec4 offset(const glm::dvec4 &p, const std::pair<glm::dvec4, glm::dvec4> &bounds);
 
-    if (std::abs(direction) >= EPSILON)
-    {
-      ret.first = tmin_numerator / direction;
-      ret.second = tmax_numerator / direction;
-    }
-    else
-    {
-      ret.first = tmin_numerator * std::numeric_limits<double>::infinity();
-      ret.second = tmax_numerator * std::numeric_limits<double>::infinity();
-    }
-    if (ret.first > ret.second)
-      std::swap(ret.first, ret.second);
+  glm::dvec4 diagonal(const std::pair<glm::dvec4, glm::dvec4> &bounds);
 
-    return ret;
-  }
+  double surfaceArea(const std::pair<glm::dvec4, glm::dvec4> &bounds);
 
-  // inline double vecDot(const glm::dvec4 &x, const glm::dvec4 &y);
-  // glm::dvec4 matVecMult(const glm::dmat4 &m, const glm::dvec4 &vec);
+  uint32_t nextPowerOfTwo(uint32_t v);
+
+  uint32_t log2int(uint32_t val);
 
 } // namespace Geometry

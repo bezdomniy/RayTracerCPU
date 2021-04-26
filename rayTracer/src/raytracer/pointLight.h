@@ -25,7 +25,7 @@ private:
   virtual glm::dvec4 normalAt(const glm::dvec4 &point) override;
   virtual glm::dvec4 normalAt(const glm::dvec4 &point, const glm::dvec2 &uv) override;
   virtual void intersectRay(Ray &ray, std::vector<Geometry::Intersection<Shape>> &intersections) override;
-  virtual std::pair<glm::dvec4, glm::dvec4> bounds() override;
+  virtual std::pair<glm::dvec4, glm::dvec4> bounds() const override;
   virtual std::string type() override;
 
 public:
