@@ -306,13 +306,13 @@ void Window::moveCamera(Float posChange, uint8_t axis)
 
 #ifndef __EMSCRIPTEN__
     Mat4 rotationX =
-        glm::rotate(Mat4(1.0), (Float)this->xRotation, Vec3(1.0, 0.0, 0.0));
+        rotate(Mat4(1.0), (Float)this->xRotation, Vec3(1.0, 0.0, 0.0));
 
     Mat4 rotationY =
-        glm::rotate(Mat4(1.0), (Float)this->yRotation, Vec3(0.0, 1.0, 0.0));
+        rotate(Mat4(1.0), (Float)this->yRotation, Vec3(0.0, 1.0, 0.0));
 
     // Mat4 rotationZ =
-    //     glm::rotate(Mat4(1.0), posChange,
+    //     rotate(Mat4(1.0), posChange,
     //                 Vec3(0.0, 0.0, 1.0));
 
     this->camera->position = rotationX * this->originalCameraPosition;
@@ -324,10 +324,10 @@ void Window::moveCamera(Float posChange, uint8_t axis)
 
     // // old from here - move to raytracer module
     // Mat4 rotationY =
-    //     glm::rotate(Mat4(1.0), posChange, axis);
+    //     rotate(Mat4(1.0), posChange, axis);
 
     // // Mat4 rotationZ =
-    // //     glm::rotate(Mat4(1.0), posChange,
+    // //     rotate(Mat4(1.0), posChange,
     // //                 Vec3(0.0, 0.0, 1.0));
 
     // this->camera->position = rotationY * this->camera->position;

@@ -1,3 +1,4 @@
+#pragma once
 // #define GLM_FORCE_INTRINSICS
 // #define GLM_FORCE_ALIGNED_GENTYPES
 // #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
@@ -7,6 +8,7 @@
 // #include "mathfu/vector.h"
 // #include "mathfu/matrix.h"
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 typedef double Float;
 
@@ -19,6 +21,18 @@ typedef glm::dmat4 Mat4;
 typedef glm::dvec4 Vec4;
 typedef glm::dvec3 Vec3;
 typedef glm::dvec2 Vec2;
+
+// template <typename T>
+// constexpr auto rotate = glm::rotate<T>;
+
+#define ALIAS_TEMPLATE_FUNCTION(highLevelF, lowLevelF)                                       \
+    template <typename... Args>                                                              \
+    inline auto highLevelF(Args &&...args)->decltype(lowLevelF(std::forward<Args>(args)...)) \
+    {                                                                                        \
+        return lowLevelF(std::forward<Args>(args)...);                                       \
+    }
+
+ALIAS_TEMPLATE_FUNCTION(rotate, glm::rotate);
 
 // glm::rotate
 // glm::lookAt

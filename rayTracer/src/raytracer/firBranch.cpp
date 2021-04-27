@@ -56,8 +56,8 @@ std::shared_ptr<Group> FirBranch::build()
             Vec3 p2(-ofs, yBase, ofs);
             Vec3 p3(0.0, yTip, needleLength);
 
-            Mat4 rotation = glm::rotate(Mat4(1.0), yAngle,
-                                              Vec3(0.0, 1.0, 0.0));
+            Mat4 rotation = rotate(Mat4(1.0), yAngle,
+                                   Vec3(0.0, 1.0, 0.0));
 
             p1 = Vec3(rotation * Vec4(p1, 1.0));
             p2 = Vec3(rotation * Vec4(p2, 1.0));

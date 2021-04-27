@@ -416,24 +416,24 @@ void ObjectLoader::assignDefinition(std::shared_ptr<Shape> &shapePtr,
     else if (value.substr(0, 8) == "rotate-x")
     {
       Mat4 rotation =
-          glm::rotate(Mat4(1.0), definition.values[value].scalar,
-                      Vec3(1.0, 0.0, 0.0));
+          rotate(Mat4(1.0), definition.values[value].scalar,
+                 Vec3(1.0, 0.0, 0.0));
       transforms.push_back(rotation);
       // shapePtr->multiplyTransform(rotation);
     }
     else if (value.substr(0, 8) == "rotate-y")
     {
       Mat4 rotation =
-          glm::rotate(Mat4(1.0), definition.values[value].scalar,
-                      Vec3(0.0, 1.0, 0.0));
+          rotate(Mat4(1.0), definition.values[value].scalar,
+                 Vec3(0.0, 1.0, 0.0));
       transforms.push_back(rotation);
       // shapePtr->multiplyTransform(rotation);
     }
     else if (value.substr(0, 8) == "rotate-z")
     {
       Mat4 rotation =
-          glm::rotate(Mat4(1.0), definition.values[value].scalar,
-                      Vec3(0.0, 0.0, 1.0));
+          rotate(Mat4(1.0), definition.values[value].scalar,
+                 Vec3(0.0, 0.0, 1.0));
       transforms.push_back(rotation);
       // shapePtr->multiplyTransform(rotation);
     }
@@ -761,22 +761,22 @@ void ObjectLoader::parsePattern(const YAML::Node &node,
         else if (transformValue[0].as<std::string>() == "rotate-x")
         {
           Mat4 rotation =
-              glm::rotate(Mat4(1.0), transformValue[1].as<Float>(),
-                          Vec3(1.0, 0.0, 0.0));
+              rotate(Mat4(1.0), transformValue[1].as<Float>(),
+                     Vec3(1.0, 0.0, 0.0));
           pattern->multiplyTransform(rotation);
         }
         else if (transformValue[0].as<std::string>() == "rotate-y")
         {
           Mat4 rotation =
-              glm::rotate(Mat4(1.0), transformValue[1].as<Float>(),
-                          Vec3(0.0, 1.0, 0.0));
+              rotate(Mat4(1.0), transformValue[1].as<Float>(),
+                     Vec3(0.0, 1.0, 0.0));
           pattern->multiplyTransform(rotation);
         }
         else if (transformValue[0].as<std::string>() == "rotate-z")
         {
           Mat4 rotation =
-              glm::rotate(Mat4(1.0), transformValue[1].as<Float>(),
-                          Vec3(0.0, 0.0, 1.0));
+              rotate(Mat4(1.0), transformValue[1].as<Float>(),
+                     Vec3(0.0, 0.0, 1.0));
           pattern->multiplyTransform(rotation);
         }
       }
